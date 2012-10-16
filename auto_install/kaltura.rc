@@ -1,0 +1,271 @@
+DIR_NAME=`dirname $0`
+USER_INI_PATH=$DIR_NAME/user_input.ini
+if [ -r "$USER_INI_PATH" ];then
+	. "$USER_INI_PATH"
+else
+	echo "Couldn't read $USER_INI_PATH, make sure its there :("
+	exit 1
+fi
+
+verify_user_input()
+{
+	for VAL in HTTPD_BIN PHP_BIN TIME_ZONE BASE_DIR KALT_VER PENTAHO_DIR PENTAHO_VER PENTAHO_URL COMMON_DEPS KALTURA_FULL_VIRTUAL_HOST_NAME ADMIN_CONSOLE_ADMIN_MAIL ADMIN_CONSOLE_PASSWORD DB1_HOST DB1_PORT DB1_NAME DB1_USER DB1_PASS KALT_USER KALT_GROUP; do
+		if [ -z "${!VAL}" ];then
+			echo "I need $VAL in user_input.ini"
+		fi
+	done
+}
+
+install_deps()
+{
+	yum -y install $COMMON_DEPS
+	echo "Do you plan on running MySQL DB on this instance? Note that it is not advised in cluster mode [Y/n]"
+	read YESNO
+	if [ "$YESNO" = 'Y' ];then
+		install_setup_mysql
+	fi
+}
+
+install_setup_mysql()
+{
+	yum -y install mysql-server
+	mysql_secure_installation
+	echo "Setting lower_case_table_names = 1 in /etc/my.cnf.."
+	sed -i 's@^\[mysqld\]$@[mysqld]\nlower_case_table_names = 1\n@' /etc/my.cnf
+	/etc/init.d/mysqld start
+	chkconfig mysqld on
+}
+
+setup_pentaho()
+{
+	rm -rf "$PENTAHO_DIR" $INSTALL_DIR/pdi-ce-$PENTAHO_VER-stable.tar.gz*
+	echo "Retrieving Pentaho.."
+	wget $PENTAHO_URL 
+	echo "Extracting Pentaho archive and copying to $PENTAHO_DIR/pdi.."
+
+	tar zxf pdi-ce-$PENTAHO_VER-stable.tar.gz
+	mkdir /usr/local/pentaho && mv data-integration $PENTAHO_DIR/pdi
+}
+
+create_kalt_user()
+{
+	echo "Creating the kaltura user.."
+	KALT_USER=kaltura
+	KALT_GROUP=kaltura
+	getent group $KALT_GROUP >/dev/null || groupadd -r $KALT_GROUP
+	getent passwd $KALT_USER >/dev/null || useradd -r  -g $KALT_GROUP -s /sbin/nologin -d $BASE_DIR -c "Kaltura" $KALT_USER
+}
+
+host_base_configure()
+{
+	echo "Dest host?"
+	read DEST_HOST
+	DEST_DIR="/tmp/$DEST_HOST"
+	APP_CONF_DIR="$DEST_DIR/app/configurations"
+	cd $KALT_PREFIX
+	find . -name tmp -o -name log -o -name cache -o -name logs -o -name entry|sed 's/^.\///g' >/tmp/excd_lst
+	rsync -avzr --exclude-from /tmp/excd_lst . $DEST_DIR
+	mkdir -p "$DEST_DIR"
+	CURR_NODE_NAME=`grep cdn_host $KALT_PREFIX/app/configurations/local.ini -m1|awk -F '=' '{print $2}'|sed 's/\s*//g'`
+	if [ -n "$CURR_NODE_NAME" ];then
+		echo "We believe in the hostname in your curr installation is: $CURR_NODE_NAME. Do you wish to alter? [Y/n]"
+		read ANS
+	else
+		echo "We could not find the hostname in your conf, would you like to input one manually? [Y/n]"
+		read ANS
+	fi
+	if [ "$ANS" = 'Y' ];then
+		echo "Input hostname: "
+		read CURR_NODE_NAME
+	fi
+	if [ -z "$CURR_NODE_NAME" ];then
+		echo "Come on guys, I need to know what host I should look for in the current config :("
+		exit 1
+	fi
+	for i in `find $KALT_PREFIX/app -name "*template*ini"`;do 
+		CONF=`echo $i|sed 's/_template//;s/.template//'` 
+		if [ -r $CONF ];then 
+			sed  "s@$CURR_NODE_NAME@$DEST_HOST@g" $CONF>  $APP_CONF_DIR/`basename $CONF`
+		fi
+	done
+	fix_hostname_values
+	cd $DEST_DIR
+}
+
+install_all_in_one()
+{
+	$DIRNAME/auto_inst_falcon_centos.sh	
+}
+	
+create_common_runme()
+{
+cat >>runme.sh << EOF
+echo "Creating the kaltura user.."
+getent group kaltura >/dev/null || groupadd -r kaltura
+getent passwd kaltura >/dev/null || useradd -r  -g kaltura -s /sbin/nologin -d $KALT_PREFIX -c "Kaltura" kaltura
+EOF
+echo "yum install -y $COMMON_DEPS" >>runme.sh
+
+}
+
+configure_apache()
+{
+	echo "Linking $KALT_PREFIX/app/configurations/apache/my_kaltura.conf to /etc/httpd/conf.d.."
+	rm /etc/httpd/conf.d/my_kaltura.conf ||true
+	ln -s $KALT_PREFIX/app/configurations/apache/my_kaltura.conf /etc/httpd/conf.d/
+	# make Apache run as the kaltura user:
+	echo "Configing Apache to run as the kaltura user.."
+	sed -i "s@^User@#User@" /etc/httpd/conf/httpd.conf
+	sed -i "s@^Group@#Group@" /etc/httpd/conf/httpd.conf
+	sed -i "1iUser $KALT_USER\nGroup $KALT_GROUP\n" /etc/httpd/conf.d/my_kaltura.conf
+	chown kaltura.kaltura /var/lib/php/session
+	/etc/init.d/httpd restart
+}
+
+configure_dwh()
+{
+	echo "Configuring DWH.."
+	mkdir -p /opt/kaltura/web/logs
+	KETTLE_CONF=$BASE_DIR/dwh/.kettle/kettle.properties
+	sed -i "s@EventsLogsDir\s*=\s*.*@EventsLogsDir = $BASE_DIR/web/logs@" $KETTLE_CONF
+	sed -i "s@EventsWildcard\s*=\s*.*@EventsWildcard = kaltura.*_apache_access.log-.*@" $KETTLE_CONF
+}
+
+set_selinux_permissive()
+{
+	echo "Setting SELinux to permissive mode.."
+	setenforce 0
+	sed -i 's@SELINUX=enforcing@SELINUX=permissive@' /etc/selinux/config
+}
+
+fix_permissions()
+{
+	echo "Changing file permissions.."
+	find $BASE_DIR -name "cache" -exec chown -R kaltura.kaltura {} \;
+	find $BASE_DIR -name "tmp" -exec chown -R kaltura.kaltura {} \;
+	find $BASE_DIR -name "log" -exec chown -R kaltura.kaltura {} \;
+	chown kaltura.kaltura $BASE_DIR/app/configurations/admin.ini $BASE_DIR/app/configurations/local.ini
+	chmod 600 $BASE_DIR/app/configurations/local.ini
+	chown kaltura $BASE_DIR/app/infra/kConf.php
+	chmod 600 $BASE_DIR/app/infra/kConf.php
+	mkdir -p /usr/local/pentaho/pdi/plugins /opt/kaltura/web/content /opt/kaltura/web/conversions /opt/kaltura/app/batch
+	chown -R kaltura.kaltura /usr/local/pentaho/pdi/plugins /opt/kaltura/web/content /opt/kaltura/web/conversions /opt/kaltura/app/batch
+
+}
+
+install_batch()
+{
+	host_base_configure
+	cd $DEST_DIR
+	rm dwh/crontab/dwh_crontab
+	for i in reportUsageTrackingIfOptIn.php watch.populate.sh dwh_plays_views_sync.sh send-usage-report.php;do  
+		sed -i "s@\(.*$i.*\)@#commented out by $0 when configuring batch: \1@g" crontab/kaltura_crontab; 
+	done
+	echo "#!/bin/sh" > runme.sh
+	for i in mysqld sphinx_watch.sh;do
+		echo "/etc/init.d/$i stop" >> runme.sh
+		echo "chkconfig	$i off" >> runme.sh
+	done
+	create_common_runme
+	echo "/etc/init.d/serviceBatchMgr.sh restart" >> runme.sh
+
+}
+
+install_sphinx()
+{
+	host_base_configure
+	cd $DEST_DIR
+	rm dwh/crontab/dwh_crontab
+	for i in reportUsageTrackingIfOptIn.php watch.batchMgr.sh dwh_plays_views_sync.sh send-usage-report.php;do  
+		sed -i "s@\(.*$i.*\)@#commented out by $0 when configuring Sphinx: \1@g" crontab/kaltura_crontab; 
+	done
+	echo "#!/bin/sh" > runme.sh
+	for i in mysqld serviceBatchMgr.sh;do
+		echo "/etc/init.d/$i stop" >> runme.sh
+		echo "chkconfig	$i off" >> runme.sh
+	done
+	create_user
+	echo "/etc/init.d/sphinx_watch.sh restart" >> runme.sh
+}
+
+install_api()
+{
+	host_base_configure
+	cd $DEST_DIR
+	rm dwh/crontab/dwh_crontab
+	for i in reportUsageTrackingIfOptIn.php watch.batchMgr.sh watch.populate.sh dwh_plays_views_sync.sh send-usage-report.php;do  
+		sed -i "s@\(.*$i.*\)@#commented out by $0 when configuring Sphinx: \1@g" crontab/kaltura_crontab; 
+	done
+	echo "#!/bin/sh" > runme.sh
+	for i in mysqld serviceBatchMgr.sh sphinx_watch.sh;do
+		echo "/etc/init.d/$i stop" >> runme.sh
+		echo "chkconfig	$i off" >> runme.sh
+	done
+	create_user
+
+}
+
+export_mysql_kalt_db()
+{
+	for DB in $DB1_NAME kalturadw kalturadw_bisources kalturadw_ds;do
+		TABLES=`mysql -p"$DB1_PASS" -B -N -e "select TABLE_NAME from information_schema.TABLES where TABLE_SCHEMA='$DB'"`
+		OUT=/tmp/kaltura_db_dump/${DB}_dump
+		mkdir -p $OUT
+		for TABLE in $TABLES; do
+    			echo "Dumping $DB.$TABLE onto $OUT/$DB.$TABLE.sql"
+			mysqldump -u"$DB1_USER" -p"$DB1_PASS" -P$DB1_PORT $DB $TABLE --routines  > $OUT/$DB.$TABLE.sql
+		done
+	done
+	echo "Dumps can be found under $OUT."
+}
+
+fix_hostname_values()
+{
+	if [ -n "$1" ];then
+		BASE=$1
+	else
+		echo "Please provide the base dir for the Kaltura install:"
+		read_BASE
+	fi
+	echo -e "We will now go through a set of questions to determine which hostname values need to be replaced on this node\nIf you do not wish to replace a certain role, just hit enter w/o inputting a value."
+	echo "Who is our batch host for this machine?"
+	read BATCH_NODENAME
+	if [ -n "$BATCH_NODENAME" ];then
+		echo "Setting batch hostname in configs to $BATCH_NODENAME.."
+		echo "I also need a scheduler ID?"           
+		read SCD_ID                    
+		sed -i "s@^\(id\s*=\s*\)1\$@\1 $SCD_ID@" $APP_CONF_DIR/batch.ini
+		sed -i "s@^\(hostName\s*=\).*@\1 $DEST_HOST@g" $APP_CONF_DIR/batch.ini
+		sed -i "s@^\(serviceUrl\s*=\).*@\1 http://$DEST_HOST@g" $APP_CONF_DIR/batch.ini
+	fi
+	echo "Who is our Sphinx host for this machine?"
+	read SPHINX_NODENAME
+	if [ -n "$SPHINX_NODENAME" ];then
+		echo "Setting Sphinx hostname in configs to $SPHINX_NODENAME.."
+	fi
+	echo "Who is our MySQL host for this machine?"
+	read MYSQL_NODENAME
+	if [ -n "$MYSQL_NODENAME" ];then
+		echo "Setting MySQL hostname in configs to $MYSQL_NODENAME.."
+	fi
+
+}
+
+replace_placeholders()
+{
+}
+
+configure_red5()
+{
+	XML=$KALT_PREFIX/`echo "select conf_file_path from ui_conf where tags like '%kmc_uploadWebCam%'"|mysql -u"$DB1_USER" -p"$DB1_PASS" -P$DB1_PORT $DB1_NAME |sed '1,1d'`
+	sed -i "s@\(<serverUrl>rtmp://\).*\(/oflaDemo</serverUrl>\)@\1$HOSTNAME\2@g" $XML
+}
+
+if [ "$AUTO_MODE" = 1 ];then
+	verify_user_input
+fi
+if [ -n "$BASE_DIR" ];then
+	KALT_PREFIX=$BASE_DIR
+else
+	KALT_PREFIX=/opt/kaltura
+fi
