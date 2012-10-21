@@ -20,7 +20,7 @@
  notifempty
  create 644 apache apache
 lastaction
- mv @LOG_DIR@/kaltura_apache_access.log-`/bin/date +%Y%m%d`.gz /opt/kaltura/web/logs/`hostname`-kaltura_apache_access.log-`/bin
+ mv @LOG_DIR@/kaltura_apache_access.log-`/bin/date +%Y%m%d`.gz /opt/kaltura/web/logs/`hostname`-kaltura_apache_access.log-`/bin/date +%Y%m%d`.gz
         #/etc/init.d/httpd reload
  	@APACHE_RESTART_COMMAND@
  endscript
