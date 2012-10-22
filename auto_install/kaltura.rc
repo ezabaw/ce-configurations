@@ -256,15 +256,15 @@ create_mysql_user()
 	KALT_USER_EXISTS=`echo $SQL|mysql --skip-column-names -h$DB1_HOST -u$DB1_USER -P$DB1_PORT -p$DB1_PASS`
 	if [ -n "$KALT_USER_EXISTS" ];then
 		return 0
-		SQL="drop user $KALT_USER;"
-		KALT_USER=`echo $SQL|mysql --skip-column-names -h$DB1_HOST -u$DB1_USER -P$DB1_PORT -p$DB1_PASS`
+		#SQL="drop user $KALT_USER;"
+		#KALT_USER=`echo $SQL|mysql --skip-column-names -h$DB1_HOST -u$DB1_USER -P$DB1_PORT -p$DB1_PASS`
 	fi
 	KALT_MYSQL_PASSWD=`< /dev/urandom tr -dc A-Za-z0-9_ | head -c15`
 	SQL="create user $KALT_USER@'%' identified by '$KALT_MYSQL_PASSWD';GRANT ALL PRIVILEGES ON *.* TO $KALT_USER@'%' WITH GRANT OPTION; Flush Privileges;"
 	echo "$SQL"|mysql -h$DB1_HOST -u$DB1_USER -P$DB1_PORT -p$DB1_PASS
 	if [ $? -eq 0 ];then
-		echo "DB1_USER=$KALT_USER" >>$DIR_NAME/user_input.ini
-		echo "DB1_PASS=$KALT_MYSQL_PASSWD" >>$DIR_NAME/user_input.ini
+		sed -i "s@^DB1_USER\s*=\s*.*@DB1_USER=$KALT_USER@g" $DIR_NAME/user_input.ini
+		sed -i "s@^DB1_PASS\s*=\s*.*@DB1_PASS=$KALT_MYSQL_PASSWD@g" $DIR_NAME/user_input.ini
 	fi
 	set +x
 }
