@@ -19,7 +19,7 @@ try {
         $results = $client->user->loginByLoginId($email,$cmsPassword,$partner_id,$expiry, $privileges);
 }
 catch (Exception $e) {
-    echo 'Caught exception: ',  $e->getMessage(), "\n";
+    echo 'Caught exception: ',  $e->getMessage(), "\nI will now create this partner.\n";
     if ($e->getMessage()==="User was not found" || $e->getMessage()==="Unknown partner_id [$partner_id]"){
         $userId = null;
         $type = KalturaSessionType::ADMIN;

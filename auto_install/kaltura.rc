@@ -18,8 +18,8 @@ install_deps()
 			echo "Setting lower_case_table_names = 1 in /etc/my.cnf.."
 			sed -i 's@^\[mysqld\]$@[mysqld]\nlower_case_table_names = 1\n@' /etc/my.cnf
 			/etc/init.d/mysqld restart
-			create_mysql_user
 			mysql_secure_installation
+			create_mysql_user
 		fi
 	fi
 }
@@ -208,7 +208,7 @@ fix_permissions()
 	find $BASE_DIR -name "log" -exec chown -R $KALT_USER.$KALT_GROUP {} \;
 	chown root.$KALT_GROUP $BASE_DIR/app/configurations/admin.ini $BASE_DIR/app/configurations/local.ini $BASE_DIR/app/infra/kConf.php
 	find $BASE_DIR/app/configurations -name "*.ini" -exec chown root.$KALT_GROUP {} \;
-	find $BASE_DIR/app/configurations -name "*.ini" -exec chmod 640 {} \;
+	find $BASE_DIR/app/configurations -name "*.ini" -o -name "*.conf" -exec chmod 640 {} \;
 	mkdir -p $PENTAHO_DIR/pdi/plugins $BASE_DIR/web/content $BASE_DIR/web/conversions $BASE_DIR/app/batch
 	chown -R $KALT_USER.$KALT_GROUP /usr/local/pentaho/pdi/plugins $BASE_DIR/web/content $BASE_DIR/web/conversions $BASE_DIR/app/batch
 	sed -i 's@ root @ kaltura @' $BASE_DIR/crontab/kaltura_crontab
@@ -251,24 +251,27 @@ create_partner()
 
 create_mysql_user()
 {
+	set -x
+	SQL="select user from mysql.user where user='$KALT_USER';"
+	KALT_USER_EXISTS=`echo $SQL|mysql --skip-column-names -h$DB1_HOST -u$DB1_USER -P$DB1_PORT -p$DB1_PASS`
+	if [ -n "$KALT_USER_EXISTS" ];then
+		return 0
+		SQL="drop user $KALT_USER;"
+		KALT_USER=`echo $SQL|mysql --skip-column-names -h$DB1_HOST -u$DB1_USER -P$DB1_PORT -p$DB1_PASS`
+	fi
 	KALT_MYSQL_PASSWD=`< /dev/urandom tr -dc A-Za-z0-9_ | head -c15`
-	SQL=`cat <<EOF
-	create user $KALT_USER@'%' identified by '$KALT_MYSQL_PASSWD';
-	GRANT ALL PRIVILEGES ON *.* TO $KALT_USER@'%';
-	Flush Privileges;
-EOF`
-	echo $SQL|mysql -h$DB1_HOST -u$DB1_USER -P$DB1_PORT -p
+	SQL="create user $KALT_USER@'%' identified by '$KALT_MYSQL_PASSWD';GRANT ALL PRIVILEGES ON *.* TO $KALT_USER@'%' WITH GRANT OPTION; Flush Privileges;"
+	echo "$SQL"|mysql -h$DB1_HOST -u$DB1_USER -P$DB1_PORT -p$DB1_PASS
 	if [ $? -eq 0 ];then
 		echo "DB1_USER=$KALT_USER" >>$DIR_NAME/user_input.ini
 		echo "DB1_PASS=$KALT_MYSQL_PASSWD" >>$DIR_NAME/user_input.ini
 	fi
-	exit;
+	set +x
 }
 
 configure_red5()
 {
 	UI_CONF=`echo "select conf_file_path from ui_conf where tags like '%kmc_uploadWebCam%';"|mysql -u$DB1_USER -P$DB1_PORT -p$DB1_PASS $DB1_NAME --skip-column-names`
-	#echo "sed -i "s@\(<serverUrl\>rtmp://\).*/oflaDemo\(</serverUrl\>\)@\1$RED5_HOST\2@" $BASE_DIR/web/$UI_CONF"
 }
 DIR_NAME=`dirname $0`
 USER_INI_PATH=$DIR_NAME/user_input.ini
