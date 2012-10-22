@@ -18,4 +18,9 @@
 
         check file httpd
             with path /usr/sbin/httpd
+            # Run /watch/dog in the case that the binary was changed
+            # and alert in the case that the checksum value recovered
+            # later
+            #if failed checksum then exec "/watch/dog"
+            #   else if recovered then alert
 
