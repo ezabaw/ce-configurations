@@ -289,6 +289,10 @@ else
 fi
 
 
+export_mysql_kalt_db()
+{
+	$DIR_NAME/export_db.sh $DB1_NAME $DB1_USER $DB1_PASS $DB1_PORT /tmp/${DB1_NAME}_`date +%d%m%y_%H%M`
+}
 
 
 
