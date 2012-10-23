@@ -4,11 +4,10 @@
            stop program = "/etc/init.d/mysqld stop"
            if 2 restarts within 3 cycles then timeout
            group kaltura
-           depends on mysqld.conf, mysqld
+           depends on my.cnf, mysqld
 
-        check file mysqld.conf
-            with path /etc/mysqld/conf/mysqld.conf
-            # Reload apache if the mysqld.conf file was changed
+        check file my.cnf
+            with path /etc/my.cnf
             if changed checksum
                then exec "/etc/init.d/mysqld reload"
 
