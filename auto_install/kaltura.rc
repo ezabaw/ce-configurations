@@ -185,10 +185,14 @@ remove_exec_bit()
 
 set_selinux_permissive()
 {
-	echo "Setting SELinux to permissive mode.."
-	setenforce 0
-	sed -i 's@SELINUX=enforcing@SELINUX=permissive@' /etc/selinux/config
+        STATUS=`getenforce`
+        if [ $STATUS = 'Enforcing' ];then
+                echo "Setting SELinux to permissive mode.."
+                setenforce Permissive
+                sed -i 's@SELINUX=enforcing@SELINUX=permissive@' /etc/selinux/config
+        fi
 }
+
 
 set_php_ini()
 {
