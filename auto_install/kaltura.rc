@@ -1,6 +1,6 @@
 verify_user_input()
 {
-for VAL in HTTPD_BIN PHP_BIN TIME_ZONE BASE_DIR KALT_VER PENTAHO_DIR PENTAHO_VER PENTAHO_URL COMMON_DEPS KALTURA_FULL_VIRTUAL_HOST_NAME ADMIN_CONSOLE_ADMIN_MAIL ADMIN_CONSOLE_PASSWORD DB1_HOST DB1_PORT DB1_NAME DB1_USER DB1_PASS KALT_USER KALT_GROUP; do
+for VAL in HTTPD_BIN PHP_BIN TIME_ZONE BASE_DIR KALT_VER PENTAHO_DIR PENTAHO_VER PENTAHO_URL COMMON_DEPS KALTURA_FULL_VIRTUAL_HOST_NAME ADMIN_CONSOLE_ADMIN_MAIL ADMIN_CONSOLE_PASSWORD DB1_HOST DB1_PORT DB1_NAME DB1_USER DB1_PASS KALT_USER KALT_GROUP TEST_PARTNER_EMAIL TEST_PARTNER_PASSWD ; do
 	if [ -z "${!VAL}" ];then
 		echo "I need $VAL in user_input.ini"
 		exit 1
@@ -199,10 +199,13 @@ set_php_ini()
 	echo "Setting request_order = CGP in php.ini"
 	# if we have a scandir
 	if [ -d /etc/php.d ];then
-		echo 'request_order = "CGP"' >> /etc/php.d/kaltura.ini
+		INI_FILE=/etc/php.d/kaltura.ini
+		echo 'request_order = "CGP"' >> $INI_FILE
 	else
-		sed -i 's@request_order\s*=\s*.*@request_order = "CGP"@' /etc/php.ini
+		INI_FILE=/etc/php.ini
+		sed -i 's@request_order\s*=\s*.*@request_order = "CGP"@' $INI_FILE
 	fi
+	echo "upload_tmp_dir = $BASE_DIR/web/tmp" >> $INI_FILE
 }
 fix_permissions()
 {
