@@ -1,6 +1,6 @@
 <?php
-if (count($argv)<2){
-    echo __FILE__ . ' <admin_secret>'."\n";
+if (count($argv)<4){
+    echo __FILE__ . ' <admin_secret> <partner email> <partner passwd> '."\n";
     exit (1);
 }
 require_once('/opt/kaltura/app/clients/php5/KalturaClient.php');
@@ -10,9 +10,9 @@ $config->serviceUrl = 'http://localhost';
 $client = new KalturaClient($config);
 $expiry = null;
 $privileges = null;
-$email='jess@kaltura.com';
+$email=$argv[2];
 $name='Kaltura test partner';
-$cmsPassword='admin012';
+$cmsPassword=$argv[3];
 $partner_id=100;
 $secret = $argv[1];
 try {
