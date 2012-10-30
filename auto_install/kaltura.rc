@@ -11,9 +11,9 @@ install_deps()
 {
 	yum -y install $COMMON_DEPS
 	if ! rpm -q mysql-server 2>/dev/null;then
-		echo "Do you plan on running MySQL DB on this instance? Note that it is not advised in cluster mode [Y/n]"
+		echo "Do you plan on running MySQL DB on this instance? Note that it is not advised in cluster mode [y/N]"
 		read YESNO
-		if [ "$YESNO" = 'Y' ];then
+		if [ "$YESNO" = 'y' ];then
 			yum -y install mysql-server
 			echo "Setting lower_case_table_names = 1 in /etc/my.cnf.."
 			sed -i 's@^\[mysqld\]$@[mysqld]\nlower_case_table_names = 1\n@' /etc/my.cnf
@@ -85,11 +85,13 @@ install_all_in_one()
 		echo "$BASE_DIR already exists. Remove and re-run me."
 		exit 1
 	fi
-	KALT_PID=`ps fax|grep kaltura|grep -v grep |awk -F " " '{print $1}'`
+	KALT_PIDS=`ps fax|grep kaltura|grep -v grep |awk -F " " '{print $1}'|xargs`
 	if [ -n "$KALT_PIDS" ];then
-		echo -e "Following PIDs of old Kaltura proces are running: $KALT_PID\nKill them and re-run me.\n"
+		echo -e "Following PIDs of old Kaltura proces are running: $KALT_PIDS\nKill them and re-run me.\n"
+		exit 1
 	fi
 	$DIR_NAME/auto_inst_falcon_centos.sh	
+	cp $DIR_NAME/package/app/crontab/kaltura_crontab $BASE_DIR/crontab/kaltura_crontab.templ
 }
 	
 create_common_runme()
@@ -104,37 +106,75 @@ echo "yum install -y $COMMON_DEPS" >>runme.sh
 }
 install_batch()
 {
-	host_base_configure
-	cd $DEST_DIR
-	rm dwh/crontab/dwh_crontab
+	if [ "$DB1_HOST" = 'localhost' -o "$DB1_HOST" = '127.0.0.1' -o "$DB1_HOST" = `hostname` ];then
+		echo "You are installing batch and you stated in $DIR_NAME/user_input.ini that your DB to be on the same machine, are you REALLY sure you mean this?"
+		read ANS
+		if [ "$ANS" != 'y' ];then
+			echo "Your DB host?"
+			read DB_HOSTNAME
+			sed  -i "s@\(DB1_HOST\)=.*@\1=$DB_HOSTNAME@g" $DIR_NAME/user_input.ini
+			echo "Your DB user? [$DB1_USER]"
+			read DB_USER
+			if [ -n "$DB_USER" ];then
+				sed  -i "s@\(DB1_USER\)=.*@\1=$DB_USER@g" $DIR_NAME/user_input.ini
+			fi
+			echo "Your DB passwd? [$DB1_PASS]"
+			read DB_PASSWD
+			if [ -n "$DB_PASSWD" ];then
+				sed  -i "s@\(DB1_PASS\)=.*@\1=$DB_USER@g" $DIR_NAME/user_input.ini
+			fi
+			echo "Your DB port? [$DB1_PORT]"
+			read DB_PORT
+			if [ -n "$DB_PORT" ];then
+				sed  -i "s@\(DB1_PORT\)=.*@\1=$DB_PORT@g" $DIR_NAME/user_input.ini
+			fi
+			sed -i 's@\(DB1_CREATE_NEW_DB\)=y@\1=n@g' $DIR_NAME/user_input.ini
+			. $DIR_NAME/user_input.ini
+			
+		fi
+	fi
+	#install_all_in_one
+	cd $BASE_DIR
+	rm /etc/cron.d/dwh_crontab||true
+	cp crontab/kaltura_crontab crontab/kaltura_crontab.bak.`date +%d_%m_%y`
+	cp crontab/kaltura_crontab.templ crontab/kaltura_crontab
+	sed -i "s%@BASE_DIR@%$BASE_DIR%g;s%@APP_DIR@%$BASE_DIR/app%g;s%@PHP_BIN@%$PHP_BIN%g;s%@LOG_DIR@%$BASE_DIR/log%g" crontab/kaltura_crontab
 	for i in reportUsageTrackingIfOptIn.php watch.populate.sh dwh_plays_views_sync.sh send-usage-report.php;do  
 		sed -i "s@\(.*$i.*\)@#commented out by $0 when configuring batch: \1@g" crontab/kaltura_crontab; 
 	done
-	echo "#!/bin/sh" > runme.sh
 	for i in mysqld sphinx_watch.sh;do
-		echo "/etc/init.d/$i stop" >> runme.sh
-		echo "chkconfig	$i off" >> runme.sh
+		/etc/init.d/$i stop
+		chkconfig $i off
 	done
-	create_common_runme
-	echo "/etc/init.d/serviceBatchMgr.sh restart" >> runme.sh
+	/etc/init.d/serviceBatchMgr.sh restart
 
 }
 
 install_sphinx()
 {
-	host_base_configure
-	cd $DEST_DIR
-	rm dwh/crontab/dwh_crontab
+	if [ "$DB1_HOST" = 'localhost' -o "$DB1_HOST" = '127.0.0.1' -o "$DB1_HOST" = `hostname` ];then
+		echo "You are installing batch and you stated in $DIR_NAME/user_input.ini that your DB to be on the same machine, are you REALLY sure you mean this?"
+		read ANS
+		if [ "$ANS" != 'y' ];then
+			echo "Exiting, correct and come back."
+			exit 1
+		fi
+	fi
+	#install_all_in_one
+	cd $BASE_DIR
+	rm /etc/cron.d/dwh_crontab || true
+	cp crontab/kaltura_crontab crontab/kaltura_crontab.bak.`date +%d_%m_%y`
+	cp crontab/kaltura_crontab.templ crontab/kaltura_crontab
+	sed -i "s%@BASE_DIR@%$BASE_DIR%g;s%@APP_DIR@%$BASE_DIR/app%g;s%@PHP_BIN@%$PHP_BIN%g;s%@LOG_DIR@%$BASE_DIR/log%g" crontab/kaltura_crontab
 	for i in reportUsageTrackingIfOptIn.php watch.batchMgr.sh dwh_plays_views_sync.sh send-usage-report.php;do  
 		sed -i "s@\(.*$i.*\)@#commented out by $0 when configuring batch: \1@g" crontab/kaltura_crontab; 
 	done
-	echo "#!/bin/sh" > runme.sh
 	for i in mysqld serviceBatchMgr.sh;do
-		echo "/etc/init.d/$i stop" >> runme.sh
-		echo "chkconfig	$i off" >> runme.sh
+		/etc/init.d/$i stop
+		chkconfig $i off
 	done
 	create_kalt_user
-	echo "/etc/init.d/sphinx_watch.sh restart" >> runme.sh
+	/etc/init.d/sphinx_watch.sh restart
 }
 
 #install_api()
