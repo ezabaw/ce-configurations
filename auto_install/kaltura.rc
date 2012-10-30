@@ -1,6 +1,6 @@
 verify_user_input()
 {
-for VAL in HTTPD_BIN PHP_BIN TIME_ZONE BASE_DIR KALT_VER PENTAHO_DIR PENTAHO_VER PENTAHO_URL COMMON_DEPS KALTURA_FULL_VIRTUAL_HOST_NAME ADMIN_CONSOLE_ADMIN_MAIL ADMIN_CONSOLE_PASSWORD DB1_HOST DB1_PORT DB1_NAME DB1_USER DB1_PASS KALT_USER KALT_GROUP TEST_PARTNER_EMAIL TEST_PARTNER_PASSWD ; do
+for VAL in HTTPD_BIN PHP_BIN TIME_ZONE BASE_DIR KALT_VER PENTAHO_DIR PENTAHO_VER PENTAHO_URL COMMON_DEPS KALTURA_FULL_VIRTUAL_HOST_NAME ADMIN_CONSOLE_ADMIN_MAIL ADMIN_CONSOLE_PASSWORD DB1_HOST DB1_PORT DB1_NAME DB1_USER DB1_PASS KALT_USER KALT_GROUP TEST_PARTNER_EMAIL TEST_PARTNER_PASSWD DB1_CREATE_NEW_DB RED5_INSTALL; do
 	if [ -z "${!VAL}" ];then
 		echo "I need $VAL in user_input.ini"
 		exit 1
@@ -84,6 +84,10 @@ install_all_in_one()
 	if [ -d $BASE_DIR ];then
 		echo "$BASE_DIR already exists. Remove and re-run me."
 		exit 1
+	fi
+	KALT_PID=`ps fax|grep kaltura|grep -v grep |awk -F " " '{print $1}'`
+	if [ -n "$KALT_PIDS" ];then
+		echo -e "Following PIDs of old Kaltura proces are running: $KALT_PID\nKill them and re-run me.\n"
 	fi
 	$DIR_NAME/auto_inst_falcon_centos.sh	
 }
