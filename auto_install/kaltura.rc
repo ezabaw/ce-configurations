@@ -133,7 +133,7 @@ install_batch()
 			
 		fi
 	fi
-	#install_all_in_one
+	install_all_in_one
 	cd $BASE_DIR
 	rm /etc/cron.d/dwh_crontab||true
 	cp crontab/kaltura_crontab crontab/kaltura_crontab.bak.`date +%d_%m_%y`
@@ -146,6 +146,9 @@ install_batch()
 		/etc/init.d/$i stop
 		chkconfig $i off
 	done
+	echo "I also need a scheduler ID?"           
+	read SCD_ID                    
+	sed -i "s@^\(id\s*=\s*\)1\$@\1 $SCD_ID@" $APP_CONF_DIR/batch.ini
 	/etc/init.d/serviceBatchMgr.sh restart
 
 }
@@ -160,7 +163,7 @@ install_sphinx()
 			exit 1
 		fi
 	fi
-	#install_all_in_one
+	install_all_in_one
 	cd $BASE_DIR
 	rm /etc/cron.d/dwh_crontab || true
 	cp crontab/kaltura_crontab crontab/kaltura_crontab.bak.`date +%d_%m_%y`
