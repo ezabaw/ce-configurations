@@ -301,7 +301,10 @@ export_mysql_kalt_db()
 	$DIR_NAME/export_db.sh $DB1_NAME $DB1_USER $DB1_PASS $DB1_PORT /tmp/${DB1_NAME}_`date +%d%m%y_%H%M`
 }
 
-
+disable_monitoring_tab()
+{
+    sed -i 's@^access.monitoring = SYSTEM_ADMIN_SYSTEM_MONITOR@;access.monitoring = SYSTEM_ADMIN_SYSTEM_MONITOR@g' "$BASE_DIR/app/configurations/admin.ini" 
+}
 
 
 #for CONF_TEMPL in $KALT_PREFIX/logrotate/kaltura_log_rotate $KALT_PREFIX/crontab/kaltura_crontab $KALT_PREFIX/app/configurations/admin.template.ini $KALT_PREFIX/app/configurations/sphinx/kaltura.conf.template $KALT_PREFIX/app/configurations/logger.template.ini $KALT_PREFIX/app/configurations/batch.template.ini $KALT_PREFIX/app/configurations/local.template.ini $KALT_PREFIX/app/configurations/db.template.ini $KALT_PREFIX/app/configurations/dc_config.template.ini $KALT_PREFIX/app/configurations/system.template.ini $KALT_PREFIX/app/configurations/var.template.ini $KALT_PREFIX/app/configurations/generator.template.ini $KALT_PREFIX/app/configurations/url_managers.template.ini $KALT_PREFIX/app/batch/monitor/fullstatus.php $KALT_PREFIX/app/configurations/apache/my_kaltura.conf $KALT_PREFIX/app/plugins/sphinx_search/scripts/configs/server-sphinx.php.template $KALT_PREFIX/app/deployment/base/sql/02.kaltura_ce_data.sql $KALT_PREFIX/app/deployment/base/sql/03.dwh_grants.sql $KALT_PREFIX/app/deployment/final/sql/02.kaltura_ce_data.sql $KALT_PREFIX/app/deployment/final/sql/03.dwh_grants.sql $KALT_PREFIX/dwh/.kettle/kettle.template.properties;do 
