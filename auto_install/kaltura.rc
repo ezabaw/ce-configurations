@@ -28,9 +28,14 @@ setup_pentaho()
 	if [ -d "$PENTAHO_DIR" ];then
 		echo "$PENTAHO_DIR already exists"
 	else
-		rm -rf "$PENTAHO_DIR" $INSTALL_DIR/pdi-ce-$PENTAHO_VER-stable.tar.gz*
-		echo "Retrieving Pentaho.."
-		wget $PENTAHO_URL 
+		rm -rf "$PENTAHO_DIR" 
+		tar ztf $INSTALL_DIR/pdi-ce-$PENTAHO_VER-stable.tar.gz > /dev/null
+		if [ $? -ne 0 ];then
+		    echo "Archive does not exist or is corrupted."
+		    rm $INSTALL_DIR/pdi-ce-$PENTAHO_VER-stable.tar.gz*
+		    echo "Retrieving Pentaho.."
+		    wget $PENTAHO_URL
+		fi
 		echo "Extracting Pentaho archive and copying to $PENTAHO_DIR/pdi.."
 		tar zxf pdi-ce-$PENTAHO_VER-stable.tar.gz
 		mkdir -p $PENTAHO_DIR && mv data-integration $PENTAHO_DIR/pdi
@@ -299,7 +304,20 @@ configure_dwh()
 create_partner()
 {
 	echo "Creating test partner.."
-	php $DIR_NAME/create_partner.php `echo "select admin_secret from partner where id=-2;" |mysql -u"$DB1_USER" -p"$DB1_PASS" -P$DB1_PORT $DB1_NAME |sed '1,1d'` $TEST_PARTNER_EMAIL $TEST_PARTNER_PASSWD 
+	SPHINX_DSN=`grep datasources.sphinx.connection.dsn "$APP_CONF_DIR/db.ini"|awk -F "= " '{print $2}'`
+	SPHINX_BOX=`echo $SPHINX_DSN |sed 's/.*host=\(.*\);port=.*/\1/'`
+	SPHINX_PORT=`echo $SPHINX_DSN |sed 's/.*host=.*;port=\(.*\);"/\1/'`
+	exec 3<>/dev/tcp/$SPHINX_BOX/$SPHINX_PORT
+	if [ $? -ne 0 ];then
+	    echo "Waiting for 15 seconds, giving Sphinx [$SPHINX_BOX] a chance to open a listener on $SPHINX_PORT.."
+	    sleep 15
+	fi
+	exec 3<>/dev/tcp/$SPHINX_BOX/$SPHINX_PORT
+	if [ $? -eq 0 ];then
+	    php $DIR_NAME/create_partner.php `echo "select admin_secret from partner where id=-2;" |mysql -u"$DB1_USER" -p"$DB1_PASS" -P$DB1_PORT $DB1_NAME |sed '1,1d'` $TEST_PARTNER_EMAIL $TEST_PARTNER_PASSWD 
+	else
+	    echo "Sphinx seems to be down :( I will not create a partner."
+	fi
 }
 
 create_mysql_user()
@@ -325,7 +343,7 @@ create_mysql_user()
 configure_red5()
 {
         if [ "$RED5_INSTALL" = 'y' -o "$RED5_INSTALL" = 'yes' ];then
-                UI_CONF=`echo "select conf_file_path from ui_conf where tags like '%kmc_uploadWebCam%';"|mysql -u$DB1_USER -P$DB1_PORT -p$DB1_PASS $DB1_NAME --skip-column-names`
+                UI_CONF=`echo "select conf_file_path from ui_conf where tags like '%kmc_uploadWebCam%';"|mysql -u$DB1_USER -P$DB1_PORT -p$DB1_PASS $DB1_NAME -h$DB1_HOST --skip-column-names`
                 sed -i "s@{HOST_NAME}@$RED5_HOST@g" "$BASE_DIR/web/$UI_CONF"
         fi
 }
