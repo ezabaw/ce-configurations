@@ -49,7 +49,6 @@ host_base_configure()
 	echo "Dest host?"
 	read DEST_HOST
 	DEST_DIR="/tmp/$DEST_HOST"
-	APP_CONF_DIR="$DEST_DIR/app/configurations"
 	cd $KALT_PREFIX
 	find . -name tmp -o -name log -o -name cache -o -name logs -o -name entry|sed 's/^.\///g' >/tmp/excd_lst
 	rsync -avzr --exclude-from /tmp/excd_lst . $DEST_DIR
@@ -325,8 +324,12 @@ create_mysql_user()
 
 configure_red5()
 {
-	UI_CONF=`echo "select conf_file_path from ui_conf where tags like '%kmc_uploadWebCam%';"|mysql -u$DB1_USER -P$DB1_PORT -p$DB1_PASS $DB1_NAME --skip-column-names`
+        if [ "$RED5_INSTALL" = 'y' -o "$RED5_INSTALL" = 'yes' ];then
+                UI_CONF=`echo "select conf_file_path from ui_conf where tags like '%kmc_uploadWebCam%';"|mysql -u$DB1_USER -P$DB1_PORT -p$DB1_PASS $DB1_NAME --skip-column-names`
+                sed -i "s@{HOST_NAME}@$RED5_HOST@g" "$BASE_DIR/web/$UI_CONF"
+        fi
 }
+
 DIR_NAME=`dirname $0`
 USER_INI_PATH=$DIR_NAME/user_input.ini
 if [ -r "$USER_INI_PATH" ];then
@@ -341,7 +344,7 @@ if [ -n "$BASE_DIR" ];then
 else
 	KALT_PREFIX=/opt/kaltura
 fi
-
+APP_CONF_DIR="$BASE_DIR/app/configurations"
 
 export_mysql_kalt_db()
 {
