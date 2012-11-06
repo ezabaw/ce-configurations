@@ -3,7 +3,6 @@
 #
 # chkconfig: 2345 13 87
 # description: Kaltura dedicated Sphinx
-
 if [ -L $0 ];then
 	REAL_SCRIPT=`readlink $0`
 else
@@ -11,8 +10,8 @@ else
 fi
 . `dirname $REAL_SCRIPT`/../configurations/system.ini
 
-COMMAND="$APP_DIR/plugins/sphinx_search/scripts/watch.daemon.sh"
-POP_COMMAND="$APP_DIR/plugins/sphinx_search/scripts/watch.populate.sh"
+COMMAND="$APP_DIR/plugins/sphinx_search/scripts/watch.daemon.sh -u root"
+POP_COMMAND="$APP_DIR/plugins/sphinx_search/scripts/watch.populate.sh @APP_DIR@/plugins/sphinx_search/scripts/configs/server-sphinx.php"
 
 # Source function library
 . /etc/rc.d/init.d/functions
@@ -25,7 +24,7 @@ start() {
                  echo
                  exit 2;
         fi
-        setsid $COMMAND &
+        setsid $COMMAND 2>&1 >> /opt/kaltura/log/`basename $0`.log &
         echo_success
     echo
     
@@ -46,7 +45,7 @@ stop() {
 		echo -n "Stopping Sphinx Watch Daemon: "
         #Kills the watch.dameon
 		KP=$(pgrep watch.daemon.sh)
-		if [ -n "$KP" ]
+		if [[ "X$KP" != "X" ]]
 		      then
 				kill -9 $KP
 		fi
@@ -55,7 +54,7 @@ stop() {
 		echo -n "Stopping populateFromLog.php script: "
 		#kills the populate from log
 		KP=$(pgrep -f populateFromLog.php)
-		if [ -n "$KP" ]
+		if [[ "X$KP" != "X" ]]
 		      then
 				kill -9 $KP
 		fi
@@ -64,7 +63,7 @@ stop() {
 		echo -n "Stopping searchd service: "
 		#kills the search service
 		KP=$(pgrep searchd)
-		if [ -n "$KP" ]
+		if [[ "X$KP" != "X" ]]
 		      then
 				kill -9 $KP
 		fi
