@@ -108,7 +108,7 @@ EOF
 echo "yum install -y $COMMON_DEPS" >>runme.sh
 
 }
-install_batch()
+prompt_for_mysql_dsn()
 {
 	if [ "$DB1_HOST" = 'localhost' -o "$DB1_HOST" = '127.0.0.1' -o "$DB1_HOST" = `hostname` ];then
 		echo "You are installing batch and you stated in $DIR_NAME/user_input.ini that your DB to be on the same machine, are you REALLY sure you mean this?"
@@ -137,6 +137,11 @@ install_batch()
 			
 		fi
 	fi
+}
+
+install_batch()
+{
+	prompt_for_mysql_dsn
 	install_all_in_one
 	cd $BASE_DIR
 	rm /etc/cron.d/dwh_crontab||true
@@ -159,14 +164,7 @@ install_batch()
 
 install_sphinx()
 {
-	if [ "$DB1_HOST" = 'localhost' -o "$DB1_HOST" = '127.0.0.1' -o "$DB1_HOST" = `hostname` ];then
-		echo "You are installing batch and you stated in $DIR_NAME/user_input.ini that your DB to be on the same machine, are you REALLY sure you mean this?"
-		read ANS
-		if [ "$ANS" != 'y' ];then
-			echo "Exiting, correct and come back."
-			exit 1
-		fi
-	fi
+	prompt_for_mysql_dsn
 	install_all_in_one
 	cd $BASE_DIR
 	rm /etc/cron.d/dwh_crontab || true
