@@ -202,10 +202,10 @@ install_api()
 
 }
 
-reconfigure_host()
-{
-
-}
+#reconfigure_host()
+#{
+#
+#}
 
 fix_hostname_values()
 {
@@ -316,6 +316,7 @@ configure_dwh()
 }
 create_partner()
 {
+	set -x
 	echo "Creating test partner.."
 	SPHINX_DSN=`grep datasources.sphinx.connection.dsn "$APP_CONF_DIR/db.ini"|awk -F "= " '{print $2}'`
 	SPHINX_BOX=`echo $SPHINX_DSN |sed 's/.*host=\(.*\);port=.*/\1/'`
@@ -327,15 +328,22 @@ create_partner()
 	fi
 	exec 3<>/dev/tcp/$SPHINX_BOX/$SPHINX_PORT
 	if [ $? -eq 0 ];then
-	    php $DIR_NAME/create_partner.php `echo "select admin_secret from partner where id=-2;" |mysql -u"$DB1_USER" -p"$DB1_PASS" -P$DB1_PORT $DB1_NAME |sed '1,1d'` $TEST_PARTNER_EMAIL $TEST_PARTNER_PASSWD 
+	    ADMIN_SECRET=`echo "select admin_secret from partner where id=-2;" |mysql -u"$DB1_USER" -p"$DB1_PASS" -P$DB1_PORT $DB1_NAME |sed '1,1d'`
+	    TEST_PARTNER_ID=`php $DIR_NAME/create_partner.php $ADMIN_SECRET $TEST_PARTNER_EMAIL $TEST_PARTNER_PASSWD `
 	else
 	    echo "Sphinx seems to be down :( I will not create a partner."
 	fi
+	echo $TEST_PARTNER_ID
+	set +x
 }
 
 upload_assets()
 {
+	TEST_PARTNER_ID=$1
     	echo 'Uploading sample content';
+	SPHINX_DSN=`grep datasources.sphinx.connection.dsn "$APP_CONF_DIR/db.ini"|awk -F "= " '{print $2}'`
+	SPHINX_BOX=`echo $SPHINX_DSN |sed 's/.*host=\(.*\);port=.*/\1/'`
+	SPHINX_PORT=`echo $SPHINX_DSN |sed 's/.*host=.*;port=\(.*\);"/\1/'`
 	exec 3<>/dev/tcp/$SPHINX_BOX/$SPHINX_PORT
 	if [ $? -ne 0 ];then
 	    echo "Waiting for 15 seconds, giving Sphinx [$SPHINX_BOX] a chance to open a listener on $SPHINX_PORT.."
@@ -343,7 +351,7 @@ upload_assets()
 	fi
 	exec 3<>/dev/tcp/$SPHINX_BOX/$SPHINX_PORT
 	if [ $? -eq 0 ];then
-	    php $DIR_NAME/upload_csv.php $TEST_PARTNER_ID 'http://localhost' `echo "select admin_secret from partner where id=;" |mysql -u"$DB1_USER" -p"$DB1_PASS" -P$DB1_PORT $DB1_NAME |sed '1,1d'` $TEST_PARTNER_EMAIL 
+	    php $DIR_NAME/upload_csv.php $TEST_PARTNER_ID 'http://localhost' `echo "select admin_secret from partner where id=$TEST_PARTNER_ID;" |mysql -u"$DB1_USER" -p"$DB1_PASS" -P$DB1_PORT $DB1_NAME |sed '1,1d'` $TEST_PARTNER_EMAIL 
 	else
 	    echo "Sphinx seems to be down :( I will not create a partner."
 	fi

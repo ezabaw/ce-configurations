@@ -1,6 +1,5 @@
 <?php
 require_once('create_session.php');
-require_once('/opt/kaltura/app/clients/php5/KalturaClient.php');
 if (count($argv)<4){
     echo 'Usage:' .__FILE__ .' <partner_id> <service_url> <secret> <uploader>'."\n";
     exit (1);
@@ -17,12 +16,12 @@ $userId = null;
 $expiry = null;
 $privileges = null;
 //csv file to use
-$csvFileData = '/tmp/kaltura_batch_upload_eagle.csv';
+$csvFileData = dirname(__FILE__).'/kaltura_batch_upload_eagle.csv';
 // type here is CSV but can also work with XML
 $bulkUploadType = 'bulkUploadCsv.CSV' ;
 $client=generate_ks($config->serviceUrl,$partnerId,$secret,$type=KalturaSessionType::ADMIN,$userId=null,$expiry = null,$privileges = null);
 // conversion profile to be used
-$conversionProfileId = 2;
+$conversionProfileId = $client->conversionProfile->getDefault()->id;
 echo "$conversionProfileId, $csvFileData, $bulkUploadType, $uploadedBy\n";
 $results = $client-> bulkUpload ->add($conversionProfileId, $csvFileData, $bulkUploadType, $uploadedBy);
 var_dump($results);
