@@ -30,4 +30,5 @@ for i in sphinx_watch.sh serviceBatchMgr.sh;do
 done
 /etc/init.d/serviceBatchMgr.sh restart
 create_partner
+upload_assets
 
