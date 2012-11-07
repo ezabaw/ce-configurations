@@ -24,5 +24,5 @@ $client=generate_ks($config->serviceUrl,$partnerId,$secret,$type=KalturaSessionT
 $conversionProfileId = $client->conversionProfile->getDefault()->id;
 echo "$conversionProfileId, $csvFileData, $bulkUploadType, $uploadedBy\n";
 $results = $client-> bulkUpload ->add($conversionProfileId, $csvFileData, $bulkUploadType, $uploadedBy);
-var_dump($results);
+//var_dump($results);
 ?>
