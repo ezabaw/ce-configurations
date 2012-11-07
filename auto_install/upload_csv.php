@@ -22,7 +22,6 @@ $bulkUploadType = 'bulkUploadCsv.CSV' ;
 $client=generate_ks($config->serviceUrl,$partnerId,$secret,$type=KalturaSessionType::ADMIN,$userId=null,$expiry = null,$privileges = null);
 // conversion profile to be used
 $conversionProfileId = $client->conversionProfile->getDefault()->id;
-echo "$conversionProfileId, $csvFileData, $bulkUploadType, $uploadedBy\n";
 $results = $client-> bulkUpload ->add($conversionProfileId, $csvFileData, $bulkUploadType, $uploadedBy);
 //var_dump($results);
 ?>
