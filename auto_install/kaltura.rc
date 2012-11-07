@@ -145,7 +145,7 @@ prompt_for_mysql_dsn()
 
 install_batch()
 {
-	install_all_in_one
+	#install_all_in_one
 	cd $BASE_DIR
 	rm /etc/cron.d/dwh_crontab||true
 	cp crontab/kaltura_crontab crontab/kaltura_crontab.bak.`date +%d_%m_%y`
@@ -175,7 +175,7 @@ install_batch()
 
 install_sphinx()
 {
-	install_all_in_one
+	#install_all_in_one
 	cd $BASE_DIR
 	rm /etc/cron.d/dwh_crontab || true
 	cp crontab/kaltura_crontab crontab/kaltura_crontab.bak.`date +%d_%m_%y`
@@ -198,7 +198,7 @@ install_sphinx()
 
 install_api()
 {
-	install_all_in_one
+	#install_all_in_one
 	cd $BASE_DIR
 	rm /etc/cron.d/dwh_crontab || true
 	cp crontab/kaltura_crontab crontab/kaltura_crontab.bak.`date +%d_%m_%y`
@@ -221,7 +221,7 @@ install_api()
 
 clear_host_from_scheduler()
 {
-	SQL="delete from scheduler where host='$KALTURA_FULL_VIRTUAL_HOST_NAME';"
+	SQL="delete from $DB1_NAME.scheduler where host='$KALTURA_FULL_VIRTUAL_HOST_NAME';"
 	echo "$SQL"|mysql -h$DB1_HOST -u$DB1_USER -P$DB1_PORT -p$DB1_PASS
 
 }
