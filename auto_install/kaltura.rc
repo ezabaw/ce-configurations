@@ -325,6 +325,7 @@ create_mysql_user()
 	SQL="select user from mysql.user where user='$KALT_USER';"
 	KALT_USER_EXISTS=`echo $SQL|mysql --skip-column-names -h$DB1_HOST -u$DB1_USER -P$DB1_PORT -p$DB1_PASS`
 	if [ -n "$KALT_USER_EXISTS" ];then
+		echo "MySQL user $KALT_USER already exists, skipping creation."
 		return 0
 	fi
 	KALT_MYSQL_PASSWD=`< /dev/urandom tr -dc A-Za-z0-9_ | head -c15`
