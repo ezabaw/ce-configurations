@@ -82,7 +82,8 @@ host_base_configure()
 	fix_hostname_values
 	cd $DEST_DIR
 }
-install_all_in_one()
+
+probe_for_garbage()
 {
 	if [ -d $BASE_DIR ];then
 		echo "$BASE_DIR already exists. Remove and re-run me."
@@ -93,6 +94,10 @@ install_all_in_one()
 		echo -e "Following PIDs of old Kaltura proces are running: $KALT_PIDS\nKill them and re-run me.\n"
 		exit 1
 	fi
+}
+
+install_all_in_one()
+{
 	$DIR_NAME/auto_inst_falcon_centos.sh	
 	cp $DIR_NAME/package/app/crontab/kaltura_crontab $BASE_DIR/crontab/kaltura_crontab.templ
 }
@@ -140,7 +145,6 @@ prompt_for_mysql_dsn()
 
 install_batch()
 {
-	prompt_for_mysql_dsn
 	install_all_in_one
 	cd $BASE_DIR
 	rm /etc/cron.d/dwh_crontab||true
@@ -158,6 +162,7 @@ install_batch()
 	read SCD_ID                    
 	sed -i "s@^\(id\s*=\s*\)1\$@\1 $SCD_ID@" $APP_CONF_DIR/batch.ini
 	rm /etc/httpd/conf.d/my_kaltura.conf
+	sed -i "1iUser $KALT_USER\nGroup $KALT_GROUP\n" $BASE_DIR/app/configurations/apache/my_kaltura_apiv3.conf
 	ln -s $APP_CONF_DIR/apache/my_kaltura_apiv3.conf /etc/httpd/conf.d/
 	/etc/init.d/httpd restart
 	/etc/init.d/serviceBatchMgr.sh restart
@@ -166,7 +171,6 @@ install_batch()
 
 install_sphinx()
 {
-	prompt_for_mysql_dsn
 	install_all_in_one
 	cd $BASE_DIR
 	rm /etc/cron.d/dwh_crontab || true
@@ -181,11 +185,11 @@ install_sphinx()
 		chkconfig $i off
 	done
 	/etc/init.d/sphinx_watch.sh restart
+	clear_host_from_scheduler
 }
 
 install_api()
 {
-	prompt_for_mysql_dsn
 	install_all_in_one
 	cd $BASE_DIR
 	rm /etc/cron.d/dwh_crontab || true
@@ -199,9 +203,16 @@ install_api()
 		/etc/init.d/$i stop
 		chkconfig $i off
 	done
+	clear_host_from_scheduler
 
 }
 
+clear_host_from_scheduler()
+{
+	SQL="delete from scheduler where host='$KALTURA_FULL_VIRTUAL_HOST_NAME';"
+	echo "$SQL"|mysql -h$DB1_HOST -u$DB1_USER -P$DB1_PORT -p$DB1_PASS
+
+}
 #reconfigure_host()
 #{
 #
@@ -316,7 +327,6 @@ configure_dwh()
 }
 create_partner()
 {
-	set -x
 	echo "Creating test partner.."
 	SPHINX_DSN=`grep datasources.sphinx.connection.dsn "$APP_CONF_DIR/db.ini"|awk -F "= " '{print $2}'`
 	SPHINX_BOX=`echo $SPHINX_DSN |sed 's/.*host=\(.*\);port=.*/\1/'`
@@ -334,7 +344,6 @@ create_partner()
 	    echo "Sphinx seems to be down :( I will not create a partner."
 	fi
 	echo $TEST_PARTNER_ID
-	set +x
 }
 
 upload_assets()
