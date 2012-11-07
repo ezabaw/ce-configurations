@@ -1,6 +1,7 @@
-#!/bin/bash -e
+#!/bin/sh -e
 
 . `dirname $0`/kaltura.rc
+probe_for_garbage
 cat << EOF 
 Welcome to Kaltura $KALT_VER setup tool
 Please select one of the following options:
@@ -11,10 +12,13 @@ Please select one of the following options:
 4. export Kaltura's MySQL DBs
 EOF
 read CHOICE
-if [ $CHOICE = 0 ];then
-	echo "About to create an all in one instance.."
+#if [ $CHOICE = 0 ];then
+	#echo "About to create an all in one instance.."
 	install_all_in_one
-elif [ $CHOICE = 1 ];then
+#fi
+# if we are not all in one, make sure the user didn't set DB creation to 'y' by mistake.
+prompt_for_mysql_dsn
+if [ $CHOICE = 1 ];then
 	echo "About to create a batch instance.."
 	install_batch
 elif [ $CHOICE = 2 ];then
