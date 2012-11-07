@@ -6,6 +6,7 @@ else
     INSTALL_DIR=`pwd`
 fi
 install_deps
+create_mysql_user
 setup_pentaho
 set_selinux_permissive
 set_php_ini

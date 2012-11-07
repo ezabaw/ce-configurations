@@ -19,7 +19,7 @@ install_deps()
 			sed -i 's@^\[mysqld\]$@[mysqld]\nlower_case_table_names = 1\n@' /etc/my.cnf
 			/etc/init.d/mysqld restart
 			mysql_secure_installation
-			create_mysql_user
+			#create_mysql_user
 		fi
 	fi
 }
@@ -322,13 +322,10 @@ create_partner()
 
 create_mysql_user()
 {
-	set -x
 	SQL="select user from mysql.user where user='$KALT_USER';"
 	KALT_USER_EXISTS=`echo $SQL|mysql --skip-column-names -h$DB1_HOST -u$DB1_USER -P$DB1_PORT -p$DB1_PASS`
 	if [ -n "$KALT_USER_EXISTS" ];then
 		return 0
-		#SQL="drop user $KALT_USER;"
-		#KALT_USER=`echo $SQL|mysql --skip-column-names -h$DB1_HOST -u$DB1_USER -P$DB1_PORT -p$DB1_PASS`
 	fi
 	KALT_MYSQL_PASSWD=`< /dev/urandom tr -dc A-Za-z0-9_ | head -c15`
 	SQL="create user $KALT_USER@'%' identified by '$KALT_MYSQL_PASSWD';GRANT ALL PRIVILEGES ON *.* TO $KALT_USER@'%' WITH GRANT OPTION; Flush Privileges;"
@@ -337,7 +334,6 @@ create_mysql_user()
 		sed -i "s@^DB1_USER\s*=\s*.*@DB1_USER=$KALT_USER@g" $DIR_NAME/user_input.ini
 		sed -i "s@^DB1_PASS\s*=\s*.*@DB1_PASS=$KALT_MYSQL_PASSWD@g" $DIR_NAME/user_input.ini
 	fi
-	set +x
 }
 
 configure_red5()
