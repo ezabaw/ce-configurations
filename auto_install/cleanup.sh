@@ -62,7 +62,7 @@ if [ "$CHOICE" = "2" ];then
                 service red5 stop
                 service mysqld stop
                 service httpd stop
-                yum remove -y httpd* mysql* memcached php*
+                yum remove -y httpd* mysql mysql-* memcached php*
                 rm -rf /etc/httpd/
                 rm -rf /var/lib/mysql/
                 rm -rf /etc/my.cnf
