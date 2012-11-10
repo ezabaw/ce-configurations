@@ -16,7 +16,7 @@
 #set -o nounset                              # Treat unset variables as an error
 
 
-if [ $# -lt 4 ]; then
+if [ $# -lt 5 ]; then
     echo "Usage: $0 <schema> <user> <passwd> <port> <output-path> [verbose]"
     exit 1
 fi
@@ -25,7 +25,7 @@ DBUSER=$2
 DBPASSWD=$3
 DBPORT=$4
 OUT="$5"
-TABLES=`mysql -u$DBUSER -p$DBPASSWD -P$DBPORT --routines --single-transaction -B -N -e "select TABLE_NAME from information_schema.TABLES where TABLE_SCHEMA='$TABLE_SCHEMA'"`
+TABLES=`mysql -u$DBUSER -p$DBPASSWD -P$DBPORT -B -N -e "select TABLE_NAME from information_schema.TABLES where TABLE_SCHEMA='$TABLE_SCHEMA'"`
 
 
 if [ ! -d $OUT ]; then
@@ -36,5 +36,5 @@ for TABLE in $TABLES; do
 	if [ -n "$6" ];then
 		echo -n "dumping $TABLE_SCHEMA.$TABLE..."
 	fi
-    	mysqldump -u$DBUSER -p$DBPASSWD -P$DBPORT $TABLE_SCHEMA $TABLE | gzip > $OUT/$TABLE_SCHEMA.$TABLE.sql.gz
+    	mysqldump -u$DBUSER -p$DBPASSWD -P$DBPORT --routines --single-transaction $TABLE_SCHEMA $TABLE | gzip > $OUT/$TABLE_SCHEMA.$TABLE.sql.gz
 done
