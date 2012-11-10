@@ -25,7 +25,7 @@ DBUSER=$2
 DBPASSWD=$3
 DBPORT=$4
 OUT="$5"
-TABLES=`mysql -u$DBUSER -p$DBPASSWD -P$DBPORT -B -N -e "select TABLE_NAME from information_schema.TABLES where TABLE_SCHEMA='$TABLE_SCHEMA'"`
+TABLES=`mysql -u$DBUSER -p$DBPASSWD -P$DBPORT --routines --single-transaction -B -N -e "select TABLE_NAME from information_schema.TABLES where TABLE_SCHEMA='$TABLE_SCHEMA'"`
 
 
 if [ ! -d $OUT ]; then
