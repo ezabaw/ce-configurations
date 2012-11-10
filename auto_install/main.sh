@@ -30,9 +30,11 @@ elif [ $CHOICE = 3 ];then
 elif [ $CHOICE = 4 ];then
 	echo "About to export Kaltura's MySQL DB.."
 	export_mysql_kalt_db
-	
+elif [ $CHOICE = 5 ];then
+	echo "About to export Kaltura's MySQL DB.."
+	`dirname $0`/cleanup.sh
 else
-	echo "Choose a value between 0-4"
+	echo "Choose a value between 1-5"
 	exit 1
 fi
 
