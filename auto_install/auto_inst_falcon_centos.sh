@@ -11,7 +11,7 @@ setup_pentaho
 set_selinux_permissive
 set_php_ini
 echo "Starting needed daemons.."
-for i in httpd memcached;do
+for i in httpd memcached crond;do
     /etc/init.d/$i start
     chkconfig $i on
 done
