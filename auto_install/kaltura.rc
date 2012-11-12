@@ -349,20 +349,18 @@ create_partner()
 	SPHINX_PORT=`echo $SPHINX_DSN |sed 's/.*host=.*;port=\(.*\);"/\1/'`
 	set +e
 	exec 3<>/dev/tcp/$SPHINX_BOX/$SPHINX_PORT
-	set -e
 	if [ $? -ne 0 ];then
 	    echo "Waiting for 15 seconds, giving Sphinx [$SPHINX_BOX] a chance to open a listener on $SPHINX_PORT.."
 	    sleep 15
 	fi
-	set +e
 	exec 3<>/dev/tcp/$SPHINX_BOX/$SPHINX_PORT
-	set -e
 	if [ $? -eq 0 ];then
 	    ADMIN_SECRET=`echo "select admin_secret from partner where id=-2;" |mysql -u"$DB1_USER" -p"$DB1_PASS" -P$DB1_PORT $DB1_NAME |sed '1,1d'`
 	    TEST_PARTNER_ID=`php $DIR_NAME/create_partner.php $ADMIN_SECRET $TEST_PARTNER_EMAIL $TEST_PARTNER_PASSWD `
 	else
 	    echo "Sphinx seems to be down :( I will not create a partner."
 	fi
+	set -e
 	echo $TEST_PARTNER_ID
 }
 
