@@ -272,6 +272,7 @@ remove_exec_bit()
 	for i in "*.xml" "*.template" "*.ttf" "*.xsl" "*.xsd" "*.yml" "*.smil" "*.srt" "*.sql" "*.orig" "*.patch" "*.po" "*.pdf" "*.otf" "*.txt" "*.php" "*.phtml" "*.project" "*.png" "*.properties" "*.sample" "*.swf" "*.sf" "*.swz" "*.uad" "*.prefs" "*.psd" "*.rvmrc" "*.sln" "*.ini" "*.log" ;do
 		find $KALT_PREFIX -iname "$i" -exec chmod 644 {} \;
 	done 
+	find $KALT_PREFIX -type d -perm 777 -exec chmod 755 {} \;
 }
 
 set_selinux_permissive()
@@ -347,6 +348,7 @@ create_partner()
 	SPHINX_DSN=`grep datasources.sphinx.connection.dsn "$APP_CONF_DIR/db.ini"|awk -F "= " '{print $2}'`
 	SPHINX_BOX=`echo $SPHINX_DSN |sed 's/.*host=\(.*\);port=.*/\1/'`
 	SPHINX_PORT=`echo $SPHINX_DSN |sed 's/.*host=.*;port=\(.*\);"/\1/'`
+	sleep 7 
 	set +e
 	exec 3<>/dev/tcp/$SPHINX_BOX/$SPHINX_PORT
 	if [ $? -ne 0 ];then
@@ -371,21 +373,20 @@ upload_assets()
 	SPHINX_DSN=`grep datasources.sphinx.connection.dsn "$APP_CONF_DIR/db.ini"|awk -F "= " '{print $2}'`
 	SPHINX_BOX=`echo $SPHINX_DSN |sed 's/.*host=\(.*\);port=.*/\1/'`
 	SPHINX_PORT=`echo $SPHINX_DSN |sed 's/.*host=.*;port=\(.*\);"/\1/'`
+	sleep 7
 	set +e
 	exec 3<>/dev/tcp/$SPHINX_BOX/$SPHINX_PORT
-	set -e
 	if [ $? -ne 0 ];then
 	    echo "Waiting for 15 seconds, giving Sphinx [$SPHINX_BOX] a chance to open a listener on $SPHINX_PORT.."
 	    sleep 15
 	fi
-	set +e
 	exec 3<>/dev/tcp/$SPHINX_BOX/$SPHINX_PORT
-	set -e
 	if [ $? -eq 0 ];then
 	    php $DIR_NAME/upload_csv.php $TEST_PARTNER_ID 'http://localhost' `echo "select admin_secret from partner where id=$TEST_PARTNER_ID;" |mysql -u"$DB1_USER" -p"$DB1_PASS" -P$DB1_PORT $DB1_NAME |sed '1,1d'` $TEST_PARTNER_EMAIL 
 	else
 	    echo "Sphinx seems to be down :( I will not create a partner."
 	fi
+	set -e
 	
 
 }
@@ -488,6 +489,7 @@ set_mysqldb_host()
 	sed "s@\(^DbReadPassword\)\s*=.*\$@\1=$DWH_PASS@g" -i $BASE_DIR/dwh/.kettle/kettle.properties
 
 	echo "Done reconfiguring MySQL operational and DWH DB and Sphinx :)"
+	/etc/init.d/httpd restart
 }
 DIR_NAME=`dirname $0`
 USER_INI_PATH=$DIR_NAME/user_input.ini
