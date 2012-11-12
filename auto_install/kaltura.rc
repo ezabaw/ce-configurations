@@ -30,13 +30,13 @@ setup_pentaho()
 		rm -rf "$PENTAHO_DIR" 
 		set +e
 		tar ztf $INSTALL_DIR/pdi-ce-$PENTAHO_VER-stable.tar.gz > /dev/null
-		set -e
 		if [ $? -ne 0 ];then
 		    echo "Archive does not exist or is corrupted."
 		    rm $INSTALL_DIR/pdi-ce-$PENTAHO_VER-stable.tar.gz*
 		    echo "Retrieving Pentaho.."
 		    wget $PENTAHO_URL
 		fi
+		set -e
 		echo "Extracting Pentaho archive and copying to $PENTAHO_DIR/pdi.."
 		tar zxf pdi-ce-$PENTAHO_VER-stable.tar.gz
 		mkdir -p $PENTAHO_DIR && mv data-integration $PENTAHO_DIR/pdi
