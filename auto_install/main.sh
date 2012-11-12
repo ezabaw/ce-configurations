@@ -36,7 +36,7 @@ elif [ $CHOICE = 5 ];then
 	`dirname $0`/cleanup.sh
 elif [ $CHOICE = 6 ];then
 	echo "About to configure MySQL && Sphinx for this host.."
-	set_sphinx_host
+	set_mysqldb_host
 else
 	echo "Choose a value between 1-6"
 	exit 1
