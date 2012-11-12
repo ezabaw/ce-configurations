@@ -1,7 +1,7 @@
 verify_user_input()
 {
 for VAL in HTTPD_BIN PHP_BIN TIME_ZONE BASE_DIR KALT_VER PENTAHO_DIR PENTAHO_VER PENTAHO_URL COMMON_DEPS KALTURA_FULL_VIRTUAL_HOST_NAME ADMIN_CONSOLE_ADMIN_MAIL ADMIN_CONSOLE_PASSWORD DB1_HOST DB1_PORT DB1_NAME DB1_USER DB1_PASS KALT_USER KALT_GROUP TEST_PARTNER_EMAIL TEST_PARTNER_PASSWD DB1_CREATE_NEW_DB RED5_INSTALL; do
-	if [ -z "${!VAL}" ];then
+T	if [ -z "${!VAL}" ];then
 		echo "I need $VAL in user_input.ini"
 		exit 1
 	fi
@@ -412,6 +412,50 @@ configure_red5()
         fi
 }
 
+export_mysql_kalt_db()
+{
+	$DIR_NAME/export_db.sh $DB1_NAME $DB1_USER $DB1_PASS $DB1_PORT /tmp/${DB1_NAME}_`date +%d%m%y_%H%M`
+}
+
+disable_monitoring_tab()
+{
+    sed -i 's@^access.monitoring = SYSTEM_ADMIN_SYSTEM_MONITOR@;access.monitoring = SYSTEM_ADMIN_SYSTEM_MONITOR@g' "$BASE_DIR/app/configurations/admin.ini" 
+}
+
+#set_sphinx_host
+#{
+#
+#}
+
+set_mysqldb_host()
+{
+	for VAL in DWH_HOST DWH_USER DWH_PASS DWH_PORT DWH_DATABASE_NAME SPHINX_DB_HOST SPHINX_DB_NAME SPHINX_DB_USER SPHINX_DB_PASS SPHINX_DB_PORT;do
+		if [ -z "${!VAL}" ];then
+			echo "I need $VAL in user_input.ini"
+			exit 1
+		fi
+	done
+	mv $APP_CONF_DIR/db.ini $APP_CONF_DIR/db.ini.`date +%d_%m_%y`
+	cp $APP_CONF_DIR/db.template.ini $APP_CONF_DIR/db.ini
+	sed "s#@DB[0-3]_HOST@#$DB1_HOST#g" -i $APP_CONF_DIR/db.ini
+	sed "s#@DB[0-3]_USER@#$DB1_USER#g" -i $APP_CONF_DIR/db.ini
+	sed "s#@DB[0-3]_PASS@#$DB1_PASS#g" -i $APP_CONF_DIR/db.ini
+	sed "s#@DB[0-3]_PORT@#$DB1_PORT#g" -i $APP_CONF_DIR/db.ini
+	sed "s#@DB[0-3]_NAME@#$DB1_NAME#g" -i $APP_CONF_DIR/db.ini
+	
+	sed "s#@DWH_HOST@#$DWH_HOST#g" -i $APP_CONF_DIR/db.ini
+	sed "s#@DWH_USER@#$DWH_USER#g" -i $APP_CONF_DIR/db.ini
+	sed "s#@DWH_PASS@#$DWH_PASSWD#g" -i $APP_CONF_DIR/db.ini
+	sed "s#@DWH_PORT@#$DWH_PORT#g" -i $APP_CONF_DIR/db.ini
+	sed "s#@DWH_DATABASE_NAME@#$DWH_DATABASE_NAME#g" -i $APP_CONF_DIR/db.ini
+ #these are called 'SPHINX.*' but it is not for Sphinx but rather, for kaltura_sphinx_log which is a DB hosted in the operational MySQL server. Confusing? very much.
+	sed "s#@SPHINX_DB_NAME@kaltura_sphinx_log#g" -i $APP_CONF_DIR/db.ini
+	sed "s#@SPHINX_DB_USER@#$SPHINX_DB_USER#g" -i $APP_CONF_DIR/db.ini
+	sed "s#@SPHINX_DB_PASS@#$SPHINX_DB_PASS#g" -i $APP_CONF_DIR/db.ini
+	sed "s#@SPHINX_DB_PORT@#$SPHINX_DB_PORT#g" -i $APP_CONF_DIR/db.ini
+# this means the Sphinx [not MySQL] host:
+	sed "s#@SPHINX_DB_HOST@#$SPHINX_DB_HOST#g" -i $APP_CONF_DIR/db.ini
+}
 DIR_NAME=`dirname $0`
 USER_INI_PATH=$DIR_NAME/user_input.ini
 if [ -r "$USER_INI_PATH" ];then
@@ -428,41 +472,4 @@ else
 fi
 APP_CONF_DIR="$BASE_DIR/app/configurations"
 
-export_mysql_kalt_db()
-{
-	$DIR_NAME/export_db.sh $DB1_NAME $DB1_USER $DB1_PASS $DB1_PORT /tmp/${DB1_NAME}_`date +%d%m%y_%H%M`
-}
-
-disable_monitoring_tab()
-{
-    sed -i 's@^access.monitoring = SYSTEM_ADMIN_SYSTEM_MONITOR@;access.monitoring = SYSTEM_ADMIN_SYSTEM_MONITOR@g' "$BASE_DIR/app/configurations/admin.ini" 
-}
-
-#set_sphinx_host
-#{
-#
-#}
-
-set_mysqldb_host
-{
-	mv $APP_CONF_DIR/db.ini $APP_CONF_DIR/db.ini.`date +%d_%m_%y`
-	cp $APP_CONF_DIR/db.template.ini $APP_CONF_DIR/db.ini
-	sed "s#@DB[0-3]_HOST@#$DB1_HOST#g" -i $APP_CONF_DIR/db.ini
-	sed "s#@DB[0-3]_USER@#$DB1_USER#g" -i $APP_CONF_DIR/db.ini
-	sed "s#@DB[0-3]_PASS@#$DB1_PASS#g" -i $APP_CONF_DIR/db.ini
-	sed "s#@DB[0-3]_PORT@#$DB1_PORT#g" -i $APP_CONF_DIR/db.ini
-	sed "s#@DB[0-3]_NAME@#$DB1_NAME#g" -i $APP_CONF_DIR/db.ini
-	
-	sed "s#@DWH_HOST@#$DWH_HOST#g" -i $APP_CONF_DIR/db.ini
-	sed "s#@DWH_USER@#$DWH_USER#g" -i $APP_CONF_DIR/db.ini
-	sed "s#@DWH_PASS@#$DWH_PASSWD#g" -i $APP_CONF_DIR/db.ini
-	sed "s#@DWH_PORT@#$DWH_PORT#g" -i $APP_CONF_DIR/db.ini
-	sed "s#@DWH_PORT@#$DWH_PORT#g" -i $APP_CONF_DIR/db.ini
-
-	sed "s#@SPHINX_DB_HOST@#$SPHINX_DB_HOST#g" -i $APP_CONF_DIR/db.ini
-	sed "s#@SPHINX_DB_NAME@kaltura_sphinx_log#g" -i $APP_CONF_DIR/db.ini
-	sed "s#@SPHINX_DB_USER@#$SPHINX_DB_USER#g" -i $APP_CONF_DIR/db.ini
-	sed "s#@SPHINX_DB_PASS@#$SPHINX_DB_PASS#g" -i $APP_CONF_DIR/db.ini
-	sed "s#@SPHINX_DB_PORT@#$SPHINX_DB_PORT#g" -i $APP_CONF_DIR/db.ini
-}
 

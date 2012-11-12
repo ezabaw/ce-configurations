@@ -1,7 +1,6 @@
 #!/bin/sh -e
 
 . `dirname $0`/kaltura.rc
-probe_for_garbage
 cat << EOF 
 Welcome to Kaltura $KALT_VER setup tool
 Please select one of the following options:
@@ -15,18 +14,23 @@ EOF
 read CHOICE
 #if [ $CHOICE = 0 ];then
 	#echo "About to create an all in one instance.."
-	install_all_in_one
 #fi
 # if we are not all in one, make sure the user didn't set DB creation to 'y' by mistake.
 prompt_for_mysql_dsn
 if [ $CHOICE = 1 ];then
 	echo "About to create a batch instance.."
+	probe_for_garbage
+	install_all_in_one
 	install_batch
 elif [ $CHOICE = 2 ];then
-	echo "About to create a Sphinx instance.."
+	echo "About to create a Sphinx instance.."	
+	probe_for_garbage
+	install_all_in_one
 	install_sphinx
 elif [ $CHOICE = 3 ];then
 	echo "About to create an API instance.."
+	probe_for_garbage
+	install_all_in_one
 	install_api
 elif [ $CHOICE = 4 ];then
 	echo "About to export Kaltura's MySQL DB.."
