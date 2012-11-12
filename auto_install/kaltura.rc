@@ -15,11 +15,13 @@ install_deps()
 		read YESNO
 		if [ "$YESNO" = 'y' ];then
 			yum -y install mysql-server
-			echo "Setting lower_case_table_names = 1 in /etc/my.cnf.."
-			sed -i 's@^\[mysqld\]$@[mysqld]\nlower_case_table_names = 1\n@' /etc/my.cnf
-			/etc/init.d/mysqld restart
 			mysql_secure_installation
 		fi
+	fi
+	if [ "$DB1_HOST" = 'localhost' -o "$DB1_HOST" = '127.0.0.1' -o "$DB1_HOST" = `hostname` ];then
+		echo "Setting lower_case_table_names = 1 in /etc/my.cnf.."
+		sed -i 's@^\[mysqld\]$@[mysqld]\nlower_case_table_names = 1\n@' /etc/my.cnf
+		/etc/init.d/mysqld restart
 	fi
 }
 setup_pentaho()
