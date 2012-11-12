@@ -435,6 +435,7 @@ set_mysqldb_host()
 			exit 1
 		fi
 	done
+	echo "iCreating backup $APP_CONF_DIR/db.ini in $APP_CONF_DIR/db.ini.`date +%d_%m_%y`"
 	mv $APP_CONF_DIR/db.ini $APP_CONF_DIR/db.ini.`date +%d_%m_%y`
 	cp $APP_CONF_DIR/db.template.ini $APP_CONF_DIR/db.ini
 	sed "s#@DB[0-3]_HOST@#$DB1_HOST#g" -i $APP_CONF_DIR/db.ini
@@ -455,6 +456,36 @@ set_mysqldb_host()
 	sed "s#@SPHINX_DB_PORT@#$SPHINX_DB_PORT#g" -i $APP_CONF_DIR/db.ini
 # this means the Sphinx [not MySQL] host:
 	sed "s#@SPHINX_DB_HOST@#$SPHINX_DB_HOST#g" -i $APP_CONF_DIR/db.ini
+	
+	cp $BASE_DIR/dwh/.kettle/kettle.properties $BASE_DIR/dwh/.kettle/kettle.properties.`date +%d_%m_%y`
+	sed "s@\(^Db*HostName\)\s*=.*\$@\1=$DWH_HOST@g" -i $BASE_DIR/dwh/.kettle/kettle.properties
+	sed "s@\(^Db*Port\)\s*=.*\$@\1=$DWH_PORT@g" -i $BASE_DIR/dwh/.kettle/kettle.properties
+	sed "s@\(^Db*User\)\s*=.*\$@\1=$DWH_USER@g" -i $BASE_DIR/dwh/.kettle/kettle.properties
+	sed "s@\(^Db*Password\)\s*=.*\$@\1=$DWH_PASS@g" -i $BASE_DIR/dwh/.kettle/kettle.properties
+
+	#sed "s@\(^OpDb*HostName\)\s*=.*\$@\1=$DB1_HOST@g" -i $BASE_DIR/dwh/.kettle/kettle.properties
+	#sed "s@\(^OpDb*Port\)\s*=.*\$@\1=$DB1_PORT@g" -i $BASE_DIR/dwh/.kettle/kettle.properties
+	sed "s@DbUser = .*@DbUser=$DWH_USER@g" -i $BASE_DIR/dwh/.kettle/kettle.properties
+	sed "s@\(^DbPassword\)\s*=.*\$@\1=$DWH_PASS@g" -i $BASE_DIR/dwh/.kettle/kettle.properties
+	sed "s@\(^DbHostName\)\s*=.*\$@\1=$DWH_HOST@g" -i $BASE_DIR/dwh/.kettle/kettle.properties
+	sed "s@\(^DbPort\)\s*=.*\$@\1=$DWH_PORT@g" -i $BASE_DIR/dwh/.kettle/kettle.properties
+	sed "s@OpDbUser = .*@OpDbUser=$DWH_USER@g" -i $BASE_DIR/dwh/.kettle/kettle.properties
+	sed "s@\(^OpDbPassword\)\s*=.*\$@\1=$DWH_PASS@g" -i $BASE_DIR/dwh/.kettle/kettle.properties
+	sed "s@\(^OpDbHostName\)\s*=.*\$@\1=$DB1_HOST@g" -i $BASE_DIR/dwh/.kettle/kettle.properties
+	sed "s@\(^OpDbPort\)\s*=.*\$@\1=$DB1_PORT@g" -i $BASE_DIR/dwh/.kettle/kettle.properties
+	sed "s@OpDbUser = .*@OpDbUser=$DWH_USER@g" -i $BASE_DIR/dwh/.kettle/kettle.properties
+	sed "s@\(^OpWritableDbPassword\)\s*=.*\$@\1=$DWH_PASS@g" -i $BASE_DIR/dwh/.kettle/kettle.properties
+	sed "s@\(^OpWritableDbHostName\)\s*=.*\$@\1=$DB1_HOST@g" -i $BASE_DIR/dwh/.kettle/kettle.properties
+	sed "s@\(^OpWritableDbPort\)\s*=.*\$@\1=$DB1_PORT@g" -i $BASE_DIR/dwh/.kettle/kettle.properties
+	sed "s@OpDWritablebUser = .*@OpWritableDbUser=$DWH_USER@g" -i $BASE_DIR/dwh/.kettle/kettle.properties
+	sed "s@\(^OpDbPassword\)\s*=.*\$@\1=$DWH_PASS@g" -i $BASE_DIR/dwh/.kettle/kettle.properties
+	sed "s@\(^OpDbPassword\)\s*=.*\$@\1=$DWH_PASS@g" -i $BASE_DIR/dwh/.kettle/kettle.properties
+	sed "s@\(^DbReadHostName\)\s*=.*\$@\1=$DWH_HOST@g" -i $BASE_DIR/dwh/.kettle/kettle.properties
+	sed "s@\(^DbReadPort\)\s*=.*\$@\1=$DWH_PORT@g" -i $BASE_DIR/dwh/.kettle/kettle.properties
+	sed "s@\(^DbReadUser\)\s*=.*\$@\1=$DWH_USER@g" -i $BASE_DIR/dwh/.kettle/kettle.properties
+	sed "s@\(^DbReadPassword\)\s*=.*\$@\1=$DWH_PASS@g" -i $BASE_DIR/dwh/.kettle/kettle.properties
+
+	echo "Done reconfiguring MySQL operational and DWH DB and Sphinx :)"
 }
 DIR_NAME=`dirname $0`
 USER_INI_PATH=$DIR_NAME/user_input.ini
