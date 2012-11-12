@@ -16,7 +16,6 @@ read CHOICE
 	#echo "About to create an all in one instance.."
 #fi
 # if we are not all in one, make sure the user didn't set DB creation to 'y' by mistake.
-prompt_for_mysql_dsn
 if [ $CHOICE = 1 ];then
 	echo "About to create a batch instance.."
 	probe_for_garbage
