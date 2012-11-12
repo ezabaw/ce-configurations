@@ -21,16 +21,19 @@ if [ $CHOICE = 1 ];then
 	probe_for_garbage
 	install_all_in_one
 	install_batch
+	set_mysqldb_host
 elif [ $CHOICE = 2 ];then
 	echo "About to create a Sphinx instance.."	
 	probe_for_garbage
 	install_all_in_one
 	install_sphinx
+	set_mysqldb_host
 elif [ $CHOICE = 3 ];then
 	echo "About to create an API instance.."
 	probe_for_garbage
 	install_all_in_one
 	install_api
+	set_mysqldb_host
 elif [ $CHOICE = 4 ];then
 	echo "About to export Kaltura's MySQL DB.."
 	export_mysql_kalt_db
