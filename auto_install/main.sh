@@ -10,8 +10,7 @@ Please select one of the following options:
 3. API machine
 4. export Kaltura's MySQL DBs
 5. unistall
-6. configure Sphinx for this host
-7. configure DB for this host
+6. configure MySQL && Sphinx for this host
 EOF
 read CHOICE
 #if [ $CHOICE = 0 ];then
@@ -36,13 +35,10 @@ elif [ $CHOICE = 5 ];then
 	echo "Uninstall"
 	`dirname $0`/cleanup.sh
 elif [ $CHOICE = 6 ];then
-	echo "About to configure Sphinx for this host.."
-	set_sphinx
-elif [ $CHOICE = 7 ];then
-	echo "About to configure MySQL DB for this host.."
-	set_mysqldb
+	echo "About to configure MySQL && Sphinx for this host.."
+	set_sphinx_host
 else
-	echo "Choose a value between 1-7"
+	echo "Choose a value between 1-6"
 	exit 1
 fi
 

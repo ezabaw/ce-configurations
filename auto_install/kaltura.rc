@@ -438,4 +438,31 @@ disable_monitoring_tab()
     sed -i 's@^access.monitoring = SYSTEM_ADMIN_SYSTEM_MONITOR@;access.monitoring = SYSTEM_ADMIN_SYSTEM_MONITOR@g' "$BASE_DIR/app/configurations/admin.ini" 
 }
 
+#set_sphinx_host
+#{
+#
+#}
+
+set_mysqldb_host
+{
+	mv $APP_CONF_DIR/db.ini $APP_CONF_DIR/db.ini.`date +%d_%m_%y`
+	cp $APP_CONF_DIR/db.template.ini $APP_CONF_DIR/db.ini
+	sed "s#@DB[0-3]_HOST@#$DB1_HOST#g" -i $APP_CONF_DIR/db.ini
+	sed "s#@DB[0-3]_USER@#$DB1_USER#g" -i $APP_CONF_DIR/db.ini
+	sed "s#@DB[0-3]_PASS@#$DB1_PASS#g" -i $APP_CONF_DIR/db.ini
+	sed "s#@DB[0-3]_PORT@#$DB1_PORT#g" -i $APP_CONF_DIR/db.ini
+	sed "s#@DB[0-3]_NAME@#$DB1_NAME#g" -i $APP_CONF_DIR/db.ini
+	
+	sed "s#@DWH_HOST@#$DWH_HOST#g" -i $APP_CONF_DIR/db.ini
+	sed "s#@DWH_USER@#$DWH_USER#g" -i $APP_CONF_DIR/db.ini
+	sed "s#@DWH_PASS@#$DWH_PASSWD#g" -i $APP_CONF_DIR/db.ini
+	sed "s#@DWH_PORT@#$DWH_PORT#g" -i $APP_CONF_DIR/db.ini
+	sed "s#@DWH_PORT@#$DWH_PORT#g" -i $APP_CONF_DIR/db.ini
+
+	sed "s#@SPHINX_DB_HOST@#$SPHINX_DB_HOST#g" -i $APP_CONF_DIR/db.ini
+	sed "s#@SPHINX_DB_NAME@kaltura_sphinx_log#g" -i $APP_CONF_DIR/db.ini
+	sed "s#@SPHINX_DB_USER@#$SPHINX_DB_USER#g" -i $APP_CONF_DIR/db.ini
+	sed "s#@SPHINX_DB_PASS@#$SPHINX_DB_PASS#g" -i $APP_CONF_DIR/db.ini
+	sed "s#@SPHINX_DB_PORT@#$SPHINX_DB_PORT#g" -i $APP_CONF_DIR/db.ini
+}
 
