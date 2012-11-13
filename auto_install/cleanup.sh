@@ -40,6 +40,7 @@ if [ "$CHOICE" = "1" ];then
                         rm -rf /etc/init.d/sphinx_watch.sh
                         rm -rf /etc/init.d/serviceBatchMgr.sh
                         rm -rf /etc/init.d/red5
+						pkill -u kaltura
                         rm -rf /opt/kaltura/
                         rm -rf /usr/local/pentaho/
                         service httpd stop
@@ -74,6 +75,7 @@ if [ "$CHOICE" = "2" ];then
                 rm -rf /etc/cron.d/dwh_crontab
                 rm -rf /etc/init.d/sphinx_watch.sh
                 rm -rf /etc/init.d/serviceBatchMgr.sh
+				pkill -u kaltura
                 rm -rf /opt/kaltura/
                 userdel mysql
                 userdel apache
