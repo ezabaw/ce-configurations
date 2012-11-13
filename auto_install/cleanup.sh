@@ -1,4 +1,4 @@
-#!/bin/sh -ex
+#!/bin/sh
 
 cat << EOF
 Please select the uninstall option
