@@ -15,6 +15,7 @@ install_deps()
 		read YESNO
 		if [ "$YESNO" = 'y' ];then
 			yum -y install mysql-server
+			/etc/init.d/mysqld restart
 			mysql_secure_installation
 		fi
 	fi
