@@ -29,6 +29,6 @@ for i in sphinx_watch.sh serviceBatchMgr.sh;do
 	chkconfig $i on
 done
 /etc/init.d/serviceBatchMgr.sh restart
+set +e
 create_partner
 upload_assets $TEST_PARTNER_ID
-
