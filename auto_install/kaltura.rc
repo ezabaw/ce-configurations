@@ -273,7 +273,6 @@ remove_exec_bit()
 	for i in "*.xml" "*.template" "*.ttf" "*.xsl" "*.xsd" "*.yml" "*.smil" "*.srt" "*.sql" "*.orig" "*.patch" "*.po" "*.pdf" "*.otf" "*.txt" "*.php" "*.phtml" "*.project" "*.png" "*.properties" "*.sample" "*.swf" "*.sf" "*.swz" "*.uad" "*.prefs" "*.psd" "*.rvmrc" "*.sln" "*.ini" "*.log" ;do
 		find $KALT_PREFIX -iname "$i" -exec chmod 644 {} \;
 	done 
-	find $KALT_PREFIX -type d -perm 777 -exec chmod 755 {} \;
 }
 
 set_selinux_permissive()
@@ -303,6 +302,7 @@ set_php_ini()
 fix_permissions()
 {
 	echo "Changing file permissions.."
+	find $BASE_DIR -type d -perm 777 -exec chmod 755 {} \;
 	find $BASE_DIR -name "cache" -exec chown -R $KALT_USER.$KALT_GROUP {} \;
 	find $BASE_DIR -name "tmp" -exec chown -R $KALT_USER.$KALT_GROUP {} \;
 	find $BASE_DIR -name "log" -exec chown -R $KALT_USER.$KALT_GROUP {} \;
