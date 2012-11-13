@@ -4,6 +4,7 @@
 cat << EOF 
 Welcome to Kaltura $KALT_VER setup tool
 Please select one of the following options:
+0. install an all in 1 instance
 1. batch instance
 2. sphinx instance
 3. API machine
@@ -12,9 +13,10 @@ Please select one of the following options:
 6. configure MySQL && Sphinx for this host
 EOF
 read CHOICE
-#if [ $CHOICE = 0 ];then
-	#echo "About to create an all in one instance.."
-#fi
+if [ $CHOICE = 0 ];then
+	echo "About to create an all in one instance.."
+	install_all_in_one
+fi
 # if we are not all in one, make sure the user didn't set DB creation to 'y' by mistake.
 if [ $CHOICE = 1 ];then
 	echo "About to create a batch instance.."
