@@ -221,6 +221,10 @@ install_api()
 		/etc/init.d/mysqld stop
 		chkconfig mysqld off
 	fi
+	if [ "$SPHINX_DB_HOST" != "localhost" ];then
+		/etc/init.d/sphinx_watch.sh stop
+		chkconfig sphinx_watch.sh off
+	fi
 	clear_host_from_scheduler
 
 }
