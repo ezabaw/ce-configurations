@@ -424,7 +424,12 @@ configure_red5()
 
 export_mysql_kalt_db()
 {
-	$DIR_NAME/export_db.sh $DB1_NAME $DB1_USER $DB1_PASS $DB1_PORT /tmp/${DB1_NAME}_`date +%d%m%y_%H%M`
+	if [ -z "$TMPDIR" ];then
+		TMPDIR=/tmp
+	fi
+	$DIR_NAME/export_db.sh $DB1_NAME $DB1_USER $DB1_PASS $DB1_PORT $TMPDIR/${DB1_NAME}_`date +%d%m%y_%H%M`
+	$DIR_NAME/export_db.sh mysql $DB1_USER $DB1_PASS $DB1_PORT $TMPDIR/mysql_`date +%d%m%y_%H%M`
+	$DIR_NAME/export_db.sh $DWH_DATABASE_NAME $DWH_USER $DWH_PASS $DWH_PORT $TMPDIR/${DWH_DATABASE_NAME}_`date +%d%m%y_%H%M`
 }
 
 disable_monitoring_tab()

@@ -34,7 +34,7 @@ fi
 
 for TABLE in $TABLES; do
 	if [ -n "$6" ];then
-		echo -n "dumping $TABLE_SCHEMA.$TABLE..."
+		echo -n "dumping $TABLE_SCHEMA.$TABLE... to $OUT"
 	fi
     	mysqldump -u$DBUSER -p$DBPASSWD -P$DBPORT --routines --single-transaction $TABLE_SCHEMA $TABLE | gzip > $OUT/$TABLE_SCHEMA.$TABLE.sql.gz
 done
