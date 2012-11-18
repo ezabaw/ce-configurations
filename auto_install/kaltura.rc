@@ -328,7 +328,7 @@ configure_apache()
 	sed -i "s@^User@#User@" /etc/httpd/conf/httpd.conf
 	sed -i "s@^Group@#Group@" /etc/httpd/conf/httpd.conf
 	sed -i "1iUser $KALT_USER\nGroup $KALT_GROUP\n" $BASE_DIR/app/configurations/apache/my_kaltura.conf
-	if [ -d /var/lib/php/session ];then chown $KALT_USER.$KALT_GROUP /var/lib/php/session;fi
+	if [ -d /var/lib/php/session ];then chown -R $KALT_USER.$KALT_GROUP /var/lib/php/session;fi
 	echo "Linking /opt/kaltura/app/configurations/apache/my_kaltura.conf to /etc/httpd/conf.d.."
 	rm /etc/httpd/conf.d/my_kaltura.conf 2>/dev/null||true
 	ln -s $BASE_DIR/app/configurations/apache/my_kaltura.conf /etc/httpd/conf.d/
