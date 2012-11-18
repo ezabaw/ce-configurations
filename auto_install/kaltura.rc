@@ -215,7 +215,7 @@ install_api()
 	for i in reportUsageTrackingIfOptIn.php watch.batchMgr.sh dwh_plays_views_sync.sh send-usage-report.php;do  
 		sed -i "s@\(.*$i.*\)@#commented out by $0 when configuring api: \1@g" crontab/kaltura_crontab; 
 	done
-	for i in serviceBatchMgr.sh watch.populate.sh serviceBatchMgr.sh;do
+	for i in serviceBatchMgr.sh serviceBatchMgr.sh;do
 		/etc/init.d/$i stop
 		chkconfig $i off
 	done
