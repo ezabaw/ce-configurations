@@ -1,5 +1,12 @@
 #!/bin/sh
 
+. `dirname $0`/kaltura.rc
+if [ $# -eq 1 ];then
+    INSTALL_DIR=$1
+else
+    INSTALL_DIR=`pwd`
+fi
+
 cat << EOF
 Please select the uninstall option
 1. Remove Kaltura and modifications that were done to services(Apache, MySQL, PHP, Memcache) during the install. Packages will NOT be removed. (Recommended on servers that are doing other things.)
@@ -15,6 +22,7 @@ if [ "$CHOICE" = "1" ];then
         read YESNO
         if [ "$YESNO" = "y" ];then
                         echo "Continuing..."
+			php $INSTALL_DIR/installer/uninstall.php
 			for i in sphinx_watch.sh serviceBatchMgr.sh red5;do
 				if [ -f /etc/init.d/$i -o -h /etc/init.d/$i ];then
 					service $i stop
@@ -28,7 +36,7 @@ if [ "$CHOICE" = "1" ];then
 			service mysqld stop
                         rm -rf /var/lib/mysql/kaltura*
 			echo "Removed Kaltura Mysql DBs"
-                        sed -i '/lower_case_table_names = 1/d' /etc/my.cnf
+                        sed -i '/^lower_case_table_names = 1/d' /etc/my.cnf
                         service mysqld start
 
                         if [ -d /etc/php.d ];then
@@ -36,12 +44,14 @@ if [ "$CHOICE" = "1" ];then
 					echo "Removed php kaltura.ini"
                         else
                                         INI_FILE="/etc/php.ini"
-                                        sed -i 's/request_order = "CGP"/request_order = "GP"/' $INI_FILE
-                                        sed -i 's/upload_tmp_dir*.*web\/tmp//g' $INI_FILE
+                                        #sed -i 's/^request_order = "CGP"/request_order = "GP"/' $INI_FILE
+                                        #sed -i 's/^upload_tmp_dir*.*web\/tmp//g' $INI_FILE
+					sed -i "s/^\(request_order*.*\"CGP\"\)$/;commented by $0: \1\nrequest_order = \"GP\"/" $INI_FILE
+					sed -i "s/^\(upload_tmp_dir*.*web\/tmp*.*\)$/;commented on `date +%d-%m-%y` by $0: \1\nupload_tmp_dir =/" $INI_FILE
                         fi
 
 			for i in /etc/cron.d/kaltura_crontab /etc/cron.d/dwh_crontab /opt/kaltura/ /usr/local/pentaho/ /etc/httpd/conf.d/my_kaltura.conf;do
-				if [ -f $i -o -h $i ];then
+				if [ -f $i -o -h $i -o -d $i ];then
 					rm -rf $i
 					echo "Removed $i"
 				fi
@@ -103,25 +113,29 @@ if [ "$CHOICE" = "2" ];then
 fi
 
 if [ "$CHOICE" = "3" ];then
-  	        service sphinx_watch.sh stop
-                service serviceBatchMgr.sh stop
-                service red5 stop
-                service mysqld stop
-                service httpd stop
-                yum remove -y httpd* memcached php*
-                rm -rf /etc/httpd/
-                rm -rf /etc/php.ini
-                rm -rf /etc/php.d/
-                chkconfig --del sphinx_watch.sh
-                chkconfig --del red5
-                rm -rf /etc/cron.d/kaltura_crontab
-                rm -rf /etc/cron.d/dwh_crontab
-                rm -rf /etc/init.d/sphinx_watch.sh
-                rm -rf /etc/init.d/serviceBatchMgr.sh
-                pkill -u kaltura
-                rm -rf /opt/kaltura/
+
+		yum remove -y httpd* memcached php*
+
+		for i in sphinx_watch.sh serviceBatchMgr.sh red5 httpd memcached;do
+                                if [ -f /etc/init.d/$i -o -h /etc/init.d/$i ];then
+                                        service $i stop
+                                        chkconfig $i off
+                                        chkconfig --del $i
+                                        rm -rf /etc/init.d/$i
+                                        echo "Removed /etc/init.d/$i"
+                                fi
+                done
+
+		pkill -u kaltura
+
+		for i in /etc/httpd/ /etc/php.ini /etc/php.d/ /etc/cron.d/kaltura_crontab /etc/cron.d/dwh_crontab /etc/init.d/sphinx_watch.sh /etc/init.d/serviceBatchMgr.sh /opt/kaltura/ /usr/local/pentaho/;do
+                                if [ -f $i -o -h $i -o -d $i ];then
+                                        rm -rf $i
+                                        echo "Removed $i"
+                                fi
+                done
+
                 userdel apache
                 userdel memcached
                 userdel kaltura
-                rm -rf /usr/local/pentaho/
 fi
