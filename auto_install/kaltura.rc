@@ -1,6 +1,6 @@
 verify_user_input()
 {
-for VAL in HTTPD_BIN PHP_BIN TIME_ZONE BASE_DIR KALT_VER PENTAHO_DIR PENTAHO_VER PENTAHO_URL COMMON_DEPS KALTURA_FULL_VIRTUAL_HOST_NAME ADMIN_CONSOLE_ADMIN_MAIL ADMIN_CONSOLE_PASSWORD DB1_HOST DB1_PORT DB1_NAME DB1_USER DB1_PASS KALT_USER KALT_GROUP TEST_PARTNER_EMAIL TEST_PARTNER_PASSWD DB1_CREATE_NEW_DB RED5_INSTALL; do
+for VAL in HTTPD_BIN PHP_BIN TIME_ZONE BASE_DIR KALT_VER PENTAHO_DIR PENTAHO_VER PENTAHO_URL COMMON_DEPS KALTURA_FULL_VIRTUAL_HOST_NAME ADMIN_CONSOLE_ADMIN_MAIL ADMIN_CONSOLE_PASSWORD DB1_HOST DB1_PORT DB1_NAME DB1_USER DB1_PASS KALT_USER KALT_GROUP TEST_PARTNER_EMAIL TEST_PARTNER_PASSWD DB1_CREATE_NEW_DB ; do
 	if [ -z "${!VAL}" ];then
 		echo "I need $VAL in user_input.ini"
 		exit 1
@@ -26,6 +26,9 @@ install_deps()
 		sed -i 's@^\[mysqld\]$@[mysqld]\nlower_case_table_names = 1\n@' $MY_CNF
 		/etc/init.d/mysqld restart
 	fi
+	for i in httpd mysqld memcached;do
+		chkconfig $i on
+	done
 }
 setup_pentaho()
 {
@@ -413,6 +416,7 @@ create_mysql_user()
 	if [ $? -eq 0 ];then
 		sed -i "s@^DB1_USER\s*=\s*.*@DB1_USER=$KALT_USER@g" $DIR_NAME/user_input.ini
 		sed -i "s@^DB1_PASS\s*=\s*.*@DB1_PASS=$KALT_MYSQL_PASSWD@g" $DIR_NAME/user_input.ini
+		sed -i "s@^SPHINX_DB_PASS\s*=\s*.*@SPHINX_DB_PASS=$KALT_MYSQL_PASSWD@g" $DIR_NAME/user_input.ini
 	fi
 }
 
