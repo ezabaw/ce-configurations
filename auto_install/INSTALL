@@ -1,0 +1,39 @@
+AUTHOR: Jess Portnoy
+VERSION: 0.1
+LAST MODIFIED: Thu Nov 22 16:27:43 EST 2012
+
+This is a mini howto for using the auto Kaltura OnPrem auto installer.
+
+Pre-reqs:
+=========
+Download the OnPrem package from:
+http://ciserver:9090/job/Kaltura-OnPrem-Falcon-Package/148/artifact/output/TM-v6.0.1-QA-148.tgz
+
+Note that this requires VPN access to the IL intra. If you do not have creds, please contact Shlomi Ben David <Shlomi.Ben.David@kaltura.com>.
+
+The auto install files can be obtained from:
+svn+ssh://kelev.kaltura.com/usr/local/kalsource/backend/server/trunk/on-premise/all/auto_install
+If you do not have an SVN account on kelev, please contact Shlomi Ben David <Shlomi.Ben.David@kaltura.com>.
+Files should be placed under the basedir of the OnPrem archive. For instance, if you extracted the package to:
+tar zxvf /tmp/TM-v6.0.1-QA-148.tgz -C /tmp/
+Auto installer should be placed under: /tmp/Kaltura-TM-v6.0.1
+
+Before running the installer, one needs to edit user_input.ini. 
+A sample file can be found under:
+svn+ssh://kelev.kaltura.com/usr/local/kalsource/backend/server/trunk/on-premise/all/auto_install/
+
+To run the auto installer, type as super user:
+# ./main.sh
+You will be presented with the following options:
+
+0. install an all in 1 instance
+1. batch instance
+2. sphinx instance
+3. API machine
+4. export Kaltura's MySQL DBs
+5. configure MySQL && Sphinx for this host
+6. unistall
+
+
+
+
