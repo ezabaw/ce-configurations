@@ -9,8 +9,8 @@ Please select one of the following options:
 2. sphinx instance
 3. API machine
 4. export Kaltura's MySQL DBs
-5. unistall
-6. configure MySQL && Sphinx for this host
+5. configure MySQL && Sphinx for this host
+6. unistall
 EOF
 read CHOICE
 if [ $CHOICE = 0 ];then
@@ -40,13 +40,14 @@ elif [ $CHOICE = 4 ];then
 	echo "About to export Kaltura's MySQL DB.."
 	export_mysql_kalt_db
 elif [ $CHOICE = 5 ];then
-	echo "Uninstall"
-	`dirname $0`/cleanup.sh
-elif [ $CHOICE = 6 ];then
 	echo "About to configure MySQL && Sphinx for this host.."
 	set_mysqldb_host
+elif [ $CHOICE = 6 ];then
+	echo "Uninstalling"
+	`dirname $0`/cleanup.sh
 else
 	echo "Choose a value between 1-6"
 	exit 1
 fi
-cp `dirname $0`/user_input.ini $DIR_NAME/etc/auto_inst
+cd `dirname $0`
+cp auto_inst_falcon_centos.sh cleanup.sh export_db.sh main.sh monit mysql_rep.sh create_* upload_csv.php monit.rc user_input.ini $DIR_NAME/etc/auto_inst
