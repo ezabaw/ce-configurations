@@ -1,4 +1,4 @@
-The following pre-requisites are needed for Falcon:
+The folloowing pre-requisites are needed for Falcon:
 ===================================================
 
 NOTE: RPM package names listed in this document are as they are called in CentOS/RHEL and may vary for other Linux distros.
@@ -15,8 +15,8 @@ Memcached is used for caching purposes to accelerate performance.
 mysql client binaries as well as rsync are used by shell scripts provided with the Kaltura platform.
 java is used by Pentaho for Analytics purposes.
 ImageMagic is used for generating video thumbnails.
-cronie is needed for the scheduling various cronjobs, for both maintanence and daemon watchdog purposes.
-An MTA such as: postfix, sendmail, exim or any other sendmail compatible variation is reqiured to allow email delivery.
+cronie is needed for the scheduling various cronjobs, for both maintenance and daemon watchdog purposes.
+An MTA such as: postfix, sendmail, exim or any other sendmail compatible variation is required to allow email delivery.
 mailx is used by various shell scripts in order to send out mail alerts about various system events.
 
 The following Apache modules need to be enabled:
