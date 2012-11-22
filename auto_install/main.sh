@@ -7,7 +7,7 @@ Please select one of the following options:
 0. install an all in 1 instance
 1. batch instance
 2. sphinx instance
-3. API machine
+3. front [API] machine
 4. export Kaltura's MySQL DBs
 5. configure MySQL && Sphinx for this host
 6. unistall
