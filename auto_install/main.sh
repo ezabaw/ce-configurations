@@ -50,4 +50,6 @@ else
 	exit 1
 fi
 cd `dirname $0`
-cp auto_inst_falcon_centos.sh cleanup.sh export_db.sh main.sh monit mysql_rep.sh create_* upload_csv.php monit.rc user_input.ini $DIR_NAME/etc/auto_inst
+if [ $CHOICE != 6 ];then
+	cp auto_inst_falcon_centos.sh cleanup.sh export_db.sh main.sh monit mysql_rep.sh create_* upload_csv.php monit.rc user_input.ini $DIR_NAME/etc/auto_inst
+fi

@@ -522,6 +522,6 @@ else
 	KALT_PREFIX=/opt/kaltura
 fi
 APP_CONF_DIR="$BASE_DIR/app/configurations"
-mkdir $DIR_NAME/etc/auto_inst
+mkdir -p $BASE_DIR/etc/auto_inst
 MANIFEST_FILE=$BASE_DIR/etc/auto_inst/`basename $0`.manifest
 
