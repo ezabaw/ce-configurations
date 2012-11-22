@@ -49,4 +49,4 @@ else
 	echo "Choose a value between 1-6"
 	exit 1
 fi
-
+cp `dirname $0`/user_input.ini $DIR_NAME/etc/auto_inst
