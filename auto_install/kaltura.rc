@@ -111,6 +111,7 @@ install_all_in_one()
 {
 	$DIR_NAME/auto_inst_falcon_centos.sh	
 	cp $DIR_NAME/package/app/crontab/kaltura_crontab $BASE_DIR/crontab/kaltura_crontab.templ
+	echo "Configured `hostname` as an all in 1 server on `date`">> $BASE_DIR/etc/`basename $0`.manifest
 }
 	
 create_common_runme()
@@ -181,6 +182,7 @@ install_batch()
 	ln -s $APP_CONF_DIR/apache/my_kaltura_apiv3.conf /etc/httpd/conf.d/
 	/etc/init.d/httpd restart
 	/etc/init.d/serviceBatchMgr.sh restart
+	echo "Configured `hostname` as a batch instance on `date`">> $BASE_DIR/etc/`basename $0`.manifest
 
 }
 
@@ -205,6 +207,7 @@ install_sphinx()
 	fi
 	/etc/init.d/sphinx_watch.sh restart
 	clear_host_from_scheduler
+	echo "Configured `hostname` as a Sphinx instance on `date`">> $BASE_DIR/etc/`basename $0`.manifest
 }
 
 install_api()
@@ -231,6 +234,7 @@ install_api()
 		chkconfig sphinx_watch.sh off
 	fi
 	clear_host_from_scheduler
+	echo "Configured `hostname` as an API instance on `date`">> $BASE_DIR/etc/`basename $0`.manifest
 
 }
 
@@ -240,10 +244,6 @@ clear_host_from_scheduler()
 	echo "$SQL"|mysql -h$DB1_HOST -u$DB1_USER -P$DB1_PORT -p$DB1_PASS
 
 }
-#reconfigure_host()
-#{
-#
-#}
 
 fix_hostname_values()
 {
