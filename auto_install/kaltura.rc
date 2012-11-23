@@ -507,6 +507,17 @@ set_mysqldb_host()
 	echo "Done reconfiguring MySQL operational and DWH DB and Sphinx :)"
 	/etc/init.d/httpd restart
 }
+
+create_kaltura_profile.sh()
+{
+	PROF_FILE=/etc/profile.d/kaltura.sh
+	touch $PROF_FILE
+	if ! grep -q HISTTIMEFORMAT $PROF_FILE;then
+		echo "HISTTIMEFORMAT='%F %T '" >> $PROF_FILE
+		echo "export HISTTIMEFORMAT" >> $PROF_FILE
+	fi
+	. $PROF_FILE
+}
 DIR_NAME=`dirname $0`
 if [ -z "$DIR_NAME" ];then
     DIR_NAME='.'
