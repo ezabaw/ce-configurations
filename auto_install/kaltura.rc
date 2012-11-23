@@ -508,6 +508,9 @@ set_mysqldb_host()
 	/etc/init.d/httpd restart
 }
 DIR_NAME=`dirname $0`
+if [ -z "$DIR_NAME" ];then
+    DIR_NAME='.'
+fi
 USER_INI_PATH=$DIR_NAME/user_input.ini
 if [ -r "$USER_INI_PATH" ];then
 	. "$USER_INI_PATH"
