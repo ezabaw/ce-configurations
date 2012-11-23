@@ -56,3 +56,15 @@ Files:
 * upload_csv.php - an API script to upload test content, makes use of kaltura_batch_upload_eagle.csv which is also included under the same directory.
 * mysql_rep.sh - configures replication between MySQL master and node instances.
 
+Using kaltura.rc functions to write your own scripts:
+=====================================================
+The following sample code shall create a test partner based on the following values from user_input.ini:
+TEST_PARTNER_EMAIL=jess@kaltura.com
+TEST_PARTNER_PASSWD=jesskalt
+
+And then use the upload_assets function which makes use of upload_csv.php to perform a bulk upload operation.
+
+#!/bin/sh
+. kaltura.rc
+create_partner
+upload_assets $TEST_PARTNER_ID
