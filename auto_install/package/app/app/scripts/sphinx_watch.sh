@@ -8,7 +8,7 @@ if [ -L $0 ];then
 else
 	REAL_SCRIPT=$0
 fi
-. `dirname $REAL_SCRIPT`/../configurations/system.ini
+. @APP_DIR@/configurations/system.ini
 
 COMMAND="$APP_DIR/plugins/sphinx_search/scripts/watch.daemon.sh -u root"
 POP_COMMAND="$APP_DIR/plugins/sphinx_search/scripts/watch.populate.sh @APP_DIR@/plugins/sphinx_search/scripts/configs/server-sphinx.php"
