@@ -506,6 +506,7 @@ set_mysqldb_host()
 
 	echo "Done reconfiguring MySQL operational and DWH DB and Sphinx :)"
 	/etc/init.d/httpd restart
+	echo "Reconfigured `hostname`'s operational and DWH DB and Sphinx on `date`">> $MANIFEST_FILE
 }
 
 create_kaltura_profile()
