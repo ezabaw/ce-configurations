@@ -112,6 +112,7 @@ install_all_in_one()
 	$DIR_NAME/auto_inst_falcon_centos.sh	
 	cp $DIR_NAME/package/app/crontab/kaltura_crontab $BASE_DIR/crontab/kaltura_crontab.templ
 	echo "Configured `hostname` as an all in 1 server on `date`">> $MANIFEST_FILE
+	echo "single" > $ROLE_FILE
 }
 	
 create_common_runme()
@@ -157,7 +158,6 @@ prompt_for_mysql_dsn()
 
 install_batch()
 {
-	#install_all_in_one
 	cd $BASE_DIR
 	rm /etc/cron.d/dwh_crontab||true
 	cp crontab/kaltura_crontab crontab/kaltura_crontab.bak.`date +%d_%m_%y`
@@ -183,12 +183,12 @@ install_batch()
 	/etc/init.d/httpd restart
 	/etc/init.d/serviceBatchMgr.sh restart
 	echo "Configured `hostname` as a batch instance on `date`">> $MANIFEST_FILE
+	echo "batch" > $ROLE_FILE
 
 }
 
 install_sphinx()
 {
-	#install_all_in_one
 	cd $BASE_DIR
 	rm /etc/cron.d/dwh_crontab || true
 	cp crontab/kaltura_crontab crontab/kaltura_crontab.bak.`date +%d_%m_%y`
@@ -208,6 +208,7 @@ install_sphinx()
 	/etc/init.d/sphinx_watch.sh restart
 	clear_host_from_scheduler
 	echo "Configured `hostname` as a Sphinx instance on `date`">> $MANIFEST_FILE
+	echo "Sphinx" > $ROLE_FILE
 }
 
 install_api()
@@ -235,6 +236,7 @@ install_api()
 	fi
 	clear_host_from_scheduler
 	echo "Configured `hostname` as an API instance on `date`">> $MANIFEST_FILE
+	echo "API" > $ROLE_FILE
 
 }
 
@@ -539,4 +541,4 @@ fi
 APP_CONF_DIR="$BASE_DIR/app/configurations"
 mkdir -p $BASE_DIR/etc/auto_inst
 MANIFEST_FILE=$BASE_DIR/etc/auto_inst/`basename $0`.manifest
-
+ROLE_FILE=$BASE_DIR/etc/auto_inst/role
