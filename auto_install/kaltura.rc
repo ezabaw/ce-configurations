@@ -508,7 +508,7 @@ set_mysqldb_host()
 	/etc/init.d/httpd restart
 }
 
-create_kaltura_profile.sh()
+create_kaltura_profile()
 {
 	PROF_FILE=/etc/profile.d/kaltura.sh
 	touch $PROF_FILE
