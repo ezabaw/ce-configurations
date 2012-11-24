@@ -10,7 +10,8 @@ Please select one of the following options:
 3. front [API] machine
 4. export Kaltura's MySQL DBs
 5. configure MySQL && Sphinx for this host
-6. unistall
+6. check for port connectivity
+7. unistall
 EOF
 read CHOICE
 if [ $CHOICE = 0 ];then
@@ -43,10 +44,13 @@ elif [ $CHOICE = 5 ];then
 	echo "About to configure MySQL && Sphinx for this host.."
 	set_mysqldb_host
 elif [ $CHOICE = 6 ];then
+	echo "Checking network port connectivity.."
+	check_port_connectivity
+elif [ $CHOICE = 7 ];then
 	echo "Uninstalling"
 	`dirname $0`/cleanup.sh
 else
-	echo "Choose a value between 1-6"
+	echo "Choose a value between 1-7"
 	exit 1
 fi
 cd `dirname $0`

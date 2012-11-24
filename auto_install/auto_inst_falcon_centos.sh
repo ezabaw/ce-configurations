@@ -32,3 +32,4 @@ done
 create_kaltura_profile
 create_partner
 upload_assets $TEST_PARTNER_ID
+check_port_connectivity
