@@ -7,6 +7,30 @@ for VAL in HTTPD_BIN PHP_BIN TIME_ZONE BASE_DIR KALT_VER PENTAHO_DIR PENTAHO_VER
 	fi
 done
 }
+check_port_connectivity()
+{
+	set +e
+	echo "Checking $KALTURA_FULL_VIRTUAL_HOST_NAME on port 80.."
+	nc -z $KALTURA_FULL_VIRTUAL_HOST_NAME 80 -w2	
+	if [ $? -ne 0 ];then echo "Connection to $KALTURA_FULL_VIRTUAL_HOST_NAME on port 80 [tcp/http] failed!";echo;fi
+	echo "Checking $NFS_SERVER on port 2049.."
+	nc -z $NFS_SERVER 2049 -w2
+	if [ $? -ne 0 ];then echo "Connection to $NFS_SERVER on port 2049 [tcp/nfs] failed!";echo;fi
+	echo "Checking $NFS_SERVER on port 2049.."
+	nc -z -u $NFS_SERVER 2049 -w2
+	if [ $? -ne 0 ];then echo "Connection to $NFS_SERVER on port 2049 [udp/nfs] failed!";echo;fi
+	echo "Checking $DB1_HOST on port $DB1_PORT.."
+	nc -z $DB1_HOST $DB1_PORT -w2
+	if [ $? -ne 0 ];then echo "Connection to $DB1_HOST on port $DB1_PORT [tcp/mysql] failed!";echo;fi
+	echo "Checking $SPHINX_DB_HOST on port 9312.."
+	nc -z $SPHINX_DB_HOST 9312 -w2
+	if [ $? -ne 0 ];then echo "Connection to $SPHINX_DB_HOST on port 9312 [tcp/sphinxapi] failed!";echo;fi
+	echo "Checking $KALTURA_FULL_VIRTUAL_HOST_NAME on port 443.."
+	nc -z $KALTURA_FULL_VIRTUAL_HOST_NAME 443 -w2
+	if [ $? -ne 0 ];then echo "Connection to $KALTURA_FULL_VIRTUAL_HOST_NAME on port 443 [tcp/https] failed!";fi
+	echo
+	set -e
+}
 install_deps()
 {
 	yum -y install $COMMON_DEPS
@@ -532,6 +556,7 @@ else
 	echo "Couldn't read $USER_INI_PATH, make sure its there :("
 	exit 1
 fi
+ 
 verify_user_input
 if [ -n "$BASE_DIR" ];then
 	KALT_PREFIX=$BASE_DIR
