@@ -22,7 +22,7 @@ if [ "$CHOICE" = "1" ];then
         read YESNO
         if [ "$YESNO" = "y" ];then
                         echo "Continuing..."
-			php $INSTALL_DIR/installer/uninstall.php
+			
 			for i in sphinx_watch.sh serviceBatchMgr.sh red5;do
 				if [ -f /etc/init.d/$i -o -h /etc/init.d/$i ];then
 					service $i stop
@@ -32,6 +32,8 @@ if [ "$CHOICE" = "1" ];then
 					echo "Removed /etc/init.d/$i"
 				fi
 			done
+
+			php $INSTALL_DIR/installer/uninstall.php			
                         
 			service mysqld stop
                         rm -rf /var/lib/mysql/kaltura*
