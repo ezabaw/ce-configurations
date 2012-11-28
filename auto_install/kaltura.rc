@@ -1,3 +1,4 @@
+#set -x
 verify_user_input()
 {
 for VAL in HTTPD_BIN PHP_BIN TIME_ZONE BASE_DIR KALT_VER PENTAHO_DIR PENTAHO_VER PENTAHO_URL COMMON_DEPS KALTURA_FULL_VIRTUAL_HOST_NAME ADMIN_CONSOLE_ADMIN_MAIL ADMIN_CONSOLE_PASSWORD DB1_HOST DB1_PORT DB1_NAME DB1_USER DB1_PASS KALT_USER KALT_GROUP TEST_PARTNER_EMAIL TEST_PARTNER_PASSWD DB1_CREATE_NEW_DB ; do
@@ -406,6 +407,10 @@ create_partner()
 
 upload_assets()
 {
+	if [ -z "$1" ];then
+		echo "Didn't get a partner ID :( returning."
+		return 0;
+	fi
 	TEST_PARTNER_ID=$1
     	echo 'Uploading sample content.';
 	SPHINX_DSN=`grep datasources.sphinx.connection.dsn "$APP_CONF_DIR/db.ini"|awk -F "= " '{print $2}'`
