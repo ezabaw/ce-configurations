@@ -377,6 +377,11 @@ configure_dwh()
 	KETTLE_CONF=$BASE_DIR/dwh/.kettle/kettle.properties
 	sed -i "s@EventsLogsDir\s*=\s*.*@EventsLogsDir = $BASE_DIR/web/logs@" $KETTLE_CONF
 	sed -i "s@EventsWildcard\s*=\s*.*@EventsWildcard = kaltura.*_apache_access.log-.*@" $KETTLE_CONF
+	if [ ! -r mysql-connector-java-$MYSQL_JAVA_CONNECTOR_VER/mysql-connector-java-$MYSQL_JAVA_CONNECTOR-bin.jar ];then
+		wget $MYSQL_JAVA_CONNECTOR
+		tar zxf mysql-connector-java-$MYSQL_JAVA_CONNECTOR_VER.tar.gz 
+	fi
+	cp mysql-connector-java-$MYSQL_JAVA_CONNECTOR_VER/mysql-connector-java-$MYSQL_JAVA_CONNECTOR_VER-bin.jar $PENTAHO_DIR/pdi/libext/JDBC
 	# fix paths in the DWH tree. There are many so listing all files explicitely is annoying. This should be fixed for Gemini.
 	#find $BASE_DIR/dwh/ -type f -exec sed -i 's@/usr/local/pentaho@/opt/kaltura/dwh/pentaho@g' {} \;
 }
