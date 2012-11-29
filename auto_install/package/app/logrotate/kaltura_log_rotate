@@ -12,7 +12,7 @@
 }
 
 @LOG_DIR@/kaltura_apache_access.log {
- rotate 5
+ rotate 30 
  daily
  missingok
  compress
