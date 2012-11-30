@@ -49,7 +49,7 @@ install_deps()
 		sed -i '/^lower_case_table_names = 1$/d' $MY_CNF
 		echo "Setting lower_case_table_names = 1 in /etc/my.cnf.."
 		sed -i 's@^\[mysqld\]$@[mysqld]\nlower_case_table_names = 1\n@' $MY_CNF
-		/etc/init.d/mysqld restart
+		if rpm -qf /etc/init.d/mysqld;then /etc/init.d/mysqld restart;fi
 	fi
 	for i in httpd mysqld memcached;do
 		chkconfig $i on
