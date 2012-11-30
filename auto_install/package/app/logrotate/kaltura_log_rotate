@@ -20,8 +20,8 @@
  notifempty
  create 644 www-data www-data
 lastaction
- mv /opt/kaltura/log/kaltura_apache_access.log-`/bin/date +%Y%m%d`.gz /opt/kaltura/web/logs/`hostname`-kaltura_apache_access.log-`/bin/date --iso-8601`.gz
- /usr/sbin/apachectl -k restart
+mv @LOG_DIR@/kaltura_apache_access.log-`/bin/date +%Y%m%d`.gz @WEB_DIR@/logs/`hostname`-kaltura_apache_access.log-`/bin/date --iso-8601`.gz
+/usr/sbin/apachectl -k restart
  endscript
 }
 
