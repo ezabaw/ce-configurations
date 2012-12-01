@@ -49,9 +49,9 @@ install_deps()
 		sed -i '/^lower_case_table_names = 1$/d' $MY_CNF
 		echo "Setting lower_case_table_names = 1 in /etc/my.cnf.."
 		sed -i 's@^\[mysqld\]$@[mysqld]\nlower_case_table_names = 1\n@' $MY_CNF
-		if rpm -qf /etc/init.d/mysqld;then /etc/init.d/mysqld restart;fi
+		if rpm -qf /etc/init.d/mysqld;then /etc/init.d/mysqld restart;chkconfig mysqld on;fi
 	fi
-	for i in httpd mysqld memcached;do
+	for i in httpd memcached;do
 		chkconfig $i on
 	done
 }
@@ -125,7 +125,7 @@ probe_for_garbage()
 		echo "$BASE_DIR already exists. Remove and re-run me."
 		exit 1
 	fi
-	KALT_PIDS=`ps fax|grep kaltura|grep -v grep |awk -F " " '{print $1}'|xargs`
+	KALT_PIDS=`ps fax|grep "$BASE_DIR"|grep -v grep |awk -F " " '{print $1}'|xargs`
 	if [ -n "$KALT_PIDS" ];then
 		echo -e "Following PIDs of old Kaltura proces are running: $KALT_PIDS\nKill them and re-run me.\n"
 		exit 1
@@ -558,6 +558,13 @@ create_kaltura_profile()
 	fi
 	. $PROF_FILE
 }
+copy_install_files_to_kalt_dir()
+{
+	APP_CONF_DIR="$BASE_DIR/app/configurations"
+	mkdir -p $BASE_DIR/etc/auto_inst
+	MANIFEST_FILE=$BASE_DIR/etc/auto_inst/`basename $0`.manifest
+	ROLE_FILE=$BASE_DIR/etc/auto_inst/role
+}
 DIR_NAME=`dirname $0`
 if [ -z "$DIR_NAME" ];then
     DIR_NAME='.'
@@ -576,7 +583,3 @@ if [ -n "$BASE_DIR" ];then
 else
 	KALT_PREFIX=/opt/kaltura
 fi
-APP_CONF_DIR="$BASE_DIR/app/configurations"
-mkdir -p $BASE_DIR/etc/auto_inst
-MANIFEST_FILE=$BASE_DIR/etc/auto_inst/`basename $0`.manifest
-ROLE_FILE=$BASE_DIR/etc/auto_inst/role

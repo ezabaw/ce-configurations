@@ -13,6 +13,9 @@ Please select one of the following options:
 6. check for port connectivity
 7. unistall
 EOF
+
+probe_for_garbage
+copy_install_files_to_kalt_dir
 read CHOICE
 if [ $CHOICE = 0 ];then
 	echo "About to create an all in one instance.."
@@ -21,19 +24,16 @@ fi
 # if we are not all in one, make sure the user didn't set DB creation to 'y' by mistake.
 if [ $CHOICE = 1 ];then
 	echo "About to create a batch instance.."
-	probe_for_garbage
 	install_all_in_one
 	install_batch
 	set_mysqldb_host
 elif [ $CHOICE = 2 ];then
 	echo "About to create a Sphinx instance.."	
-	probe_for_garbage
 	install_all_in_one
 	install_sphinx
 	set_mysqldb_host
 elif [ $CHOICE = 3 ];then
 	echo "About to create an API instance.."
-	probe_for_garbage
 	install_all_in_one
 	install_api
 	set_mysqldb_host
