@@ -495,7 +495,7 @@ set_mysqldb_host()
 			exit 1
 		fi
 	done
-	echo "iCreating backup $APP_CONF_DIR/db.ini in $APP_CONF_DIR/db.ini.`date +%d_%m_%y`"
+	echo "Creating backup $APP_CONF_DIR/db.ini in $APP_CONF_DIR/db.ini.`date +%d_%m_%y`"
 	mv $APP_CONF_DIR/db.ini $APP_CONF_DIR/db.ini.`date +%d_%m_%y`
 	cp $APP_CONF_DIR/db.template.ini $APP_CONF_DIR/db.ini
 	sed "s#@DB[0-3]_HOST@#$DB1_HOST#g" -i $APP_CONF_DIR/db.ini
@@ -544,7 +544,6 @@ set_mysqldb_host()
 	sed "s@\(^DbReadPassword\)\s*=.*\$@\1=$DWH_PASS@g" -i $BASE_DIR/dwh/.kettle/kettle.properties
 
 	echo "Done reconfiguring MySQL operational and DWH DB and Sphinx :)"
-	/etc/init.d/httpd restart
 	echo "Reconfigured `hostname`'s operational and DWH DB and Sphinx on `date`">> $MANIFEST_FILE
 }
 

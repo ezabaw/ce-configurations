@@ -52,7 +52,7 @@ if [ "$CHOICE" = "1" ];then
 					sed -i "s/^\(upload_tmp_dir*.*web\/tmp*.*\)$/;commented on `date +%d-%m-%y` by $0: \1\nupload_tmp_dir =/" $INI_FILE
                         fi
 
-			for i in /etc/cron.d/kaltura_crontab /etc/cron.d/dwh_crontab /opt/kaltura/ /usr/local/pentaho/ /etc/httpd/conf.d/my_kaltura.conf;do
+			for i in /etc/cron.d/kaltura_crontab /etc/cron.d/dwh_crontab /opt/kaltura/ /usr/local/pentaho/ /etc/httpd/conf.d/my_kaltura.conf /etc/httpd/conf.d/my_kaltura_apiv3.conf;do
 				if [ -f $i -o -h $i -o -d $i ];then
 					rm -rf $i
 					echo "Removed $i"

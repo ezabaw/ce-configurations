@@ -20,13 +20,13 @@ read CHOICE
 if [ $CHOICE = 0 ];then
 	echo "About to create an all in one instance.."
 	install_all_in_one
-fi
 # if we are not all in one, make sure the user didn't set DB creation to 'y' by mistake.
-if [ $CHOICE = 1 ];then
+elif [ $CHOICE = 1 ];then
 	echo "About to create a batch instance.."
 	install_all_in_one
 	install_batch
 	set_mysqldb_host
+	/etc/init.d/httpd restart
 elif [ $CHOICE = 2 ];then
 	echo "About to create a Sphinx instance.."	
 	install_all_in_one
@@ -37,12 +37,14 @@ elif [ $CHOICE = 3 ];then
 	install_all_in_one
 	install_api
 	set_mysqldb_host
+	/etc/init.d/httpd restart
 elif [ $CHOICE = 4 ];then
 	echo "About to export Kaltura's MySQL DB.."
 	export_mysql_kalt_db
 elif [ $CHOICE = 5 ];then
 	echo "About to configure MySQL && Sphinx for this host.."
 	set_mysqldb_host
+	/etc/init.d/httpd restart
 elif [ $CHOICE = 6 ];then
 	echo "Checking network port connectivity.."
 	check_port_connectivity
@@ -53,7 +55,8 @@ else
 	echo "Choose a value between 1-7"
 	exit 1
 fi
+echo `dirname $0`
 cd `dirname $0`
-if [ $CHOICE -lt 4 ];then
-	cp auto_inst_falcon_centos.sh cleanup.sh export_db.sh main.sh monit mysql_rep.sh create_* upload_csv.php monit.rc user_input.ini $DIR_NAME/etc/auto_inst
-fi
+#if [ $CHOICE -lt 4 ];then
+#	cp auto_inst_falcon_centos.sh cleanup.sh export_db.sh main.sh monit mysql_rep.sh create_* upload_csv.php monit.rc user_input.ini $DIR_NAME/etc/auto_inst
+#fi
