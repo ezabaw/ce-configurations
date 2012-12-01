@@ -560,7 +560,6 @@ create_kaltura_profile()
 }
 copy_install_files_to_kalt_dir()
 {
-	APP_CONF_DIR="$BASE_DIR/app/configurations"
 	mkdir -p $BASE_DIR/etc/auto_inst
 	MANIFEST_FILE=$BASE_DIR/etc/auto_inst/`basename $0`.manifest
 	ROLE_FILE=$BASE_DIR/etc/auto_inst/role
@@ -578,6 +577,7 @@ else
 fi
  
 verify_user_input
+APP_CONF_DIR="$BASE_DIR/app/configurations"
 if [ -n "$BASE_DIR" ];then
 	KALT_PREFIX=$BASE_DIR
 else
