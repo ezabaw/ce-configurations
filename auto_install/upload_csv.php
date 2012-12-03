@@ -16,7 +16,7 @@ $userId = null;
 $expiry = null;
 $privileges = null;
 //csv file to use
-$csvFileData = dirname(__FILE__).'/kaltura_batch_upload_eagle.csv';
+$csvFileData = dirname(__FILE__).'/sample2_working.csv';
 // type here is CSV but can also work with XML
 $bulkUploadType = 'bulkUploadCsv.CSV' ;
 $client=generate_ks($config->serviceUrl,$partnerId,$secret,$type=KalturaSessionType::ADMIN,$userId=null,$expiry = null,$privileges = null);
