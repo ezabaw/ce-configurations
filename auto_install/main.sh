@@ -14,25 +14,31 @@ Please select one of the following options:
 7. unistall
 EOF
 
-probe_for_garbage
-copy_install_files_to_kalt_dir
 read CHOICE
 if [ $CHOICE = 0 ];then
+	probe_for_garbage
+	copy_install_files_to_kalt_dir
 	echo "About to create an all in one instance.."
 	install_all_in_one
 # if we are not all in one, make sure the user didn't set DB creation to 'y' by mistake.
 elif [ $CHOICE = 1 ];then
 	echo "About to create a batch instance.."
+	probe_for_garbage
+	copy_install_files_to_kalt_dir
 	install_all_in_one
 	install_batch
 	set_mysqldb_host
 	/etc/init.d/httpd restart
 elif [ $CHOICE = 2 ];then
+	probe_for_garbage
+	copy_install_files_to_kalt_dir
 	echo "About to create a Sphinx instance.."	
 	install_all_in_one
 	install_sphinx
 	set_mysqldb_host
 elif [ $CHOICE = 3 ];then
+	probe_for_garbage
+	copy_install_files_to_kalt_dir
 	echo "About to create an API instance.."
 	install_all_in_one
 	install_api
