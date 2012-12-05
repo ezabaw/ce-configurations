@@ -329,7 +329,9 @@ set_php_ini()
 	# if we have a scandir
 	if [ -d /etc/php.d ];then
 		INI_FILE=/etc/php.d/zzkaltura.ini
-		echo 'request_order = "CGP"' >> $INI_FILE
+		echo 'request_order = "CGP"' > $INI_FILE
+		echo "apc.shm_size=256M" >> $INI_FILE
+		echo "date.timezone=$TIME_ZONE" >> $INI_FILE
 	else
 		INI_FILE=/etc/php.ini
 		sed -i 's@request_order\s*=\s*.*@request_order = "CGP"@' $INI_FILE
