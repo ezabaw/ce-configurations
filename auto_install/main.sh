@@ -11,7 +11,8 @@ Please select one of the following options:
 4. export Kaltura's MySQL DBs
 5. configure MySQL && Sphinx for this host
 6. check for port connectivity
-7. unistall
+7. configure multiple roles
+8. unistall
 EOF
 
 read CHOICE
@@ -55,13 +56,21 @@ elif [ $CHOICE = 6 ];then
 	echo "Checking network port connectivity.."
 	check_port_connectivity
 elif [ $CHOICE = 7 ];then
+	echo "Please input the role numbers you'd like to configure this host for, separated by spaces [ie: 1 3]:"
+	read ROLES
+	for i in $ROLES;do
+		if [ $i -lt 1 -o $i -gt 3 ];then
+			echo "Supported roles are [1 - batch, 2 - sphinx, 3 - API."
+			exit 1
+		fi
+	done
+elif [ $CHOICE = 8 ];then
 	echo "Uninstalling"
 	`dirname $0`/cleanup.sh
 else
 	echo "Choose a value between 1-7"
 	exit 1
 fi
-echo `dirname $0`
 cd `dirname $0`
 #if [ $CHOICE -lt 4 ];then
 #	cp auto_inst_falcon_centos.sh cleanup.sh export_db.sh main.sh monit mysql_rep.sh create_* upload_csv.php monit.rc user_input.ini $DIR_NAME/etc/auto_inst
