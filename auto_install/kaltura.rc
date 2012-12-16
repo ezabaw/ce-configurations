@@ -202,9 +202,9 @@ install_batch()
 	echo "I also need a scheduler ID?"           
 	read SCD_ID                    
 	sed -i "s@^\(id\s*=\s*\)1\$@\1 $SCD_ID@" $APP_CONF_DIR/batch.ini
-	rm /etc/httpd/conf.d/my_kaltura.conf
+	rm /etc/httpd/conf.d/my_kaltura.conf||true
 	sed -i "1iUser $KALT_USER\nGroup $KALT_GROUP\n" $BASE_DIR/app/configurations/apache/my_kaltura_apiv3.conf
-	ln -s $APP_CONF_DIR/apache/my_kaltura_apiv3.conf /etc/httpd/conf.d/
+	ln -sf $APP_CONF_DIR/apache/my_kaltura_apiv3.conf /etc/httpd/conf.d/
 	/etc/init.d/httpd restart
 	/etc/init.d/serviceBatchMgr.sh restart
 	echo "Configured `hostname` as a batch instance on `date`">> $MANIFEST_FILE
@@ -232,6 +232,7 @@ install_sphinx()
 	fi
 	/etc/init.d/sphinx_watch.sh restart
 	clear_host_from_scheduler
+	php $BASE_DIR/app/deployment/base/scripts/populateSphinxEntries.php >>$BASE_DIR/log/populateSphinxEntries.log
 	echo "Configured `hostname` as a Sphinx instance on `date`">> $MANIFEST_FILE
 	echo "Sphinx" > $ROLE_FILE
 }
@@ -484,10 +485,6 @@ disable_monitoring_tab()
     sed -i 's@^access.monitoring = SYSTEM_ADMIN_SYSTEM_MONITOR@;access.monitoring = SYSTEM_ADMIN_SYSTEM_MONITOR@g' "$BASE_DIR/app/configurations/admin.ini" 
 }
 
-#set_sphinx_host
-#{
-#
-#}
 
 set_mysqldb_host()
 {
@@ -568,13 +565,77 @@ copy_install_files_to_kalt_dir()
 
 clear_all_roles()
 {
+	set +e
+	rm $ROLE_FILE
+	for i in serviceBatchMgr.sh sphinx_watch.sh httpd;do
+		/etc/init.d/$i stop
+		chkconfig $i off
+	done
+	rm /etc/cron.d/kaltura_crontab||true
+	set -e
+}
+configure_batch()
+{
+	echo "I also need a scheduler ID?"           
+	read SCD_ID                    
+	sed -i "s@^\(id\s*=\s*\)1\$@\1 $SCD_ID@" $APP_CONF_DIR/batch.ini
+	rm /etc/httpd/conf.d/my_kaltura.conf||true
+	sed -i "1iUser $KALT_USER\nGroup $KALT_GROUP\n" $BASE_DIR/app/configurations/apache/my_kaltura_apiv3.conf
+	ln -sf $APP_CONF_DIR/apache/my_kaltura_apiv3.conf /etc/httpd/conf.d/
+	/etc/init.d/httpd restart
+	/etc/init.d/serviceBatchMgr.sh restart
+	if [ "$DB1_HOST" != "localhost" ];then
+		/etc/init.d/mysqld stop
+		chkconfig mysqld off
+	fi
+	for i in httpd serviceBatchMgr.sh;do
+		chkconfig $i on
+	done
+	ln -sf $BASE_DIR/crontab/kaltura_batch /etc/cron.d
+	echo "Configured `hostname` as a batch instance on `date`">> $MANIFEST_FILE
+	echo "batch" >> $ROLE_FILE
+
+}
+
+configure_sphinx()
+{
+
+	if [ "$DB1_HOST" != "localhost" ];then
+		/etc/init.d/mysqld stop
+		chkconfig mysqld off
+	fi
+	/etc/init.d/sphinx_watch.sh restart
+	clear_host_from_scheduler
+	chkconfig sphinx_watch.sh on
+	ln -sf $BASE_DIR/crontab/kaltura_sphinx /etc/cron.d/ 
+	php $BASE_DIR/app/deployment/base/scripts/populateSphinxEntries.php >>$BASE_DIR/log/populateSphinxEntries.log
+	echo "Configured `hostname` as a Sphinx instance on `date`">> $MANIFEST_FILE
+	echo "Sphinx" >> $ROLE_FILE
+
+}
+
+configure_api()
+{
+	if [ "$DB1_HOST" != "localhost" ];then
+		/etc/init.d/mysqld stop
+		chkconfig mysqld off
+	fi
+	if [ "$SPHINX_DB_HOST" != "localhost" ];then
+		/etc/init.d/sphinx_watch.sh stop
+		chkconfig sphinx_watch.sh off
+	fi
+	clear_host_from_scheduler
+	chkconfig httpd on
+	echo "Configured `hostname` as an API instance on `date`">> $MANIFEST_FILE
+	echo "API" >> $ROLE_FILE
 
 }
 reconfigure_roles()
 {
-	ROLES=$1
+	ROLES="$1"
 	echo "Clearing all role assignments.."
 	clear_all_roles
+	ln -sf $BASE_DIR/crontab/kaltura_rotate /etc/cron.d/
 	for ROLE in $ROLES;do
 		if [ $ROLE = 1 ];then
 			configure_batch

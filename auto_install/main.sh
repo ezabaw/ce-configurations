@@ -64,11 +64,13 @@ elif [ $CHOICE = 7 ];then
 			exit 1
 		fi
 	done
+	copy_install_files_to_kalt_dir
+	reconfigure_roles "$ROLES"
 elif [ $CHOICE = 8 ];then
 	echo "Uninstalling"
 	`dirname $0`/cleanup.sh
 else
-	echo "Choose a value between 1-7"
+	echo "Choose a value between 1-8"
 	exit 1
 fi
 cd `dirname $0`
