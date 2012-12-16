@@ -32,7 +32,7 @@ if [ "$CHOICE" = "1" ];then
 					echo "Removed /etc/init.d/$i"
 				fi
 			done
-
+			cd $INSTALL_DIR/installer
 			php $INSTALL_DIR/installer/uninstall.php			
                         
 			service mysqld stop
