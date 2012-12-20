@@ -12,7 +12,7 @@ set_selinux_permissive
 set_php_ini
 echo "Starting needed daemons.."
 for i in httpd memcached crond;do
-    /etc/init.d/$i start
+    /etc/init.d/$i restart
     chkconfig $i on
 done
 cd $INSTALL_DIR && php install.php -s user_input.ini
