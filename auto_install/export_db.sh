@@ -1,7 +1,7 @@
 #!/bin/bash - 
 #===============================================================================
-#          FILE: table_per_file.sh
-#         USAGE: ./table_per_file.sh 
+#          FILE: ./export_db.sh
+#         USAGE: ./export_db.sh <schema> <user> <passwd> <port> <output/path> [verbose]
 #   DESCRIPTION: 
 #       OPTIONS: ---
 #  REQUIREMENTS: ---
@@ -17,7 +17,7 @@
 
 
 if [ $# -lt 5 ]; then
-    echo "Usage: $0 <schema> <user> <passwd> <port> <output-path> [verbose]"
+    echo "Usage: $0 <schema> <user> <passwd> <port> <output/path> [verbose]"
     exit 1
 fi
 TABLE_SCHEMA=$1
