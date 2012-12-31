@@ -32,4 +32,5 @@ done
 create_kaltura_profile
 create_partner
 upload_assets $TEST_PARTNER_ID
+disable_monitoring_tab
 check_port_connectivity
