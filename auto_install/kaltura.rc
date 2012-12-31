@@ -64,8 +64,11 @@ install_deps()
 	if [ "$DB1_HOST" = 'localhost' -o "$DB1_HOST" = '127.0.0.1' -o "$DB1_HOST" = `hostname` ];then
 		MY_CNF=/etc/my.cnf
 		sed -i '/^lower_case_table_names = 1$/d' $MY_CNF
+		sed -i '/^open_files_limit$/d' $MY_CNF
 		echo "Setting lower_case_table_names = 1 in /etc/my.cnf.."
 		sed -i 's@^\[mysqld\]$@[mysqld]\nlower_case_table_names = 1\n@' $MY_CNF
+                echo "Setting open_files_limit = 20000 in /etc/my.cnf.."
+                sed -i 's@^\[mysqld\]$@[mysqld]\nopen_files_limit = 20000\n@' $MY_CNF
 		if rpm -qf /etc/init.d/mysqld;then /etc/init.d/mysqld restart;chkconfig mysqld on;fi
 	fi
 	for i in httpd memcached;do
