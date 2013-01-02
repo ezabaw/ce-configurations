@@ -21,7 +21,7 @@
  create 644 kaltura kaltura
 lastaction
 mv @LOG_DIR@/kaltura_apache_access.log-`/bin/date +%Y%m%d`.gz @WEB_DIR@/logs/`hostname`-kaltura_apache_access.log-`/bin/date --iso-8601`.gz
-/usr/sbin/apachectl -k restart
+/etc/init.d/apache2 reload > /dev/null
  endscript
 }
 
