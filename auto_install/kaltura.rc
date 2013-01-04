@@ -44,13 +44,13 @@ install_deps()
 {
 	# this looks a bit strange but the idea is this:
 	# if the repo is already enabled, just install monit, otherwise, set it up, install monit and disable it again because we may not want it for anything else for fear of somebody installing stuff from there by mistake.
-	if ! yum repolist enabled|grep -q rpmforge;then
-		setup_rpm_forge_repo
-		yum -y install monit
-		mv /etc/yum.repos.d/rpmforge.repo /etc/yum.repos.d/rpmforge.repo.dis
-	else
-		yum -y install monit
-	fi
+	#if ! yum repolist enabled|grep -q rpmforge;then
+	#	setup_rpm_forge_repo
+	#	yum -y install monit
+	#	mv /etc/yum.repos.d/rpmforge.repo /etc/yum.repos.d/rpmforge.repo.dis
+	#else
+	#	yum -y install monit
+	#fi
 	yum -y install $COMMON_DEPS
 	if ! rpm -q mysql-server 2>/dev/null;then
 		echo "Do you plan on running MySQL DB on this instance? Note that it is not advised in cluster mode [y/N]"
