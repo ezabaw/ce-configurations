@@ -2,7 +2,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <base href="<?php echo requestUtils::getRequestHost() ?>/" />
-<meta http-equiv=?x-ua-compatible? content="IE-8" />
 
 <?php echo include_http_metas() ?>
 <?php echo include_metas() ?>
