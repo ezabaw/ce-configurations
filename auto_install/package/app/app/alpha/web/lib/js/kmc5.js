@@ -1066,7 +1066,8 @@ kmc.preview_embed = {
 		embed_code = embed_code.replace('{FLASHVARS}', kmc.functions.flashVarsToString(flashVars));	
 		embed_code = embed_code.replace('{FLASHVARS_URL}', kmc.functions.flashVarsToUrl(flashVars));	
 
-		var embed_host = (https_support) ? kmc.vars.embed_host_https : kmc.vars.embed_host;
+//		var embed_host = (https_support) ? kmc.vars.embed_host_https : kmc.vars.embed_host;
+		var embed_host = kmc.vars.embed_host;
 		var script_url = 'http://' + embed_host + '/p/'+ kmc.vars.partner_id + '/sp/' + kmc.vars.partner_id + '00/embedIframeJs/uiconf_id/' + uiconf_id + '/partner_id/' + kmc.vars.partner_id;
 
 		// Used by kWidget.embed
