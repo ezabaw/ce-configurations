@@ -833,9 +833,9 @@ kmc.preview_embed = {
 		embed_code = embed_code.replace("{SCRIPT_URL}", script_url); 
 		
 		if( https_support ) {
-			embed_code = embed_code.replace(/http/g, "https");
+			embed_code = embed_code.replace(/http:/g, "https");
 		} else {
-			embed_code = embed_code.replace(/https/g, "http");
+			embed_code = embed_code.replace(/https:/g, "http");
 		}
 
 		return embed_code;
