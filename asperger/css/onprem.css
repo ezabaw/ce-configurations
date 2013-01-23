@@ -103,9 +103,10 @@ ul#navlist li a
     background-color:black;
 }
 fieldset { height: 330px; width: 550px;color: black;}
+fieldset.ui_ifs { height: 450px; width: 550px;}
 
 fieldset.login { 
-    height: 130px; width: 550px;color: black; 
+    height: 130px; width: 550px;
     margin: 0 auto;
 }
 

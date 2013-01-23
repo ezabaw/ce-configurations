@@ -29,7 +29,7 @@ function show_passwd(obj)
 	obj.parentNode.replaceChild(newO,obj);
 	newO.focus();
 }
-function update_host1(host_id)
+function update_host(host_id)
 {
     var orig_host=host_id;
     var host = document.getElementById(host_id+'_hostname').value;
@@ -63,6 +63,59 @@ function add_host()
 		  type: 'POST',
 		  url: 'add_host.php',
 		  data: {'customer_id': cust_id, 'host': host,'host_description': host_description,'distro_version_arch': distro_version_arch, 'ssh_user': ssh_user, 'ssh_passwd': ssh_passwd, 'notes': notes},
+		  success: function(data){
+		      if (data!==null){
+			    alert(data);
+		      } 
+		  }
+    });
+    add_form.className='hidden';
+    //document.location.reload();
+}
+
+
+function update_ui_ifs(ui_id)
+{
+    var admin_console_url = document.getElementById(ui_id+'admin_console_url').value;
+    var admin_console_user = document.getElementById(ui_id+'_admin_console_user_'+ui_id).value;
+    var admin_console_passwd = document.getElementById(ui_id+'admin_console_passwd_'+ui_id).value;
+    var kmc_url = document.getElementById(ui_id+'_kmc_url').value;
+    var kmc_user = document.getElementById(ui_id+'_kmc_user').value;
+    var kmc_passwd = document.getElementById(ui_id+'_kmc_passwd').value;
+    var kms_admin_url = document.getElementById(ui_id+'_kms_admin_url').value;
+    var kms_admin_user = document.getElementById(ui_id+'_kms_admin_user').value;
+    var kms_admin_passwd = document.getElementById(ui_id+'_kms_admin_passwd').value;
+    var notes = document.getElementById(ui_id+'_ui_ifs_notes').value;
+    var cust_id = document.getElementById('customer_id').value;
+    $.ajax({
+		  type: 'POST',
+		  url: 'update_ui_ifs.php',
+		  data: {'customer_id': cust_id, 'admin_console_url': admin_console_url,'admin_console_user': admin_console_user,'admin_console_passwd': admin_console_passwd, 'kmc_url': kmc_url, 'kmc_user': kmc_user, 'kmc_passwd': kmc_passwd,'kmc_url': kmc_url, 'kmc_user': kms_admin_user, 'kms_admin_passwd': kms_admin_passwd,'notes': notes},
+		  success: function(data){
+		      if (data!==null){
+			    alert(data);
+		      } 
+		  }
+    });
+}
+function add_ui_ifs()
+{
+    var env = document.getElementById('env').value;
+    var admin_console_url = document.getElementById('admin_console_url').value;
+    var admin_console_user = document.getElementById('admin_console_user').value;
+    var admin_console_passwd = document.getElementById('admin_console_passwd').value;
+    var kmc_url = document.getElementById('kmc_url').value;
+    var kmc_user = document.getElementById('kmc_user').value;
+    var kmc_passwd = document.getElementById('kmc_passwd').value;
+    var kms_admin_url = document.getElementById('kms_url').value;
+    var kms_admin_user = document.getElementById('kms_user').value;
+    var kms_admin_passwd = document.getElementById('kms_passwd').value;
+    var notes = document.getElementById('ui_ifs_notes').value;
+    var cust_id = document.getElementById('customer_id').value;
+    $.ajax({
+		  type: 'POST',
+		  url: 'add_ui_ifs.php',
+		  data: {'customer_id': cust_id, 'env': env,'admin_console_url': admin_console_url,'admin_console_user': admin_console_user,'admin_console_passwd': admin_console_passwd, 'kmc_url': kmc_url, 'kmc_user': kmc_user, 'kmc_passwd': kmc_passwd,'kms_admin_url': kms_admin_url, 'kms_admin_user': kms_admin_user, 'kms_admin_passwd': kms_admin_passwd,'notes': notes},
 		  success: function(data){
 		      if (data!==null){
 			    alert(data);
@@ -139,7 +192,7 @@ while($hosts = $result->fetchArray(SQLITE3_ASSOC)){
 	$result1=$db->query('select hostname, host_description, distro_version_arch, ssh_user, ssh_passwd, notes from hosts where hostname="'.$val.'"');
 	while($host = $result1->fetchArray(SQLITE3_ASSOC)){
 	    $id1=str_replace('.','',$val);
-	    echo '<div class=.k-slider id=hide_show_div><input type=button id=hide_show value="'.$val.'" onclick="javascript:unhide(\''.$id1.'\')"></div>
+	    echo '<div class=.k-slider id=hide_show_div><input type=button id=hide_show value="'.$val.'" onclick="javascript:unhide(\''.$id1.'\')">'.$host['host_description'].'</div>
 		<div id='.$id1.' class=hidden><ul id="navlist">';
 
 	    echo '<li>Hostname: <input type=text class=k-textbox id="'.$id1.'_hostname" value="'.$host['hostname'].'"></il><br>';
@@ -148,7 +201,7 @@ while($hosts = $result->fetchArray(SQLITE3_ASSOC)){
 	    echo '<li>User: <input type=text class=k-textbox id="'.$id1.'_ssh_user" value="'.$host['ssh_user'].'"></il><br>';
 	    echo '<li>Passwd: <input type=password class=k-textbox id="'.$id1.'_ssh_passwd" value="'.$host['ssh_passwd'].'" onfocus=="javascript:show_passwd(this);></il><br>';
 	    echo '<li>Notes: <textarea class=k-textbox id="'.$id1.'_notes" rows=3>'.$host['notes'].'</textarea><br>
-	    <input type=button id="'.$id1.'_update_host" value="Update" onclick="javascript:update_host1(\''.$id1.'\')"><br>
+	    <input type=button id="'.$id1.'_update_host" value="Update" onclick="javascript:update_host(\''.$id1.'\')"><br>
 	    </div><br>';
 	}
     }
@@ -262,7 +315,99 @@ while($vpns = $result->fetchArray(SQLITE3_ASSOC)){
 
 	    </ul>
     </fieldset></div>
-    </form>
-    <body>
+<h3 class="onprem"><tr>
+	<h3><a href="#ui">UI:</a></h3>';
+$result=$db->query('select id from ui where customer_id='.$id);
+	while($ui_ifs = $result->fetchArray(SQLITE3_ASSOC)){
+		$index++;
+	    foreach($ui_ifs as $key => $val){
+	error_log("'select id, admin_console_url,admin_console_user,admin_console_passwd,kmc_url,kmc_user,kmc_passwd,kms_admin_url,kms_admin_user,kms_admin_passwd,notes from ui where id=$val\n",3,'/tmp/tmp');
+		$result1=$db->query('select id, admin_console_url,admin_console_user,admin_console_passwd,kmc_url,kmc_user,kmc_passwd,kms_admin_url,kms_admin_user,kms_admin_passwd,notes,env from ui where id='.$val);
+		while($ui_ifs = $result1->fetchArray(SQLITE3_ASSOC)){
+		error_log(print_r($ui_ifs,true),3,'/tmp/dani');
+		    echo '<div class=.k-slider id=hide_show_div><input type=button id=hide_show_ui_if value="'.$ui_ifs['env'].'" onclick="javascript:unhide(\''.$ui_ifs['env'].'\')"></div>
+			<div id='.$ui_ifs['env'].' class=hidden><ul id="navlist">';
+
+		    echo '<li>Admin console URL: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_admin_console_url" value="'.$ui_ifs['admin_console_url'].'"></il><br>';
+		    echo '<li>Admin console user: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_admin_console_user" value="'.$ui_ifs['admin_console_user'].'"></il><br>';
+		    echo '<li>Admin console passwd: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_admin_console_passwd" value="'.$ui_ifs['admin_console_passwd'].'"></il><br>';
+		    echo '<li>KMC URL: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_kmc_url" value="'.$ui_ifs['kmc_url'].'"></il><br>';
+		    echo '<li>KMC user: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_kmc_user" value="'.$ui_ifs['kmc_user'].'"></il><br>';
+		    echo '<li>KMC passwd: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_kmc_passwd" value="'.$ui_ifs['kmc_passwd'].'"></il><br>';
+		    echo '<li>KMS admin URL: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_kms_admin__url" value="'.$ui_ifs['kms_admin_url'].'"></il><br>';
+		    echo '<li>KMS admin user: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_kms_admin_user" value="'.$ui_ifs['kms_admin_user'].'"></il><br>';
+		    echo '<li>KMS passwd: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_kms_admin_passwd" value="'.$ui_ifs['kms_admin_passwd'].'"></il><br>';
+		    echo '<li>Notes: <textarea class=k-textbox id="'.$ui_ifs['id'].'_notes" rows=3>'.$ui_ifs['notes'].'</textarea><br>';
+		    echo '</div><br></form>';
+		}
+	    }
+		
+	}
+	    echo'<form method="POST">
+	    <div class=.k-slider ><input type=button class=.k-button id=hide_show_ui_if value="Add UI I/F" onclick="javascript:unhide(\'add_ui_ifs\')"></div>
+	<div id=\'add_ui_ifs\' class=hidden>
+	    <fieldset class=ui_ifs>
+		<legend>UI</legend>
+		<ul>
+		    <li class="fl">
+		    <label for="env">env:</label>
+			<input type="text" id="env" name="env" tabindex="20" autocomplete="on">
+		    </li>
+		    <li class="fl">
+		    <label for="admin_console_url">Admin console URL:</label>
+			<input type="text" id="admin_console_url" name="admin_console_url" tabindex="25" autocomplete="on">
+		    </li>
+
+		    <li class="fl">
+			<label for="admin_console_user">Admin console user:</label>
+			<input type="text" id="admin_console_user" name="admin_console_user" tabindex="30" autocomplete="on">
+		    </li>
+
+		    <li class="fl">
+			<label for="admin_console_passwd">Admin console passwd:</label>
+			<input type="password" id="admin_console_passwd" name="admin_console_passwd" tabindex="35" autocomplete="on">
+		    </li>
+
+		    <li class="fl">
+		    <label for="kmc_url">KMC URL:</label>
+			<input type="text" id="kmc_url" name="kmc_url" tabindex="45" autocomplete="on">
+		    </li>
+
+		    <li class="fl">
+			<label for="kmc_user">KMC user:</label>
+			<input type="text" id="kmc_user" name="kmc_user" tabindex="50" autocomplete="on">
+		    </li>
+
+		    <li class="fl">
+			<label for="kmc_passwd">KMC passwd:</label>
+			<input type="password" id="kmc_passwd" name="kmc_passwd" tabindex="55" autocomplete="on">
+		    </li>
+		    <li class="fl">
+		    <label for="kms_url">KMS URL:</label>
+			<input type="text" id="kms_url" name="kms_url" tabindex="60" autocomplete="on">
+		    </li>
+
+		    <li class="fl">
+			<label for="kms_user">KMS user:</label>
+			<input type="text" id="kms_user" name="kms_user" tabindex="65" autocomplete="on">
+		    </li>
+
+		    <li class="fl">
+			<label for="kms_passwd">KMS passwd:</label>
+			<input type="password" id="kms_passwd" name="kms_passwd" tabindex="70" autocomplete="on">
+		    </li>
+		    <li class="fl">
+		    <label for="ui_if_notes">Notes:</label>
+			<input type="text" id="ui_ifs_notes" name="ui_notes" tabindex="75" autocomplete="on">
+		    </li>
+		    <li class="fl">
+			<label for="update"></label>
+			<input type=button value="update" onclick="javascript:add_ui_ifs();">
+		    </li>
+
+		    </ul>
+	    </fieldset></div>
+	</form>
+    </body>
     </html>';
 ?>
