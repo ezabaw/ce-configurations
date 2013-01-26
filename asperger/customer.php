@@ -26,12 +26,25 @@ function show_passwd(obj)
 	var newO=document.createElement('input');
 	newO.setAttribute('type','text');
 	newO.setAttribute('id',obj.getAttribute('id'));
+	newO.setAttribute('value',obj.getAttribute('value'));
 	obj.parentNode.replaceChild(newO,obj);
-	newO.focus();
+	//newO.focus();
+
 }
-function update_host(host_id)
+/*
+function hide_passwd(obj)
 {
-    var orig_host=host_id;
+	var newO=document.createElement('input');
+	newO.setAttribute('type','password');
+	newO.setAttribute('id',obj.getAttribute('id'));
+	newO.setAttribute('value',obj.getAttribute('value'));
+	newO.setAttribute('onfocus',"'javascript:show_passwd(newO)'");
+	newO.parentNode.replaceChild(newO,obj);
+}
+*/
+function update_host(orig_host,host_id)
+{
+    //var orig_host=host_id;
     var host = document.getElementById(host_id+'_hostname').value;
     var host_description = document.getElementById(host_id+'_host_description').value;
     var distro_version_arch = document.getElementById(host_id+'_distro_version_arch').value;
@@ -50,6 +63,7 @@ function update_host(host_id)
 		  }
     });
 }
+//function update_vpn(orig_vpn,vpn_id)
 function add_host()
 {
     var host = document.getElementById('new_host').value;
@@ -192,16 +206,17 @@ while($hosts = $result->fetchArray(SQLITE3_ASSOC)){
 	$result1=$db->query('select hostname, host_description, distro_version_arch, ssh_user, ssh_passwd, notes from hosts where hostname="'.$val.'"');
 	while($host = $result1->fetchArray(SQLITE3_ASSOC)){
 	    $id1=str_replace('.','',$val);
-	    echo '<div class=.k-slider id=hide_show_div><input type=button id=hide_show value="'.$val.'" onclick="javascript:unhide(\''.$id1.'\')">'.$host['host_description'].'</div>
+	    $orig_host=$val;
+	    echo '<div class=.k-slider id=hide_show_div><input type=button id=hide_show value="'.$val.'" onclick="javascript:unhide(\''.$id1.'\')">'. '  |  ' .  $host['host_description'].'</div>
 		<div id='.$id1.' class=hidden><ul id="navlist">';
 
 	    echo '<li>Hostname: <input type=text class=k-textbox id="'.$id1.'_hostname" value="'.$host['hostname'].'"></il><br>';
 	    echo '<li>Description: <input type=text class=k-textbox id="'.$id1.'_host_description" value="'.$host['host_description'].'"></il><br>';
 	    echo '<li>Distro && arch: <input type=text class=k-textbox id="'.$id1.'_distro_version_arch" value="'.$host['distro_version_arch'].'"></il><br>';
 	    echo '<li>User: <input type=text class=k-textbox id="'.$id1.'_ssh_user" value="'.$host['ssh_user'].'"></il><br>';
-	    echo '<li>Passwd: <input type=password class=k-textbox id="'.$id1.'_ssh_passwd" value="'.$host['ssh_passwd'].'" onfocus=="javascript:show_passwd(this);></il><br>';
+	    echo '<li>Password: <input type=password class=k-textbox id="'.$id1.'_ssh_passwd" value="'.$host['ssh_passwd'].'" onfocus="javascript:show_passwd(this)";></il><br>';
 	    echo '<li>Notes: <textarea class=k-textbox id="'.$id1.'_notes" rows=3>'.$host['notes'].'</textarea><br>
-	    <input type=button id="'.$id1.'_update_host" value="Update" onclick="javascript:update_host(\''.$id1.'\')"><br>
+	    <input type=button id="'.$id1.'_update_host" value="Update" onclick="javascript:update_host(\''.$orig_host.'\',\''.$id1.'\')"><br>
 	    </div><br>';
 	}
     }
@@ -233,7 +248,7 @@ echo '<tr></table><div class=.k-slider ><input type=button class=.k-button id=hi
 	    </li>
 	    <li class="fl">
 	    <label for="new_ssh_passwd">Passwd:</label>
-		<input type="password" id="new_ssh_passwd" name="new_ssh_passwd" tabindex="50" autocomplete="on">
+		<input type="text" id="new_ssh_passwd" name="new_ssh_passwd" tabindex="50" autocomplete="on">
 	    </li>
 	    <li class="fl">
 	    <label for="new_notes">Notes:</label>
@@ -260,15 +275,17 @@ while($vpns = $result->fetchArray(SQLITE3_ASSOC)){
 	while($vpn = $result1->fetchArray(SQLITE3_ASSOC)){
 	    $id1=str_replace('.','',$val);
 	    $id1=str_replace(' ','',$val);
+	    $orig_vpn=$val;
 	    echo '<div class=.k-slider id=hide_show_div><input type=button id=hide_show_vpn value="'.$val.'" onclick="javascript:unhide(\''.$id1.'\')"></div>
 		<div id='.$id1.' class=hidden><ul id="navlist">';
 
 	    echo '<li>Description: <input type=text class=k-textbox id="'.$id1.'_display_name" value="'.$vpn['display_name'].'"></il><br>';
 	    echo '<li>Gateway: <input type=text class=k-textbox id="'.$id1.'_gateway" value="'.$vpn['gateway'].'"></il><br>';
 	    echo '<li>User: <input type=text class=k-textbox id="'.$id1.'_username" value="'.$vpn['username'].'"></il><br>';
-	    echo '<li>Passwd: <input type=password class=k-textbox id="'.$id1.'_passwd" value="'.$vpn['passwd'].'"></il><br>';
-	    echo '<li>Notes: <textarea class=k-textbox id="'.$id1.'_notes" rows=3>'.$vpn['notes'].'</textarea><br>';
-	    echo '</div><br>';
+	    echo '<li>Passwd: <input type=password class=k-textbox id="'.$id1.'_passwd" value="'.$vpn['passwd'].'"  onfocus="javascript:show_passwd(this)" ></il><br>';
+	    echo '<li>Notes: <textarea class=k-textbox id="'.$id1.'_notes" rows=3>'.$vpn['notes'].'</textarea><br>
+	<input type=button id="'.$id1.'_update_vpn" value="Update" onclick="javascript:update_vpn(\''.$orig_vpn.'\',\''.$id1.'\')"><br>
+	    </div><br>';
 	}
     }
 	
@@ -330,13 +347,13 @@ $result=$db->query('select id from ui where customer_id='.$id);
 
 		    echo '<li>Admin console URL: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_admin_console_url" value="'.$ui_ifs['admin_console_url'].'"></il><br>';
 		    echo '<li>Admin console user: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_admin_console_user" value="'.$ui_ifs['admin_console_user'].'"></il><br>';
-		    echo '<li>Admin console passwd: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_admin_console_passwd" value="'.$ui_ifs['admin_console_passwd'].'"></il><br>';
+		    echo '<li>Admin console passwd: <input type=password class=k-textbox id="'.$ui_ifs['id'].'_admin_console_passwd" value="'.$ui_ifs['admin_console_passwd'].'"  onfocus="javascript:show_passwd(this)"></il><br>';
 		    echo '<li>KMC URL: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_kmc_url" value="'.$ui_ifs['kmc_url'].'"></il><br>';
 		    echo '<li>KMC user: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_kmc_user" value="'.$ui_ifs['kmc_user'].'"></il><br>';
-		    echo '<li>KMC passwd: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_kmc_passwd" value="'.$ui_ifs['kmc_passwd'].'"></il><br>';
+		    echo '<li>KMC passwd: <input type=password class=k-textbox id="'.$ui_ifs['id'].'_kmc_passwd" value="'.$ui_ifs['kmc_passwd'].'" onfocus="javascript:show_passwd(this)"></il><br>';
 		    echo '<li>KMS admin URL: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_kms_admin__url" value="'.$ui_ifs['kms_admin_url'].'"></il><br>';
 		    echo '<li>KMS admin user: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_kms_admin_user" value="'.$ui_ifs['kms_admin_user'].'"></il><br>';
-		    echo '<li>KMS passwd: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_kms_admin_passwd" value="'.$ui_ifs['kms_admin_passwd'].'"></il><br>';
+		    echo '<li>KMS passwd: <input type=password class=k-textbox id="'.$ui_ifs['id'].'_kms_admin_passwd" value="'.$ui_ifs['kms_admin_passwd'].'"  onfocus="javascript:show_passwd(this)"></il><br>';
 		    echo '<li>Notes: <textarea class=k-textbox id="'.$ui_ifs['id'].'_notes" rows=3>'.$ui_ifs['notes'].'</textarea><br>';
 		    echo '</div><br></form>';
 		}
@@ -365,7 +382,7 @@ $result=$db->query('select id from ui where customer_id='.$id);
 
 		    <li class="fl">
 			<label for="admin_console_passwd">Admin console passwd:</label>
-			<input type="password" id="admin_console_passwd" name="admin_console_passwd" tabindex="35" autocomplete="on">
+			<input type="text" id="admin_console_passwd" name="admin_console_passwd" tabindex="35" autocomplete="on">
 		    </li>
 
 		    <li class="fl">
@@ -380,7 +397,7 @@ $result=$db->query('select id from ui where customer_id='.$id);
 
 		    <li class="fl">
 			<label for="kmc_passwd">KMC passwd:</label>
-			<input type="password" id="kmc_passwd" name="kmc_passwd" tabindex="55" autocomplete="on">
+			<input type="text" id="kmc_passwd" name="kmc_passwd" tabindex="55" autocomplete="on">
 		    </li>
 		    <li class="fl">
 		    <label for="kms_url">KMS URL:</label>
@@ -394,7 +411,7 @@ $result=$db->query('select id from ui where customer_id='.$id);
 
 		    <li class="fl">
 			<label for="kms_passwd">KMS passwd:</label>
-			<input type="password" id="kms_passwd" name="kms_passwd" tabindex="70" autocomplete="on">
+			<input type="text" id="kms_passwd" name="kms_passwd" tabindex="70" autocomplete="on">
 		    </li>
 		    <li class="fl">
 		    <label for="ui_if_notes">Notes:</label>

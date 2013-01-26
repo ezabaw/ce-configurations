@@ -77,14 +77,14 @@ while($res = $result->fetchArray(SQLITE3_ASSOC)){
 	echo '<table>
 	<h3 class="onprem">OnPrem Clients (by '.$order_by.')<h3>
 	<tr>
-	<th><a href='.$script_name.'?orderby=id>Id</a></th>
+	<th><a href='.$script_name.'?orderby=id>ID</a></th>
 	<th><a href='.$script_name.'?orderby=name>Client name</a></th>
 	<th><a href='.$script_name.'?orderby=customer_tech_contact>Technical contact</a></th>
 	<th><a href='.$script_name.'?orderby=pm>PM</a></th>
 	<th><a href='.$script_name.'?orderby=am>AM</a></th>
-	<th><a href='.$script_name.'?orderby=ps_tech_contact>PS technical contact</a></th>
+	<th><a href='.$script_name.'?orderby=ps_tech_contact>PS Engineer</a></th>
 	<th><a href='.$script_name.'?orderby=on_prem_version>Version</a></th>
-	<th><a href='.$script_name.'>Network dia</th>
+	<th><a href='.$script_name.'>SharePoint</th>
 	<th><a href='.$script_name.'>Notes</th>
 	</tr>';
     }
@@ -101,7 +101,7 @@ while($res = $result->fetchArray(SQLITE3_ASSOC)){
     <td>' . $res['am'].'</td>
     <td>' . $res['ps_tech_contact'].'</td>
     <td>' . $res['on_prem_version'].'</td>
-    <td><a href="assets/'.str_replace(' ','_',$res['name']).'?customer_name='.str_replace(' ','_',$res['name']).'">Network diagram</a></td>
+    <td align="center"><a href="' . $res['sharepoint']. '"><img src="images/sharepoint.png" /></a></td>
     <td>' . $res['notes'].'</td>
     </tr>';
     $index++;
