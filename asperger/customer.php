@@ -161,6 +161,26 @@ function add_vpn()
     add_vpn.className='hidden';
     //document.location.reload();
 }
+function update_vpn(id)
+{
+    var gateway = document.getElementById(id+'_gateway').value;
+    var username = document.getElementById(id+'_username').value;
+    var passwd = document.getElementById(id+'_passwd').value;
+    var display_name = document.getElementById(id+'_display_name').value;
+    var type = document.getElementById(id+'_type').value;
+    var notes = document.getElementById(id+'_notes').value;
+    var cust_id = document.getElementById('customer_id').value;
+    $.ajax({
+		  type: 'POST',
+		  url: 'update_vpn.php',
+		  data: {'customer_id': cust_id, 'gateway': gateway,'username': username,'passwd': passwd, 'display_name': display_name, 'type': type, 'notes': notes},
+		  success: function(data){
+		      if (data!==null){
+			    alert(data);
+		      } 
+		  }
+    });
+}
 </script>
 <?php
 $script_name=basename(__FILE__);
@@ -271,7 +291,7 @@ while($vpns = $result->fetchArray(SQLITE3_ASSOC)){
 	$index++;
     foreach($vpns as $key => $val){
 	error_log('select username,passwd,display_name,gateway,vpn_type from vpn where gateway='.$val."\n",3,'/tmp/tmp');
-	$result1=$db->query('select username,passwd,display_name,gateway,vpn_type,notes from vpn where gateway=\''.$val.'\'');
+	$result1=$db->query('select username,passwd,display_name,gateway,vpn_type,notes from vpn where customer_id=\''.$id.'\'');
 	while($vpn = $result1->fetchArray(SQLITE3_ASSOC)){
 	    $id1=str_replace('.','',$val);
 	    $id1=str_replace(' ','',$val);
@@ -280,11 +300,12 @@ while($vpns = $result->fetchArray(SQLITE3_ASSOC)){
 		<div id='.$id1.' class=hidden><ul id="navlist">';
 
 	    echo '<li>Description: <input type=text class=k-textbox id="'.$id1.'_display_name" value="'.$vpn['display_name'].'"></il><br>';
+	    echo '<li>Type: <input type=text class=k-textbox id="'.$id1.'_type" value="'.$vpn['vpn_type'].'"></il><br>';
 	    echo '<li>Gateway: <input type=text class=k-textbox id="'.$id1.'_gateway" value="'.$vpn['gateway'].'"></il><br>';
 	    echo '<li>User: <input type=text class=k-textbox id="'.$id1.'_username" value="'.$vpn['username'].'"></il><br>';
 	    echo '<li>Passwd: <input type=password class=k-textbox id="'.$id1.'_passwd" value="'.$vpn['passwd'].'"  onfocus="javascript:show_passwd(this)" ></il><br>';
 	    echo '<li>Notes: <textarea class=k-textbox id="'.$id1.'_notes" rows=3>'.$vpn['notes'].'</textarea><br>
-	<input type=button id="'.$id1.'_update_vpn" value="Update" onclick="javascript:update_vpn(\''.$orig_vpn.'\',\''.$id1.'\')"><br>
+	<input type=button id="'.$id1.'_update_vpn" value="Update" onclick="javascript:update_vpn(\''.$id1.'\')"><br>
 	    </div><br>';
 	}
     }
