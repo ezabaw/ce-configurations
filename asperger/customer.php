@@ -181,6 +181,31 @@ function update_vpn(id)
 		  }
     });
 }
+function update_client()
+{
+	var client_id = document.getElementById('customer_id').value;
+	var name = document.getElementById('client_name').value;
+	var tech_contact = document.getElementById('client_customer_tech_contact').value;
+	var pm = document.getElementById('client_pm').value;
+	var am = document.getElementById('client_am').value;
+	var engineer = document.getElementById('client_ps_tech_contact').value;
+	var version = document.getElementById('client_on_prem_version').value;
+	var sharepoint = document.getElementById('client_sharepoint').value;
+	var notes = document.getElementById('client_notes').value;
+	$.ajax({
+			type: 'POST',
+			url: 'update_client.php',
+			data: {'client_id':client_id, 'name':name,'tech_contact':tech_contact,'client_pm':pm,'client_am':am,'engineer':engineer,'version':version,'sharepoint':sharepoint,'notes':notes},
+	success:function(data){
+		if (data!==null){
+			alert(data);
+		}
+	}
+		
+	
+	});
+}
+	
 </script>
 <?php
 $script_name=basename(__FILE__);
@@ -200,7 +225,8 @@ if (isset($_GET["id"])&& is_numeric ($_GET['id'])){
 echo '
     <title>'.$header.'</title>
 <body class=onprem>
-<form action="'.$script_name.'" method="GET">';
+<input type="hidden" id="customer_id" name="customer_id" value="'.$id.'" />';
+echo '<h3><a href=#customer>Customer info:</a></h3>';
 echo '<table id="customers">';
 $index=0;
 while($customers = $result->fetchArray(SQLITE3_ASSOC)){
@@ -210,14 +236,16 @@ while($customers = $result->fetchArray(SQLITE3_ASSOC)){
 	}else{
 	    $color='yellow';
 	}
-	echo "<tr class=$color><td>$key</td><td>$val</td></tr>";
+	// no point in displaying customer ID.
+	if ($key !== 'id'){
+		echo "<tr class=$color><td>$key</td><td><input type=text id='client_$key' class=k-textbox value='$val'></td></tr>";
+	}
 	$index++;
     }
 }
-echo 
-    '</table>
-    <input type="hidden" id="customer_id" name="customer_id" value="'.$id.'" />
-    <table id="hosts"><h3 class="onprem"><tr>';
+echo '<tr><td><input type=button id="updateclient" value="Update" onclick="javascript:update_client()"></td></tr>
+    </table>
+    <table id="hosts">';
 $result=$db->query('select hostname from hosts where customer_id='.$id);
 echo '<h3><a href=#hosts>Hosts:</a></h3>';
 while($hosts = $result->fetchArray(SQLITE3_ASSOC)){

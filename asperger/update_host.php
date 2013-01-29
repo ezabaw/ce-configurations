@@ -52,6 +52,5 @@ if (!isset($msg)){
 }
 
 $db->close();
-$query="update hosts set hostname='$host' where customer_id=$customer_id and hostname='$orig_host'";
 echo $msg;
 ?>
