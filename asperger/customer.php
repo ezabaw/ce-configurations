@@ -58,12 +58,15 @@ function update_host(orig_host,host_id)
 		  data: {'customer_id': cust_id,'orig_host': orig_host, 'host': host,'host_description': host_description,'distro_version_arch': distro_version_arch, 'ssh_user': ssh_user, 'ssh_passwd': ssh_passwd, 'notes': notes},
 		  success: function(data){
 		      if (data!==null){
-			    alert(data);
+			message=document.getElementById("host_message_"+host_id);
+    			message.className='unhidden';
+			message.innerHTML = data;
+			message.style.color = 'green';
+			message.style.fontWeight="bold";
 		      } 
 		  }
     });
 }
-//function update_vpn(orig_vpn,vpn_id)
 function add_host()
 {
     var host = document.getElementById('new_host').value;
@@ -79,7 +82,11 @@ function add_host()
 		  data: {'customer_id': cust_id, 'host': host,'host_description': host_description,'distro_version_arch': distro_version_arch, 'ssh_user': ssh_user, 'ssh_passwd': ssh_passwd, 'notes': notes},
 		  success: function(data){
 		      if (data!==null){
-			    alert(data);
+			message=document.getElementById("new_host_message");
+    			message.className='unhidden';
+			message.innerHTML = data;
+			message.style.color = 'green';
+			message.style.fontWeight="bold";
 		      } 
 		  }
     });
@@ -107,7 +114,11 @@ function update_ui_ifs(ui_id)
 		  data: {'customer_id': cust_id, 'admin_console_url': admin_console_url,'admin_console_user': admin_console_user,'admin_console_passwd': admin_console_passwd, 'kmc_url': kmc_url, 'kmc_user': kmc_user, 'kmc_passwd': kmc_passwd,'kmc_url': kmc_url, 'kmc_user': kms_admin_user, 'kms_admin_passwd': kms_admin_passwd,'notes': notes},
 		  success: function(data){
 		      if (data!==null){
-			    alert(data);
+			message=document.getElementById("message");
+    			message.className='unhidden';
+			message.innerHTML = data;
+			message.style.color = 'green';
+			message.style.fontWeight="bold";
 		      } 
 		  }
     });
@@ -132,7 +143,11 @@ function add_ui_ifs()
 		  data: {'customer_id': cust_id, 'env': env,'admin_console_url': admin_console_url,'admin_console_user': admin_console_user,'admin_console_passwd': admin_console_passwd, 'kmc_url': kmc_url, 'kmc_user': kmc_user, 'kmc_passwd': kmc_passwd,'kms_admin_url': kms_admin_url, 'kms_admin_user': kms_admin_user, 'kms_admin_passwd': kms_admin_passwd,'notes': notes},
 		  success: function(data){
 		      if (data!==null){
-			    alert(data);
+			message=document.getElementById("new_ui_message");
+    			message.className='unhidden';
+			message.innerHTML = data;
+			message.style.color = 'green';
+			message.style.fontWeight="bold";
 		      } 
 		  }
     });
@@ -154,7 +169,11 @@ function add_vpn()
 		  data: {'customer_id': cust_id, 'gateway': gateway,'username': username,'passwd': passwd, 'display_name': display_name, 'type': type, 'notes': notes},
 		  success: function(data){
 		      if (data!==null){
-			    alert(data);
+			message=document.getElementById("new_vpn_message");
+    			message.className='unhidden';
+			message.innerHTML = data;
+			message.style.color = 'green';
+			message.style.fontWeight="bold";
 		      } 
 		  }
     });
@@ -176,7 +195,11 @@ function update_vpn(id)
 		  data: {'customer_id': cust_id, 'gateway': gateway,'username': username,'passwd': passwd, 'display_name': display_name, 'type': type, 'notes': notes},
 		  success: function(data){
 		      if (data!==null){
-			    alert(data);
+			message=document.getElementById("vpn_message_"+id);
+    			message.className='unhidden';
+			message.innerHTML = data;
+			message.style.color = 'green';
+			message.style.fontWeight="bold";
 		      } 
 		  }
     });
@@ -198,7 +221,11 @@ function update_client()
 			data: {'client_id':client_id, 'name':name,'tech_contact':tech_contact,'client_pm':pm,'client_am':am,'engineer':engineer,'version':version,'sharepoint':sharepoint,'notes':notes},
 	success:function(data){
 		if (data!==null){
-			alert(data);
+			message=document.getElementById("client_message");
+    			message.className='unhidden';
+			message.innerHTML = data;
+			message.style.color = 'green';
+			message.style.fontWeight="bold";
 		}
 	}
 		
@@ -225,9 +252,9 @@ if (isset($_GET["id"])&& is_numeric ($_GET['id'])){
 echo '
     <title>'.$header.'</title>
 <body class=onprem>
-<input type="hidden" id="customer_id" name="customer_id" value="'.$id.'" />';
-echo '<h3><a href=#customer>Customer info:</a></h3>';
-echo '<table id="customers">';
+<input type="hidden" id="customer_id" name="customer_id" value="'.$id.'" />
+<h3><a href=#customer>Customer info:</a></h3>
+<table id="customers">';
 $index=0;
 while($customers = $result->fetchArray(SQLITE3_ASSOC)){
     foreach($customers as $key => $val){
@@ -244,6 +271,7 @@ while($customers = $result->fetchArray(SQLITE3_ASSOC)){
     }
 }
 echo '<tr><td><input type=button id="updateclient" value="Update" onclick="javascript:update_client()"></td></tr>
+<tr><td><div class=.k-slider id="client_message" class=hidden></div></td></tr>
     </table>
     <table id="hosts">';
 $result=$db->query('select hostname from hosts where customer_id='.$id);
@@ -265,12 +293,13 @@ while($hosts = $result->fetchArray(SQLITE3_ASSOC)){
 	    echo '<li>Password: <input type=password class=k-textbox id="'.$id1.'_ssh_passwd" value="'.$host['ssh_passwd'].'" onfocus="javascript:show_passwd(this)";></il><br>';
 	    echo '<li>Notes: <textarea class=k-textbox id="'.$id1.'_notes" rows=3>'.$host['notes'].'</textarea><br>
 	    <input type=button id="'.$id1.'_update_host" value="Update" onclick="javascript:update_host(\''.$orig_host.'\',\''.$id1.'\')"><br>
-	    </div><br>';
+	    </div>
+<div class=.k-slider id="host_message_'.$id1.'" class=hidden></div><br>';
 	}
     }
 	
 }
-echo '<tr></table><div class=.k-slider ><input type=button class=.k-button id=hide_show value="Add new host" onclick="javascript:unhide_add(\'add_form\')"></div>
+echo '<tr></table><div class=.k-slider ><input type=button class=.k-button id=hide_show value="Add new host" onclick="javascript:unhide(\'add_form\')"></div>
 <div id=\'add_form\' class=hidden>
     <fieldset>
 	<legend>Add host</legend>
@@ -309,6 +338,7 @@ echo '<tr></table><div class=.k-slider ><input type=button class=.k-button id=hi
 
 	    </ul>
     </fieldset></div>
+<div class=.k-slider id="new_host_message" class=hidden></div><br>
 <table id="vpn">
 
 
@@ -318,8 +348,8 @@ echo '<h3><a href="#vpn">VPN:</a></h3>';
 while($vpns = $result->fetchArray(SQLITE3_ASSOC)){
 	$index++;
     foreach($vpns as $key => $val){
-	error_log('select username,passwd,display_name,gateway,vpn_type from vpn where gateway='.$val."\n",3,'/tmp/tmp');
-	$result1=$db->query('select username,passwd,display_name,gateway,vpn_type,notes from vpn where customer_id=\''.$id.'\'');
+	error_log('select id,username,passwd,display_name,gateway,vpn_type from vpn where gateway='.$val.' and customer_id=\''.$id.'\''."\n",3,'/tmp/tmp');
+	$result1=$db->query('select id,username,passwd,display_name,gateway,vpn_type,notes from vpn where customer_id=\''.$id.'\'');
 	while($vpn = $result1->fetchArray(SQLITE3_ASSOC)){
 	    $id1=str_replace('.','',$val);
 	    $id1=str_replace(' ','',$val);
@@ -327,14 +357,15 @@ while($vpns = $result->fetchArray(SQLITE3_ASSOC)){
 	    echo '<div class=.k-slider id=hide_show_div><input type=button id=hide_show_vpn value="'.$val.'" onclick="javascript:unhide(\''.$id1.'\')"></div>
 		<div id='.$id1.' class=hidden><ul id="navlist">';
 
-	    echo '<li>Description: <input type=text class=k-textbox id="'.$id1.'_display_name" value="'.$vpn['display_name'].'"></il><br>';
-	    echo '<li>Type: <input type=text class=k-textbox id="'.$id1.'_type" value="'.$vpn['vpn_type'].'"></il><br>';
-	    echo '<li>Gateway: <input type=text class=k-textbox id="'.$id1.'_gateway" value="'.$vpn['gateway'].'"></il><br>';
-	    echo '<li>User: <input type=text class=k-textbox id="'.$id1.'_username" value="'.$vpn['username'].'"></il><br>';
-	    echo '<li>Passwd: <input type=password class=k-textbox id="'.$id1.'_passwd" value="'.$vpn['passwd'].'"  onfocus="javascript:show_passwd(this)" ></il><br>';
-	    echo '<li>Notes: <textarea class=k-textbox id="'.$id1.'_notes" rows=3>'.$vpn['notes'].'</textarea><br>
-	<input type=button id="'.$id1.'_update_vpn" value="Update" onclick="javascript:update_vpn(\''.$id1.'\')"><br>
-	    </div><br>';
+	    echo '<li>Description: <input type=text class=k-textbox id="'.$vpn['id'].'_display_name" value="'.$vpn['display_name'].'"></il><br>';
+	    echo '<li>Type: <input type=text class=k-textbox id="'.$vpn['id'].'_type" value="'.$vpn['vpn_type'].'"></il><br>';
+	    echo '<li>Gateway: <input type=text class=k-textbox id="'.$vpn['id'].'_gateway" value="'.$vpn['gateway'].'"></il><br>';
+	    echo '<li>User: <input type=text class=k-textbox id="'.$vpn['id'].'_username" value="'.$vpn['username'].'"></il><br>';
+	    echo '<li>Passwd: <input type=password class=k-textbox id="'.$vpn['id'].'_passwd" value="'.$vpn['passwd'].'"  onfocus="javascript:show_passwd(this)" ></il><br>';
+	    echo '<li>Notes: <textarea class=k-textbox id="'.$vpn['id'].'_notes" rows=3>'.$vpn['notes'].'</textarea><br>
+	<input type=button id="'.$vpn['id'].'_update_vpn" value="Update" onclick="javascript:update_vpn(\''.$vpn['id'].'\')"><br>
+	    </div><br>
+	<div id="vpn_message_'.$vpn['id'].'" class=hidden></div><br>';
 	}
     }
 	
@@ -381,6 +412,7 @@ while($vpns = $result->fetchArray(SQLITE3_ASSOC)){
 
 	    </ul>
     </fieldset></div>
+	<div class=.k-slider id="new_vpn_message" class=hidden></div><br>
 <h3 class="onprem"><tr>
 	<h3><a href="#ui">UI:</a></h3>';
 $result=$db->query('select id from ui where customer_id='.$id);
@@ -404,7 +436,8 @@ $result=$db->query('select id from ui where customer_id='.$id);
 		    echo '<li>KMS admin user: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_kms_admin_user" value="'.$ui_ifs['kms_admin_user'].'"></il><br>';
 		    echo '<li>KMS passwd: <input type=password class=k-textbox id="'.$ui_ifs['id'].'_kms_admin_passwd" value="'.$ui_ifs['kms_admin_passwd'].'"  onfocus="javascript:show_passwd(this)"></il><br>';
 		    echo '<li>Notes: <textarea class=k-textbox id="'.$ui_ifs['id'].'_notes" rows=3>'.$ui_ifs['notes'].'</textarea><br>';
-		    echo '</div><br></form>';
+		    echo '</div><div class=.k-slider id="ui_message_'.$ui_ifs['id'].'" class=hidden></div>
+			<br></form>';
 		}
 	    }
 		
@@ -472,8 +505,10 @@ $result=$db->query('select id from ui where customer_id='.$id);
 		    </li>
 
 		    </ul>
-	    </fieldset></div>
+	    </fieldset>
+	</div><br>
 	</form>
+	<div class=.k-slider id="new_ui_message" class=hidden></div>
     </body>
     </html>';
 ?>
