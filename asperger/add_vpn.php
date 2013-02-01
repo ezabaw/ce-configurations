@@ -5,7 +5,7 @@ if (!isset($_SESSION['asper_session']) || !$_SESSION['asper_session']){
     require_once(dirname($script_name).DIRECTORY_SEPARATOR.'validate_session.inc');
 }
 if (empty($_POST['gateway'])){
-    die('A gateway is mandatory.');
+    die('ERR: A gateway is mandatory.');
 }
 $customer_id=SQLite3::escapeString($_POST['customer_id']);
 $username=SQLite3::escapeString($_POST['username']);

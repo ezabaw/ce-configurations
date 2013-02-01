@@ -59,9 +59,13 @@ function update_host(orig_host,host_id)
 		  success: function(data){
 		      if (data!==null){
 			message=document.getElementById("host_message_"+host_id);
+			if (data.indexOf("ERR") !==-1) {
+				message.style.color = 'red';
+			}else{
+				message.style.color = 'green';
+			}
     			message.className='unhidden';
 			message.innerHTML = data;
-			message.style.color = 'green';
 			message.style.fontWeight="bold";
 		      } 
 		  }
@@ -83,9 +87,13 @@ function add_host()
 		  success: function(data){
 		      if (data!==null){
 			message=document.getElementById("new_host_message");
+			if (data.indexOf("ERR") !==-1) {
+				message.style.color = 'red';
+			}else{
+				message.style.color = 'green';
+			}
     			message.className='unhidden';
 			message.innerHTML = data;
-			message.style.color = 'green';
 			message.style.fontWeight="bold";
 		      } 
 		  }
@@ -116,9 +124,13 @@ function add_ui_ifs()
 		  success: function(data){
 		      if (data!==null){
 			message=document.getElementById("new_ui_message");
+			if (data.indexOf("ERR") !==-1) {
+				message.style.color = 'red';
+			}else{
+				message.style.color = 'green';
+			}
     			message.className='unhidden';
 			message.innerHTML = data;
-			message.style.color = 'green';
 			message.style.fontWeight="bold";
 		      } 
 		  }
@@ -147,9 +159,13 @@ function update_ui_ifs(id)
 		  success: function(data){
 		      if (data!==null){
 			message=document.getElementById("ui_message_"+id);
+			if (data.indexOf("ERR") !==-1) {
+				message.style.color = 'red';
+			}else{
+				message.style.color = 'green';
+			}
     			message.className='unhidden';
 			message.innerHTML = data;
-			message.style.color = 'green';
 			message.style.fontWeight="bold";
 		      } 
 		  }
@@ -173,9 +189,13 @@ function add_vpn()
 		  success: function(data){
 		      if (data!==null){
 			message=document.getElementById("new_vpn_message");
+			if (data.indexOf("ERR") !==-1) {
+				message.style.color = 'red';
+			}else{
+				message.style.color = 'green';
+			}
     			message.className='unhidden';
 			message.innerHTML = data;
-			message.style.color = 'green';
 			message.style.fontWeight="bold";
 		      } 
 		  }
@@ -199,9 +219,13 @@ function update_vpn(id)
 		  success: function(data){
 		      if (data!==null){
 			message=document.getElementById("vpn_message_"+id);
+			if (data.indexOf("ERR") !==-1) {
+				message.style.color = 'red';
+			}else{
+				message.style.color = 'green';
+			}
     			message.className='unhidden';
 			message.innerHTML = data;
-			message.style.color = 'green';
 			message.style.fontWeight="bold";
 		      } 
 		  }
@@ -225,9 +249,13 @@ function update_client()
 	success:function(data){
 		if (data!==null){
 			message=document.getElementById("client_message");
+			if (data.indexOf("ERR") !==-1) {
+				message.style.color = 'red';
+			}else{
+				message.style.color = 'green';
+			}
     			message.className='unhidden';
 			message.innerHTML = data;
-			message.style.color = 'green';
 			message.style.fontWeight="bold";
 		}
 	}

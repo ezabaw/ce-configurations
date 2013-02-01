@@ -2,7 +2,7 @@
 //var_dump($_POST);
 session_start();
 if (empty($_POST['host']) || empty($_POST['customer_id'])){
-    die('A hostname and customer ID are mandatory.');
+    die('ERR: A hostname and customer ID are mandatory.');
 }
 require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'conn.inc');
 if (!isset($_SESSION['asper_session']) || !$_SESSION['asper_session']){
@@ -48,7 +48,7 @@ if ($db->lastErrorCode()){
     $msg=json_encode('ERROR: notes#' . $db->lastErrorCode() . ' '.$db->lastErrorMsg().' :(');
 }
 if (!isset($msg)){
-    $msg="Record for $host updated successfully to hosts.";
+    $msg="Record for $host updated successfully.";
 }
 
 $db->close();
