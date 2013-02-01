@@ -32,6 +32,8 @@
     {
 	var item = document.getElementById(divID);
 	item.className='unhidden';
+	var name=document.getElementById('name');
+	name.focus();
     }
 
     function add_customer()
@@ -68,7 +70,8 @@ if (isset($_GET["orderby"])){
 }else{
     $order_by = 'name';
 }
-echo '<title>OnPrem Clients ordered by '.$order_by.'</title>';
+echo '<title>OnPrem Clients ordered by '.$order_by.'</title>
+<div class=.k-slider ><input type=button class=.k-button id=hide_show value="Add new" onclick="javascript:unhide_add(\'add_form\')"></div>';
 $db=new SQLite3($dbfile,SQLITE3_OPEN_READONLY) or die("Unable to connect to database $dbfile");
 $result=$db->query('select * from customers order by '.$order_by);
 $index=0;
