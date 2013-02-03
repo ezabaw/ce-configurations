@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'conn.inc');
-if (!isset($_SESSION['asper_session']) || !$_SESSION['asper_session']){
+if (!isset($_SESSION['asper_user']) || !$_SESSION['asper_user']){
     require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'validate_session.inc');
 }
 if (empty($_POST['name']) || empty($_POST['customer_tech_contact'])){

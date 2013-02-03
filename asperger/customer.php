@@ -268,7 +268,7 @@ function update_client()
 <?php
 $script_name=basename(__FILE__);
 require_once(dirname($script_name).DIRECTORY_SEPARATOR.'conn.inc');
-if (!isset($_SESSION['asper_session']) || !$_SESSION['asper_session']){
+if (!isset($_SESSION['asper_user']) || !$_SESSION['asper_user']){
     require_once(dirname($script_name).DIRECTORY_SEPARATOR.'validate_session.inc');
 }
 $db=new SQLite3($dbfile,SQLITE3_OPEN_READWRITE) or die("Unable to connect to database $dbfile");

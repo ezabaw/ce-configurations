@@ -16,7 +16,7 @@ if ($ldap_user && $ldap_pass){
 	    // verify binding
 	    if ($ldapbind) {
 		session_start();
-		$_SESSION['asper_session']=true;
+		$_SESSION['asper_user']=$ldap_user;
 	    }
 	    header('Location: index.php');
 

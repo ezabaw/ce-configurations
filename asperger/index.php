@@ -62,7 +62,7 @@
 <?php
 $script_name=basename(__FILE__);
 require_once(dirname($script_name).DIRECTORY_SEPARATOR.'conn.inc');
-if (!isset($_SESSION['asper_session']) || !$_SESSION['asper_session']){
+if (!isset($_SESSION['asper_user']) || !$_SESSION['asper_user']){
     require_once(dirname($script_name).DIRECTORY_SEPARATOR.'validate_session.inc');
 }
 if (isset($_GET["orderby"])){
@@ -71,6 +71,8 @@ if (isset($_GET["orderby"])){
     $order_by = 'name';
 }
 echo '<title>OnPrem Clients ordered by '.$order_by.'</title>
+Logged in as '.$_SESSION['asper_user'].'<br><a href=logout.php>Logout</a>
+<br><br>
 <div class=.k-slider ><input type=button class=.k-button id=hide_show value="Add new" onclick="javascript:unhide_add(\'add_form\')"></div>';
 $db=new SQLite3($dbfile,SQLITE3_OPEN_READONLY) or die("Unable to connect to database $dbfile");
 $result=$db->query('select * from customers order by '.$order_by);
@@ -97,8 +99,8 @@ while($res = $result->fetchArray(SQLITE3_ASSOC)){
 	$color='yellow';
     }
     echo '<tr class="'.$color.'">
-    <td> <a href=customer.php?id='.$res['id'].'>'. $res['id'].'<a></td>
-    <td>' . $res['name'].'</td>
+    <td> <a href=customer.php?id='.$res['id'].'>'. $res['id'].'</a></td>
+    <td><a href=customer.php?id='.$res['id'].'>' . $res['name'].'</a></td>
     <td>' . $res['customer_tech_contact'].'</td>
     <td>' . $res['pm'].'</td>'. '</td>
     <td>' . $res['am'].'</td>

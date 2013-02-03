@@ -4,7 +4,7 @@ if (empty($_POST['host']) || empty($_POST['customer_id'])){
     die('ERR: A hostname and customer ID are mandatory.');
 }
 require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'conn.inc');
-if (!isset($_SESSION['asper_session']) || !$_SESSION['asper_session']){
+if (!isset($_SESSION['asper_user']) || !$_SESSION['asper_user']){
     require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'validate_session.inc');
 }
 $host=$_POST['host'];

@@ -4,7 +4,7 @@ if (empty($_POST['admin_console_url']) && empty($_POST['kmc_url'])&& empty($_POS
     die('At least one URL is mandatory.');
 }
 require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'conn.inc');
-if (!isset($_SESSION['asper_session']) || !$_SESSION['asper_session']){
+if (!isset($_SESSION['asper_user']) || !$_SESSION['asper_user']){
     require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'validate_session.inc');
 }
 
