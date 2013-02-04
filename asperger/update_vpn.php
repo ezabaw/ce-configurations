@@ -8,6 +8,7 @@ require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'conn.inc');
 if (!isset($_SESSION['asper_user']) || !$_SESSION['asper_user']){
     require_once(dirname($script_name).DIRECTORY_SEPARATOR.'validate_session.inc');
 }
+$sys_user=$_SESSION['asper_user'];
 $gateway=SQLite3::escapeString($_POST['gateway']);
 $username=SQLite3::escapeString($_POST['username']);
 $passwd=SQLite3::escapeString($_POST['passwd']);
@@ -22,6 +23,8 @@ if ($db->lastErrorCode()){
     $msg=json_encode("ERROR: on vpn update: '.$gateway .'\n#" . $db->lastErrorCode() . ' '.$db->lastErrorMsg().' :(');
 }
 if (!isset($msg)){
+ 	$query="insert into log values(NULL,'Updated vpn $gateway.',DATE(),'$sys_user','$customer_id')";
+	$db->exec($query);
     $msg="Record for $gateway updated successfully.";
 }
 

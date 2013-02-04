@@ -7,6 +7,7 @@ if (!isset($_SESSION['asper_user']) || !$_SESSION['asper_user']){
 if (empty($_POST['gateway'])){
     die('ERR: A gateway is mandatory.');
 }
+$sys_user=$_SESSION['asper_user'];
 $customer_id=SQLite3::escapeString($_POST['customer_id']);
 $username=SQLite3::escapeString($_POST['username']);
 $passwd=SQLite3::escapeString($_POST['passwd']);
@@ -20,6 +21,8 @@ $db->exec($query);
 if ($db->lastErrorCode()){
     $msg=json_encode('ERROR: #' . $db->lastErrorCode() . ' '.$db->lastErrorMsg().' :(');
 }else{
+ 	$query="insert into log values(NULL,'Added vpn $gateway.',DATE(),'$sys_user','$customer_id')";
+	$db->exec($query);
     $msg="Record for $display_name added successfully to vpn table.";
 }
 $db->close();
