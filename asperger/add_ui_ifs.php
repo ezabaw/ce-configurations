@@ -8,6 +8,7 @@ if (!isset($_SESSION['asper_user']) || !$_SESSION['asper_user']){
     require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'validate_session.inc');
 }
 
+$sys_user=$_SESSION['asper_user'];
 $env=$_POST['env'];
 $admin_console_url=$_POST['admin_console_url'];
 $admin_console_user=SQLite3::escapeString($_POST['admin_console_user']);
@@ -27,6 +28,8 @@ $db->exec($query);
 if ($db->lastErrorCode()){
     $msg=json_encode('ERROR: #' . $db->lastErrorCode() . ' '.$db->lastErrorMsg().' :(');
 }else{
+	$query="insert into log values(NULL,'Added ui for $env.',DATE(),'$sys_user','$customer_id')";
+	$db->exec($query);
     $msg="Record added successfully to ui.";
 }
 $db->close();

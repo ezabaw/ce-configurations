@@ -9,6 +9,7 @@ CREATE TABLE customers
     on_prem_version VARCHAR(128),
     net_dia VARCHAR(256),
     notes VARCHAR(1024),
+    create_time INTEGER
     UNIQUE(name),
     UNIQUE(id)
 );
@@ -59,6 +60,7 @@ CREATE TABLE log
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     action VARCHAR(256),
     create_time INTEGER,
-    username VARCHAR(128) NOT NULL
+    username VARCHAR(128) NOT NULL,
+    customer_id INTEGER NOT NULL,
 );
 

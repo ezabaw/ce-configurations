@@ -275,7 +275,7 @@ $db=new SQLite3($dbfile,SQLITE3_OPEN_READWRITE) or die("Unable to connect to dat
 if (isset($_GET["id"])&& is_numeric ($_GET['id'])){
     $id = $_GET["id"];
     $result=$db->query('select * from customers where id='.$id);
-    $header='Customer details:';
+    $header='Customer details';
 }elseif(!isset($_GET["edit"])){
     die('You need to pass a customer ID from customers.id.');
 }
@@ -285,7 +285,7 @@ echo '
 <body class=onprem>
 <input type="hidden" id="customer_id" name="customer_id" value="'.$id.'" />
 <h3><a href=#customer>Customer info:</a></h3>
-<table id="customers">';
+<table id="customers" class=onprem>';
 $index=0;
 while($customers = $result->fetchArray(SQLITE3_ASSOC)){
     foreach($customers as $key => $val){

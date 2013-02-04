@@ -77,6 +77,16 @@ tr.green td {
 	-moz-border-radius: 0px 0px 0px 0px;
 
 }
+tr.separator td {
+	border-width: 2px;
+	font.color: ;
+	padding: 2px;
+/*border-style: inset;*/
+	border-color: gray;
+	background-color:#7100FF;
+	-moz-border-radius: 0px 0px 0px 0px;
+
+}
 .onprem h3 {
 	color: #000000;
 	font-weight: bold;

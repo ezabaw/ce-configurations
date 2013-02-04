@@ -8,6 +8,7 @@ require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'conn.inc');
 if (!isset($_SESSION['asper_user']) || !$_SESSION['asper_user']){
     require_once(dirname($script_name).DIRECTORY_SEPARATOR.'validate_session.inc');
 }
+$sys_user=$_SESSION['asper_user'];
 $orig_host=$_POST['orig_host'];
 $host=$_POST['host'];
 $host_desc=SQLite3::escapeString($_POST['host_description']);
@@ -48,7 +49,9 @@ if ($db->lastErrorCode()){
     $msg=json_encode('ERROR: notes#' . $db->lastErrorCode() . ' '.$db->lastErrorMsg().' :(');
 }
 if (!isset($msg)){
-    $msg="Record for $host updated successfully.";
+	$query="insert into log values(NULL,'Host $host updated.',DATE(),'$sys_user','$customer_id')";
+	$db->exec($query);
+	$msg="Record for $host updated successfully.";
 }
 
 $db->close();

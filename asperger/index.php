@@ -90,6 +90,7 @@ while($res = $result->fetchArray(SQLITE3_ASSOC)){
 	<th><a href='.$script_name.'?orderby=ps_tech_contact>PS Engineer</a></th>
 	<th><a href='.$script_name.'?orderby=on_prem_version>Version</a></th>
 	<th><a href='.$script_name.'>SharePoint</th>
+	<th><a href='.$script_name.'>Changelog</th>
 	<th><a href='.$script_name.'>Notes</th>
 	</tr>';
     }
@@ -107,6 +108,7 @@ while($res = $result->fetchArray(SQLITE3_ASSOC)){
     <td>' . $res['ps_tech_contact'].'</td>
     <td>' . $res['on_prem_version'].'</td>
     <td align="center"><a href="' . $res['sharepoint']. '"><img src="images/sharepoint.png" /></a></td>
+    <td><a href="changelog.php?id='.$res['id'].'">Changelog</a></td>
     <td>' . $res['notes'].'</td>
     </tr>';
     $index++;
