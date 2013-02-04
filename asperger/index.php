@@ -100,8 +100,8 @@ while($res = $result->fetchArray(SQLITE3_ASSOC)){
 	$color='yellow';
     }
     echo '<tr class="'.$color.'">
-    <td> <a href=customer.php?id='.$res['id'].'>'. $res['id'].'</a></td>
-    <td><a href=customer.php?id='.$res['id'].'>' . $res['name'].'</a></td>
+    <td> <a href=customer.php?id='.$res['id'].'&name='.$res['name'].'>'. $res['id'].'</a></td>
+    <td><a href=customer.php?id='.$res['id'].'&name='.$res['name'].'>' . $res['name'].'</a></td>
     <td>' . $res['customer_tech_contact'].'</td>
     <td>' . $res['pm'].'</td>'. '</td>
     <td>' . $res['am'].'</td>

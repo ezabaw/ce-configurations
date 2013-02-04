@@ -263,6 +263,24 @@ function update_client()
 	
 	});
 }
+function export_csv()
+{
+	var customer_id = document.getElementById('customer_id').value;
+	var customer_name = document.getElementById('customer_name').value;
+
+	$.ajax({
+		type: 'POST',
+		url: 'export_csv.php',
+		data: {'customer_id':customer_id,'customer_name': customer_name},
+		success:function(data){
+		if (data!==null){
+			alert(data);
+		}
+	}
+		
+	
+	});
+}
 	
 </script>
 <?php
@@ -274,8 +292,9 @@ if (!isset($_SESSION['asper_user']) || !$_SESSION['asper_user']){
 $db=new SQLite3($dbfile,SQLITE3_OPEN_READWRITE) or die("Unable to connect to database $dbfile");
 if (isset($_GET["id"])&& is_numeric ($_GET['id'])){
     $id = $_GET["id"];
+    $name = $_GET["name"];
     $result=$db->query('select * from customers where id='.$id);
-    $header='Customer details';
+    $header=$name . ' - Customer details';
 }elseif(!isset($_GET["edit"])){
     die('You need to pass a customer ID from customers.id.');
 }
@@ -284,6 +303,7 @@ echo '
     <title>'.$header.'</title>
 <body class=onprem>
 <input type="hidden" id="customer_id" name="customer_id" value="'.$id.'" />
+<input type="hidden" id="customer_name" name="customer_name" value="'.$name.'" />
 <h3><a href=#customer>Customer info:</a></h3>
 <table id="customers" class=onprem>';
 $index=0;
@@ -304,6 +324,8 @@ while($customers = $result->fetchArray(SQLITE3_ASSOC)){
 echo '<tr><td><input type=button id="updateclient" value="Update" onclick="javascript:update_client()"></td></tr>
 <tr><td><div class=.k-slider id="client_message" class=hidden></div></td></tr>
     </table>
+<br><a href=changelog.php?id='.$id.'>View changelog</a>
+<br><input type=button id="exportcsv" value="Export to CSV" onclick="javascript:export_csv()">
     <table id="hosts">';
 $result=$db->query('select hostname from hosts where customer_id='.$id);
 echo '<h3><a href=#hosts>Hosts:</a></h3>';
