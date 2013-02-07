@@ -8,9 +8,10 @@ if (!isset($_SESSION['asper_user']) || !$_SESSION['asper_user']){
 function mail_it($to, $files, $sendermail,$subject)
 {
     // email fields: to, from, subject, and so on
-    $from = "Files attach <".$sendermail.">";
-    $subject = date("d.M H:i")." F=".count($files);
-    $message = date("Y.m.d H:i:s")."\n".count($files)." attachments";
+    $from = "Asperger gnome <".$sendermail.">";
+    //$subject = date("d.M H:i")." F=".count($files);
+    //$message = date("Y.m.d H:i:s")."\n".count($files)." attachments";
+    $message='Hello '.$_SESSION['asper_user'].",\n\nAttached are the CSVs you requested.\n\nMay the source be with you,\nThe Asperger gnome";
     $headers = "From: $from";
  
     // boundary
@@ -39,6 +40,7 @@ function mail_it($to, $files, $sendermail,$subject)
             }
         }
 	$message .= "--{$mime_boundary}--";
+	error_log($message,3,'/tmp/11111');
 	$returnpath = "-f" . $sendermail;
 	$ok = mail($to, $subject, $message, $headers, $returnpath);
 	if($ok){ 
@@ -62,10 +64,9 @@ if ($ret!==0){
 	$msg.="Failed to export ui for $name\n";
 }
 if (!isset($msg)){
-	$files=array($name.'_hosts.csv',$name.'_vpns.csv',$name.'_ui.csv');
+	$files=array('/tmp/'.$name.'_hosts.csv','/tmp/'.$name.'_vpns.csv','/tmp/'.$name.'_ui.csv');
 	$msg="Export done successfully. Mail will be sent to ".$_SESSION['asper_user']."@kaltura.com\n";
 	$returnc=mail_it($_SESSION['asper_user'].'@kaltura.com', $files, 'asperger@kaltura.com','Customer info for '.$name);
-	$msg.="$returnc\n";
 }
 echo $msg;
 ?>

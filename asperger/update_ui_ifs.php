@@ -8,6 +8,7 @@ if (!isset($_SESSION['asper_user']) || !$_SESSION['asper_user']){
     require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'validate_session.inc');
 }
 
+$sys_user=$_SESSION['asper_user'];
 $envid=$_POST['envid'];
 $env=$_POST['env'];
 $admin_console_url=$_POST['admin_console_url'];
@@ -28,6 +29,8 @@ if ($db->lastErrorCode()){
     $msg=json_encode("ERROR: on ui update: '.$env .'\n#" . $db->lastErrorCode() . ' '.$db->lastErrorMsg().' :(');
 }
 if (!isset($msg)){
+	$query="insert into log values(NULL,'Updated ui for $env.',DATE(),'$sys_user','$customer_id')";
+	$db->exec($query);
     $msg="Record for $env updated successfully.";
 }
 
