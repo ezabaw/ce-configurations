@@ -5,7 +5,7 @@ if (!isset($_SESSION['asper_user']) || !$_SESSION['asper_user']){
     require_once(dirname($script_name).DIRECTORY_SEPARATOR.'validate_session.inc');
 }
 
-function mail_it($to, $files, $sendermail)
+function mail_it($to, $files, $sendermail,$subject)
 {
     // email fields: to, from, subject, and so on
     $from = "Files attach <".$sendermail.">";
@@ -38,13 +38,13 @@ function mail_it($to, $files, $sendermail)
             "Content-Transfer-Encoding: base64\n\n" . $data . "\n\n";
             }
         }
-    $message .= "--{$mime_boundary}--";
-    $returnpath = "-f" . $sendermail;
-    $ok = mail($to, $subject, $message, $headers, $returnpath);
+	$message .= "--{$mime_boundary}--";
+	$returnpath = "-f" . $sendermail;
+	$ok = mail($to, $subject, $message, $headers, $returnpath);
 	if($ok){ 
-		return $i; 
+		return true; 
 	} else { 
-		return 0; 
+		return false; 
 	}
 }
 $id=$_POST['customer_id'];
@@ -64,7 +64,7 @@ if ($ret!==0){
 if (!isset($msg)){
 	$files=array($name.'_hosts.csv',$name.'_vpns.csv',$name.'_ui.csv');
 	$msg="Export done successfully. Mail will be sent to ".$_SESSION['asper_user']."@kaltura.com\n";
-	$returnc=mail_it($_SESSION['asper_user'].'@kaltura.com', $files, 'asperger@kaltura.com');
+	$returnc=mail_it($_SESSION['asper_user'].'@kaltura.com', $files, 'asperger@kaltura.com','Customer info for '.$name);
 	$msg.="$returnc\n";
 }
 echo $msg;

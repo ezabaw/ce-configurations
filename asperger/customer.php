@@ -140,6 +140,7 @@ function add_ui_ifs()
 }
 function update_ui_ifs(id)
 {
+    var envid = id; 
     var env = document.getElementById('env_'+id).value;
     var admin_console_url = document.getElementById(id+'_admin_console_url').value;
     var admin_console_user = document.getElementById(id+'_admin_console_user').value;
@@ -155,7 +156,7 @@ function update_ui_ifs(id)
     $.ajax({
 		  type: 'POST',
 		  url: 'update_ui_ifs.php',
-		  data: {'customer_id': cust_id, 'env': env,'admin_console_url': admin_console_url,'admin_console_user': admin_console_user,'admin_console_passwd': admin_console_passwd, 'kmc_url': kmc_url, 'kmc_user': kmc_user, 'kmc_passwd': kmc_passwd,'kms_admin_url': kms_admin_url, 'kms_admin_user': kms_admin_user, 'kms_admin_passwd': kms_admin_passwd,'notes': notes},
+		  data: {'customer_id': cust_id, 'env': env,'admin_console_url': admin_console_url,'admin_console_user': admin_console_user,'admin_console_passwd': admin_console_passwd, 'kmc_url': kmc_url, 'kmc_user': kmc_user, 'kmc_passwd': kmc_passwd,'kms_admin_url': kms_admin_url, 'kms_admin_user': kms_admin_user, 'kms_admin_passwd': kms_admin_passwd,'notes': notes, 'envid':envid},
 		  success: function(data){
 		      if (data!==null){
 			message=document.getElementById("ui_message_"+id);
