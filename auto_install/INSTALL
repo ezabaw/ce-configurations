@@ -1,28 +1,20 @@
 AUTHOR: Jess Portnoy
 VERSION: 0.1
-LAST MODIFIED: Thu Nov 22 16:27:43 EST 2012
+LAST MODIFIED: Wed Feb 06 20:00:00 EST 2013
+Modified by Zohar Babin to fit GitHub paths
 
-This is a mini howto for using the auto Kaltura OnPrem auto installer.
+This is a mini howto for using the auto installer for self hosted Kaltura environments.
 
 Pre-reqs:
 =========
-Download the OnPrem package. At the time of writing this document, latest can be obtained here:
-http://ciserver:9090/job/Kaltura-OnPrem-Falcon-Package/148/artifact/output/TM-v6.0.1-QA-148.tgz
-
-Note that this requires VPN access to the IL intra. If you do not have creds, please contact Shlomi Ben David <Shlomi.Ben.David@kaltura.com>.
-
-The auto install files can be obtained from:
-svn+ssh://kelev.kaltura.com/usr/local/kalsource/backend/server/trunk/on-premise/all/auto_install
-If you do not have an SVN account on kelev, please contact Shlomi Ben David <Shlomi.Ben.David@kaltura.com>.
-Files should be placed under the basedir of the OnPrem archive. For instance, if you extracted the package to:
-tar zxvf /tmp/TM-v6.0.1-QA-148.tgz -C /tmp/
-Auto installer should be placed under: /tmp/Kaltura-TM-v6.0.1
+Clone all the Kaltura package repositories (using ce-packager: https://github.com/kaltura/ce-packager)
+Place the package under: /tmp/Kaltura-v6.0.1
 
 Installation:
 =============
 Before running the installer, one needs to edit user_input.ini. 
 A sample file can be found under:
-svn+ssh://kelev.kaltura.com/usr/local/kalsource/backend/server/trunk/on-premise/all/auto_install/
+https://github.com/kaltura/ce-configurations/blob/master/auto_install/user_input.ini
 
 To run the auto installer, type as super user:
 # ./main.sh
