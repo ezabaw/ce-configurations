@@ -402,8 +402,7 @@ echo '<h3><a href="#vpn">VPN:</a></h3>';
 while($vpns = $result->fetchArray(SQLITE3_ASSOC)){
 	$index++;
     foreach($vpns as $key => $val){
-	error_log('select id,username,passwd,display_name,gateway,vpn_type from vpn where gateway='.$val.' and customer_id=\''.$id.'\''."\n",3,'/tmp/tmp');
-	$result1=$db->query('select id,username,passwd,display_name,gateway,vpn_type,notes from vpn where customer_id=\''.$id.'\'');
+	$result1=$db->query('select id,username,passwd,display_name,gateway,vpn_type,notes from vpn where customer_id=\''.$id.'\' and gateway=\''.$val.'\'');
 	while($vpn = $result1->fetchArray(SQLITE3_ASSOC)){
 	    $id1=str_replace('.','',$val);
 	    $id1=str_replace(' ','',$val);

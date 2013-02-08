@@ -68,5 +68,8 @@ if (!isset($msg)){
 	$msg="Export done successfully. Mail will be sent to ".$_SESSION['asper_user']."@kaltura.com\n";
 	$returnc=mail_it($_SESSION['asper_user'].'@kaltura.com', $files, 'asperger@kaltura.com','Customer info for '.$name);
 }
+foreach ($files => $file){
+	unlink($file);
+}
 echo $msg;
 ?>

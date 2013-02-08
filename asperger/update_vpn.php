@@ -17,7 +17,7 @@ $vpn_type=SQLite3::escapeString($_POST['type']);
 $notes=SQLite3::escapeString($_POST['notes']);
 $customer_id=SQLite3::escapeString($_POST['customer_id']);
 $db=new SQLite3($dbfile) or die("Unable to connect to database $dbfile");
-$query="update vpn set gateway='$gateway',username='$username',passwd='$passwd',display_name='$display_name',vpn_type='$vpn_type',notes='$notes' where customer_id=$customer_id";
+$query="update vpn set gateway='$gateway',username='$username',passwd='$passwd',display_name='$display_name',vpn_type='$vpn_type',notes='$notes' where customer_id=$customer_id and gateway='$gateway'";
 $db->exec($query);
 if ($db->lastErrorCode()){
     $msg=json_encode("ERROR: on vpn update: '.$gateway .'\n#" . $db->lastErrorCode() . ' '.$db->lastErrorMsg().' :(');
