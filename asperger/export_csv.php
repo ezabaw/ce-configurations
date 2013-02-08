@@ -40,7 +40,6 @@ function mail_it($to, $files, $sendermail,$subject)
             }
         }
 	$message .= "--{$mime_boundary}--";
-	error_log($message,3,'/tmp/11111');
 	$returnpath = "-f" . $sendermail;
 	$ok = mail($to, $subject, $message, $headers, $returnpath);
 	if($ok){ 
@@ -68,7 +67,7 @@ if (!isset($msg)){
 	$msg="Export done successfully. Mail will be sent to ".$_SESSION['asper_user']."@kaltura.com\n";
 	$returnc=mail_it($_SESSION['asper_user'].'@kaltura.com', $files, 'asperger@kaltura.com','Customer info for '.$name);
 }
-foreach ($files => $file){
+foreach ($files as $file){
 	unlink($file);
 }
 echo $msg;
