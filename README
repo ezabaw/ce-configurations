@@ -1,0 +1,55 @@
+Onlooker
+Author: Anthony Drimones, Kaltura System Integrator
+--------
+An inotify watch script integrated with Git, specialized for the Kaltura platform. This script tracks all system changes instantaneously.
+
+Requirements:
+- Access to Yum repo to install Git
+- inotify-tools: inotify-tools-3.14-1.el6.x86_64.rpm is included in package. Or if only grabbed the code, you can download from: 
+http://github.com/downloads/rvoicilas/inotify-tools/inotify-tools-3.14.tar.gz
+
+----------------
+Install:
+Extract anywhere
+cd to directory
+./install-onlooker.sh
+
+Run:
+service onlooker start
+---------------
+
+Git tips:
+
+You dont have to copy the full commit hash, only the first few characters.
+
+View files modified with file name:
+git log --name-status
+
+View files modified and what was changed:
+git log -p
+
+View what was modified for specific file:
+git log -p -- THE_FILE_NAME
+
+View the difference between two commit points:
+git diff b7a8s9k9^ jdk92b00 -- /path/to/the/file
+
+Show a specific file from a specific revision:
+git show 4096784226^:opt/mediaspace/configs/config.ini
+Note: there is no beginning /
+
+Show a specific file:
+git show 4096784226^:opt/mediaspace/configs/config.ini
+
+Show a specific file and copy it to new place:
+git show 4096784226^:opt/mediaspace/configs/config.ini > THE_NEW_FILE_NAME
+
+Rollback a specific file to previous change:
+git checkout 4096784226 -- THE_FILE_NAME 
+
+Backing up the repo:
+cd /
+mkdir A_NEW_DIRECTORY
+git clone . A_NEW_DIRECTORY
+tar czvf A_NEW_DIRECTORY.tar.gz A_NEW_DIRECTORY
+
