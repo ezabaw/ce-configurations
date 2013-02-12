@@ -64,8 +64,8 @@ if ($ret!==0){
 }
 if (!isset($msg)){
 	$files=array('/tmp/'.$name.'_hosts.csv','/tmp/'.$name.'_vpns.csv','/tmp/'.$name.'_ui.csv');
-	$msg="Export done successfully. Mail will be sent to ".$_SESSION['asper_user']."@kaltura.com\n";
-	$returnc=mail_it($_SESSION['asper_user'].'@kaltura.com', $files, 'asperger@kaltura.com','Customer info for '.$name);
+	$msg="Export done successfully. Mail will be sent to ".$_SESSION['asper_user']."@$domain\n";
+	$returnc=mail_it($_SESSION['asper_user'].'@'.$domain, $files, 'asperger@'.$domain,'Customer info for '.$name);
 }
 foreach ($files as $file){
 	unlink($file);
