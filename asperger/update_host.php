@@ -49,7 +49,7 @@ if ($db->lastErrorCode()){
     $msg=json_encode('ERROR: notes#' . $db->lastErrorCode() . ' '.$db->lastErrorMsg().' :(');
 }
 if (!isset($msg)){
-	$query="insert into log values(NULL,'Host $host updated.',DATE(),'$sys_user','$customer_id')";
+	$query="insert into log values(NULL,'$host updated.',DATE(),'$sys_user','$customer_id')";
 	$db->exec($query);
 	$msg="Record for $host updated successfully.";
 }
