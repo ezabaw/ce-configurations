@@ -303,6 +303,8 @@ if (isset($_GET["id"])&& is_numeric ($_GET['id'])){
 echo '
     <title>'.$header.'</title>
 <body class=onprem>
+Logged in as '.$_SESSION['asper_user'].'<br><a href=logout.php>Logout</a>
+<br><br>
 <input type="hidden" id="customer_id" name="customer_id" value="'.$id.'" />
 <input type="hidden" id="customer_name" name="customer_name" value="'.$name.'" />
 <h3><a href=#customer>Customer info:</a></h3>
