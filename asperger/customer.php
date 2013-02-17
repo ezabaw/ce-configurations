@@ -21,14 +21,11 @@ function unhide_add(divID)
 
 function show_passwd(obj)
 {
-	//var item=document.getElementById(id);
-	//item.innerHTML = "<input id="+id+" type=text class=k-textbox>";
 	var newO=document.createElement('input');
 	newO.setAttribute('type','text');
 	newO.setAttribute('id',obj.getAttribute('id'));
 	newO.setAttribute('value',obj.getAttribute('value'));
 	obj.parentNode.replaceChild(newO,obj);
-	//newO.focus();
 
 }
 /*
@@ -172,7 +169,6 @@ function update_ui_ifs(id)
 		  }
     });
     add_form.className='hidden';
-    //document.location.reload();
 }
 function add_vpn()
 {
@@ -287,6 +283,7 @@ function export_csv()
 <?php
 $script_name=basename(__FILE__);
 require_once(dirname($script_name).DIRECTORY_SEPARATOR.'conn.inc');
+require_once(dirname($script_name).DIRECTORY_SEPARATOR.'locale.inc');
 if (!isset($_SESSION['asper_user']) || !$_SESSION['asper_user']){
     require_once(dirname($script_name).DIRECTORY_SEPARATOR.'validate_session.inc');
 }
@@ -481,15 +478,15 @@ $result=$db->query('select id from ui where customer_id='.$id);
 		    echo '<div class=.k-slider id=hide_show_div><input type=button id=hide_show_ui_if value="'.$ui_ifs['env'].'" onclick="javascript:unhide(\''.$ui_ifs['env'].'\')"></div>
 			<div id='.$ui_ifs['env'].' class=hidden><ul id="navlist">';
 
-		    echo '<li>Admin console URL: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_admin_console_url" value="'.$ui_ifs['admin_console_url'].'"></il><br>';
-		    echo '<li>Admin console user: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_admin_console_user" value="'.$ui_ifs['admin_console_user'].'"></il><br>';
-		    echo '<li>Admin console passwd: <input type=password class=k-textbox id="'.$ui_ifs['id'].'_admin_console_passwd" value="'.$ui_ifs['admin_console_passwd'].'"  onfocus="javascript:show_passwd(this)"></il><br>';
-		    echo '<li>KMC URL: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_kmc_url" value="'.$ui_ifs['kmc_url'].'"></il><br>';
-		    echo '<li>KMC user: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_kmc_user" value="'.$ui_ifs['kmc_user'].'"></il><br>';
-		    echo '<li>KMC passwd: <input type=password class=k-textbox id="'.$ui_ifs['id'].'_kmc_passwd" value="'.$ui_ifs['kmc_passwd'].'" onfocus="javascript:show_passwd(this)"></il><br>';
-		    echo '<li>KMS admin URL: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_kms_admin_url" value="'.$ui_ifs['kms_admin_url'].'"></il><br>';
-		    echo '<li>KMS admin user: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_kms_admin_user" value="'.$ui_ifs['kms_admin_user'].'"></il><br>';
-		    echo '<li>KMS passwd: <input type=password class=k-textbox id="'.$ui_ifs['id'].'_kms_admin_passwd" value="'.$ui_ifs['kms_admin_passwd'].'"  onfocus="javascript:show_passwd(this)"></il><br>';
+		    echo '<li>'.$app0.' URL: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_admin_console_url" value="'.$ui_ifs['admin_console_url'].'"></il><br>';
+		    echo '<li>'.$app0.' user: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_admin_console_user" value="'.$ui_ifs['admin_console_user'].'"></il><br>';
+		    echo '<li>'.$app0.' passwd: <input type=password class=k-textbox id="'.$ui_ifs['id'].'_admin_console_passwd" value="'.$ui_ifs['admin_console_passwd'].'"  onfocus="javascript:show_passwd(this)"></il><br>';
+		    echo '<li>'.$app1.' URL: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_kmc_url" value="'.$ui_ifs['kmc_url'].'"></il><br>';
+		    echo '<li>'.$app1.' user: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_kmc_user" value="'.$ui_ifs['kmc_user'].'"></il><br>';
+		    echo '<li>'.$app1.' passwd: <input type=password class=k-textbox id="'.$ui_ifs['id'].'_kmc_passwd" value="'.$ui_ifs['kmc_passwd'].'" onfocus="javascript:show_passwd(this)"></il><br>';
+		    echo '<li>'.$app2.' URL: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_kms_admin_url" value="'.$ui_ifs['kms_admin_url'].'"></il><br>';
+		    echo '<li>'.$app2.' user: <input type=text class=k-textbox id="'.$ui_ifs['id'].'_kms_admin_user" value="'.$ui_ifs['kms_admin_user'].'"></il><br>';
+		    echo '<li>'.$app2.' passwd: <input type=password class=k-textbox id="'.$ui_ifs['id'].'_kms_admin_passwd" value="'.$ui_ifs['kms_admin_passwd'].'"  onfocus="javascript:show_passwd(this)"></il><br>';
 		    echo '<li>Notes: <textarea class=k-textbox id="'.$ui_ifs['id'].'_notes" rows=3>'.$ui_ifs['notes'].'</textarea></il><br>
 	<input type="hidden" id="env_'.$ui_ifs['id'].'" name="env_"'.$ui_ifs['id'].' value="'.$ui_ifs['env'].'" />
 	<input type=button id="'.$ui_ifs['id'].'_update_ui_ifs" value="Update '.$ui_ifs['env'].'" onclick="javascript:update_ui_ifs(\''.$ui_ifs['id'].'\')">
