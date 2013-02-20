@@ -1,4 +1,5 @@
 #!/bin/sh
+
 #
 # sphinx searchd Free open-source SQL full-text search engine
 #
@@ -15,7 +16,6 @@
 # Short-Description: start and stop sphinx searchd daemon
 # Description: Sphinx is a free open-source SQL full-text search engine     
 ### END INIT INFO
-
 
 . @APP_DIR@/configurations/system.ini
 . /etc/rc.d/init.d/functions
@@ -39,11 +39,10 @@ start() {
 stop() {
     echo -n $"Stopping $prog: "
     # stop it here, often "killproc $prog"
-    #killproc $prog
     $exec --config $config --stopwait 
     retval=$?
     echo
-    [ $retval -eq 0 ] && rm -f $lockfile
+    [ $retval -eq 0 ]
     return $retval
 }
 
