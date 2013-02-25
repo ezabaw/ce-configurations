@@ -79,7 +79,7 @@ if [ "$CHOICE" = "2" ];then
 			service $i stop
 		done
                 
-		yum remove -y httpd* mysql mysql-* memcached php*
+		yum remove -y httpd* mysql mysql-* memcached php-*
 		
 		for i in /etc/httpd/ /etc/php.d/ /var/lib/mysql/ /opt/kaltura/ /usr/local/pentaho/;do
 			if [ -d $i -o -h $i ];then
@@ -116,7 +116,7 @@ fi
 
 if [ "$CHOICE" = "3" ];then
 
-		yum remove -y httpd* memcached php*
+		yum remove -y httpd* memcached php-*
 
 		for i in sphinx_watch.sh serviceBatchMgr.sh red5 httpd memcached;do
                                 if [ -f /etc/init.d/$i -o -h /etc/init.d/$i ];then
