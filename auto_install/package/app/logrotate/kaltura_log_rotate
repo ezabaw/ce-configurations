@@ -78,6 +78,9 @@ mv @LOG_DIR@/kaltura_apache_access.log-`/bin/date +%Y%m%d`.gz @WEB_DIR@/logs/`ho
  compress
  dateext
  notifempty
+lastaction
+    /etc/init.d/serviceBatchMgr.sh restart
+endscript
 }
 
 @LOG_DIR@/kaltura_multi_publishers.log {
