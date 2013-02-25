@@ -96,6 +96,8 @@ setup_pentaho()
 		echo "Extracting Pentaho archive and copying to $PENTAHO_DIR/pdi.."
 		tar zxf pdi-ce-$PENTAHO_VER-stable.tar.gz
 		mkdir -p $PENTAHO_DIR && mv data-integration $PENTAHO_DIR/pdi
+		cp $DIR_NAME/package/app/dwh/ksDecrypt.jar $PENTAHO_DIR/pdi/libext
+		chmod +x $PENTAHO_DIR/pdi/libext/ksDecrypt.jar
 	fi
 }
 create_kalt_user()
