@@ -335,6 +335,7 @@ while($hosts = $result->fetchArray(SQLITE3_ASSOC)){
 	$result1=$db->query('select hostname, host_description, distro_version_arch, ssh_user, ssh_passwd, notes from hosts where hostname="'.$val.'"');
 	while($host = $result1->fetchArray(SQLITE3_ASSOC)){
 	    $id1=str_replace('.','',$val);
+	    $id1=str_replace(' ','_',$val);
 	    $orig_host=$val;
 	    echo '<div class=.k-slider id=hide_show_div><input type=button id=hide_show value="'.$val.'" onclick="javascript:unhide(\''.$id1.'\')">'. '  |  ' .  $host['host_description'].'</div>
 		<div id='.$id1.' class=hidden><ul id="navlist">';
