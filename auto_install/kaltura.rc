@@ -220,7 +220,7 @@ install_batch()
 		/etc/init.d/$i stop
 		chkconfig $i off
 	done 
-	if [ "$DB1_HOST" != "localhost" ];then
+	if [ "$DB1_HOST" != "localhost" -a -x "/etc/init.d/mysqld" ];then
 		/etc/init.d/mysqld stop
 		chkconfig mysqld off
 	fi
@@ -251,7 +251,7 @@ install_sphinx()
 		/etc/init.d/$i stop
 		chkconfig $i off
 	done
-	if [ "$DB1_HOST" != "localhost" ];then
+	if [ "$DB1_HOST" != "localhost" -a -x "/etc/init.d/mysqld" ];then
 		/etc/init.d/mysqld stop
 		chkconfig mysqld off
 	fi
@@ -277,7 +277,7 @@ install_api()
 		/etc/init.d/$i stop
 		chkconfig $i off
 	done
-	if [ "$DB1_HOST" != "localhost" ];then
+	if [ "$DB1_HOST" != "localhost" -a -x "/etc/init.d/mysqld" ];then
 		/etc/init.d/mysqld stop
 		chkconfig mysqld off
 	fi
@@ -609,7 +609,7 @@ configure_batch()
 	ln -sf $APP_CONF_DIR/apache/my_kaltura_apiv3.conf /etc/httpd/conf.d/
 	/etc/init.d/httpd restart
 	/etc/init.d/serviceBatchMgr.sh restart
-	if [ "$DB1_HOST" != "localhost" ];then
+	if [ "$DB1_HOST" != "localhost" -a -x "/etc/init.d/mysqld" ];then
 		/etc/init.d/mysqld stop
 		chkconfig mysqld off
 	fi
@@ -625,7 +625,7 @@ configure_batch()
 configure_sphinx()
 {
 
-	if [ "$DB1_HOST" != "localhost" ];then
+	if [ "$DB1_HOST" != "localhost" -a -x "/etc/init.d/mysqld" ];then
 		/etc/init.d/mysqld stop
 		chkconfig mysqld off
 	fi
@@ -641,7 +641,7 @@ configure_sphinx()
 
 configure_api()
 {
-	if [ "$DB1_HOST" != "localhost" ];then
+	if [ "$DB1_HOST" != "localhost" -a -x "/etc/init.d/mysqld" ];then
 		/etc/init.d/mysqld stop
 		chkconfig mysqld off
 	fi
@@ -670,6 +670,11 @@ reconfigure_roles()
 	                configure_api
 		fi
 	done
+}
+
+fix_mencoder()
+{
+    ln -s $BASE_DIR/bin/mencoder-dir/codecs/ /usr/local/lib/
 }
 DIR_NAME=`dirname $0`
 if [ -z "$DIR_NAME" ];then
