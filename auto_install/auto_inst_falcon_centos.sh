@@ -28,6 +28,7 @@ configure_red5
 for i in sphinx_watch.sh serviceBatchMgr.sh;do
 	chkconfig $i on
 done
+fix_mencoder
 /etc/init.d/serviceBatchMgr.sh restart
 create_kaltura_profile
 create_partner
