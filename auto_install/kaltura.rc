@@ -581,6 +581,9 @@ create_kaltura_profile()
 		echo "HISTTIMEFORMAT='%F %T '" >> $PROF_FILE
 		echo "export HISTTIMEFORMAT" >> $PROF_FILE
 	fi
+	if ! grep "alias kaltlogtail" $PROF_FILE;then
+	    echo "alias kaltlogtail='tail -f $BASE_DIR/log/kaltura*.log|grep \"ERR:\|PHP\|CRIT\" --color'"
+	fi
 	. $PROF_FILE
 }
 copy_install_files_to_kalt_dir()
