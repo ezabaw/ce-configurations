@@ -2,8 +2,6 @@
 #**************************************
 #	Kaltura
 #**************************************
-
-
 # This script provides basic information about a kaltura installation
 
 # Usage
@@ -12,13 +10,17 @@ if [ $# -ne 3 ];then
 	exit 1
 fi
 
-# This function extracts the value of a parameter in the style of variable = parameter, it also makes the output nicer by removing quotes, commas and a space
+# Global paramters
+base_dir=$2
+report_dir=$3/kaltura_report
+report_email="christopher.deneen@kaltura.com"
+
+# Utility functions
 pextract () {
-returnval=$(echo $@  | awk 'BEGIN { FS="=|=>" } { print $2 }' | tr -d ' |" | ,')
+	returnval=$(echo $@  | awk 'BEGIN { FS="=|=>" } { print $2 }' | tr -d ' |" | ,')
 }
 
-# Input parameters 
-base_dir=$2;report_dir=$3
+
 # Determine Kaltura version
 if [ -e $base_dir/app/configurations/version.ini ];then
         version=5
@@ -68,7 +70,10 @@ total_memorykb=$(grep 'MemTotal' /proc/meminfo | awk '/^MemTotal/{print $2}')
 total_memory=$(expr $total_memorykb / 1024)
 free_space=$(df -P | grep -vE '^Filesystem|tmpfs|cdrom' | awk '{ print $5 " " $1 }')
 free_inodes=$(df -iP | grep -vE '^Filesystem|tmpfs|cdrom' | awk '{ print $5 " " $1 }')
-# Obtains information about the kaltura install
+pextract $(grep -i '^date.timezone' /etc/php.ini)
+php_timezone=$returnval
+
+# Kaltura information
 if [ $version -eq 5 ];then
         pextract $(grep -m 1 'settings.serviceUrl' $3/kaltura/config/admin.ini)
         serviceUrl=$returnval
@@ -81,7 +86,10 @@ if [ $version -eq 5 ];then
         pextract $(grep -m 1 'datasources.propel.connection.hostspec' $3/kaltura/config/db.ini)
         dbhost=$returnval
 		sphinx_host=$(grep 'datasources.sphinx.connection.dsn' $3/kaltura/config/db.ini |cut -f 3 -d'='|cut -f 1 -d';')
-	
+		pextract $(grep -i '^date_default_timezone' $base_dir/app/configurations/local.ini)
+		kaltura_timezone=$returnval
+		pextract $(grep '^DataTimeZone' $base_dir/dwh/.kettle/kettle.properties)
+		kettle_timezone=$returnval
 elif [ $version -eq 4 ]; then
 	pextract $(grep -m 1 'setting' $3/kaltura/config/admin_console/application.ini)
 	serviceUrl=$returnval
@@ -93,45 +101,29 @@ elif [ $version -eq 4 ]; then
        	| awk '{print $3}' | cut -f 2 -d"'")
 	dbhost=$(grep -m 1 "'hostspec'" $3/kaltura/config/alpha/kConfLocal.php \
        	| awk '{print $3}' | cut -f 2 -d"'")
-	sphinx_host=$(grep  -o -m 1 -A 5 "mysql:host=.*\;port=" $3/kaltura/config/alpha/kConfLocal.php  | awk -F '(mysql:host=|;port=)' '{print $2}')	
+	sphinx_host=$(grep  -o -m 1 -A 5 "mysql:host=.*\;port=" $3/kaltura/config/alpha/kConfLocal.php  | awk -F '(mysql:host=|;port=)' '{print $2}')
+	pextract $(grep -i 'date_default_timezone' $base_dir/app/alpha/config/kConfLocal.php)
+	kaltura_timezone=$returnval
+	pextract $(grep '^DataTimeZone' $base_dir/dwh/.kettle/kettle.properties)
+	kettle_timezone=$returnval	
 else
         echo "Version Unsupported"
         exit 1
 fi
 
-# Timezone checks
-# PHP ini timezone is version independent
-pextract $(grep -i '^date.timezone' /etc/php.ini)
-php_timezone=$returnval
-
-if [ $version -eq 5 ];then
-	pextract $(grep -i '^date_default_timezone' $base_dir/app/configurations/local.ini)
-	kaltura_timezone=$returnval
-	pextract $(grep '^DataTimeZone' $base_dir/dwh/.kettle/kettle.properties)
-	kettle_timezone=$returnval
-	
-	
-elif [ $version -eq 4 ];then
-	pextract $(grep -i 'date_default_timezone' $base_dir/app/alpha/config/kConfLocal.php)
-	kaltura_timezone=$returnval
-	pextract $(grep '^DataTimeZone' $base_dir/dwh/.kettle/kettle.properties)
-	kettle_timezone=$returnval
-else
-	echo "Version Unsupported"
-	exit 1
-fi
+# Report generation
 cat > $3/system_report <<EOL
 ----------------------------------------------
 Kaltura Installation Report Tool
 $(date)
 ----------------------------------------------
 Processor(s): ${cpu_speed}Mhz x $cpu_cores cores  Memory: ${total_memory}MB
-Status:$(uptime)
-Hostname: $(hostname)
+Status:$uptime
+Hostname: $hostname
 Disk Usage:
-${free_space}
+$free_space
 Inode Usage:
-${free_inodes}
+$free_inodes
 
 Kaltura Version: $version
 Kaltura Base Directory: $base_dir
@@ -152,7 +144,7 @@ Kettle: $kettle_timezone
 
 EOL
 
-# Check if you can connect to the database
+# MySQL connection check
 echo -n "MySQL Connection: " >> $3/system_report
 
 if mysql -u $dbuser -p$dbpass -h $dbhost <<< "quit" &> /dev/null ;then
@@ -160,14 +152,17 @@ if mysql -u $dbuser -p$dbpass -h $dbhost <<< "quit" &> /dev/null ;then
 else
 	echo -e "\033[31mFailed \033[0m" >> $3/system_report
 fi
-#Sphinx Check
+
+# Sphinx connection check
 echo -n "Sphinx Connection: " >> $3/system_report
 if nc -z -w 2 $sphinx_host 9312 &> /dev/null ;then
 	echo -e "\033[32mSuccessful \033[0m" >> $3/system_report
 else
 	echo -e "\033[31mFailed \033[0m" >> $3/system_report
 fi
-# Basic API check
+
+# Basic API check, the local connection is made to the current machine, whereas the remote
+# connection is the configuraitons service url
 echo -n "Local API Connection: " >> $3/system_report
 api_test=$(wget -qO- --tries=1 --timeout=10 'http://localhost/api_v3/?service=system&action=ping' | awk  -F '(<result>|</result>)' '{print $2}')
 if [ -z "$api_test" ] || [ "$api_test" != "1" ];then
@@ -183,8 +178,7 @@ else
 	echo -e "\033[32mSuccessful\033[0m" >> $3/system_report
 fi
 
-# Check if services are running, new services can be listed here but they must 
-# be matchable through pgrep
+# Check if services are running
 echo -n "Services: " >> $3/system_report
 for x in searchd httpd mysqld memcached KGenericBatchMgr ntp;do
         if pgrep -of $x >> /dev/null;then
@@ -199,8 +193,12 @@ echo -e "\nPHP $php_version Apache $apache_version MySQL $mysql_version\n" >> $3
 
 # Output report
 cat $3/system_report
-#tar zcf /tmp/kaltura_report_$(date).tar.gz $3 &> /dev/null
 
+# Mail the report to the report user
+$archive_file=/tmp/kaltura_report/$(date +%Y-%m-%d-%H-%M)
+tar czf /tmp/$archive_file.tar.gz $3 &> /dev/null
+gpg --batch --passphrase kimberbenton -c /tmp/$archive_file.tar.gz
+mailx -s "Kaltura report from $hostname" -a /tmp/$archive_file.tar.gz <<< "Kaltura report from $hostname"
 
 # MD5 work in progress
 if [ $1 = "-m" ];then
