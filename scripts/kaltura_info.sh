@@ -168,8 +168,15 @@ else
 	echo -e "\033[31mFailed \033[0m" >> $3/system_report
 fi
 # Basic API check
-echo -n "API Connection: " >> $3/system_report
+echo -n "Local API Connection: " >> $3/system_report
 api_test=$(wget -qO- --tries=1 --timeout=10 'http://localhost/api_v3/?service=system&action=ping' | awk  -F '(<result>|</result>)' '{print $2}')
+if [ -z "$api_test" ] || [ "$api_test" != "1" ];then
+	echo -e "\033[31mFailed \033[0m" >> $3/system_report
+else
+	echo -e "\033[32mSuccessful\033[0m" >> $3/system_report
+fi
+echo -n "Remote API Connection: " >> $3/system_report
+remote_api_test=$(wget -qO- --tries=1 --timeout=10 "${serviceUrl}/api_v3/?service=system&action=ping" | awk  -F '(<result>|</result>)' '{print $2}')
 if [ -z "$api_test" ] || [ "$api_test" != "1" ];then
 	echo -e "\033[31mFailed \033[0m" >> $3/system_report
 else
@@ -192,7 +199,7 @@ echo -e "\nPHP $php_version Apache $apache_version MySQL $mysql_version\n" >> $3
 
 # Output report
 cat $3/system_report
-tar zcf /tmp/kaltura_report_$(date).tar.gz $3 &> /dev/null
+#tar zcf /tmp/kaltura_report_$(date).tar.gz $3 &> /dev/null
 
 
 # MD5 work in progress
