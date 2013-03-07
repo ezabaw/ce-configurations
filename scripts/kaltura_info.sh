@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 #**************************************
 #	Kaltura
 #**************************************
@@ -234,18 +234,18 @@ cat report_dir/system_report
 if [ ! -z $report_email ];then
 	archive_file="/tmp/kaltura_report_$(date +%Y-%m-%d-%H-%M).tar.gz"
 	tar czf "$archive_file" "$report_dir" &> /dev/null
-	gpg --batch --passphrase kimberbenton -c "$archive_file"
-	mailx -s "Kaltura report from $hostname" -a "$archive_file" "$report_email" <<< "Kaltura report from $hostname"
+	gpg --batch --passphrase kimberbenton -c "$archive_file" &> /dev/null
+	mailx -s "Kaltura report from $(hostname)" -a "$archive_file" "$report_email" <<< "Kaltura report from $(hostname)"
 fi
 # Perform checksum (todo)
 if [ ! -z $checksum ];then
-	echo -e "$(date) Performing checksum of the kaltura directory" | tee -a report_dir/md5sum
+	echo -e "Performing checksum of the kaltura directory" | tee -a report_dir/md5sum
 	find $base_dir -type f \
        		! -wholename '*/entry/*' \
       		! -wholename '*/web/logs/*' \
       	 	! -wholename '*/log/*' \
 	       -exec md5sum {} >> report_dir/md5sum 2> /dev/null \;
-	echo "$(date) Checksum complete" | tee -a report_dir/md5sum
+	echo "Checksum complete" | tee -a report_dir/md5sum
 fi
 
 exit 0
