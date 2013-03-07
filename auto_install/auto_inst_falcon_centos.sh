@@ -25,7 +25,7 @@ configure_apache
 set_serial
 configure_dwh
 configure_red5
-for i in sphinx_watch.sh serviceBatchMgr.sh;do
+for i in sphinx_watch.sh serviceBatchMgr.sh crond;do
 	chkconfig $i on
 done
 fix_mencoder
