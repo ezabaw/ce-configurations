@@ -52,7 +52,7 @@ if [ "$CHOICE" = "1" ];then
 					sed -i "s/^\(upload_tmp_dir*.*web\/tmp*.*\)$/;commented on `date +%d-%m-%y` by $0: \1\nupload_tmp_dir =/" $INI_FILE
                         fi
 
-			for i in /etc/cron.d/kaltura_crontab /etc/cron.d/dwh_crontab /opt/kaltura/ /usr/local/pentaho/ /etc/httpd/conf.d/my_kaltura.conf /etc/httpd/conf.d/my_kaltura_apiv3.conf;do
+			for i in /etc/cron.d/kaltura_crontab /etc/cron.d/dwh_crontab /opt/kaltura/ /usr/local/pentaho/ /etc/httpd/conf.d/my_kaltura.conf /etc/httpd/conf.d/my_kaltura_apiv3.conf /usr/local/lib/codecs/;do
 				if [ -f $i -o -h $i -o -d $i ];then
 					rm -rf $i
 					echo "Removed $i"
@@ -81,7 +81,7 @@ if [ "$CHOICE" = "2" ];then
                 
 		yum remove -y httpd* mysql mysql-* memcached php-*
 		
-		for i in /etc/httpd/ /etc/php.d/ /var/lib/mysql/ /opt/kaltura/ /usr/local/pentaho/;do
+		for i in /etc/httpd/ /etc/php.d/ /var/lib/mysql/ /opt/kaltura/ /usr/local/pentaho/ /usr/local/lib/codecs/;do
 			if [ -d $i -o -h $i ];then
 				rm -rf $i
 				echo "Removed $i"
@@ -130,7 +130,7 @@ if [ "$CHOICE" = "3" ];then
 
 		pkill -u kaltura
 
-		for i in /etc/httpd/ /etc/php.ini /etc/php.d/ /etc/cron.d/kaltura_crontab /etc/cron.d/dwh_crontab /etc/init.d/sphinx_watch.sh /etc/init.d/serviceBatchMgr.sh /opt/kaltura/ /usr/local/pentaho/;do
+		for i in /etc/httpd/ /etc/php.ini /etc/php.d/ /etc/cron.d/kaltura_crontab /etc/cron.d/dwh_crontab /etc/init.d/sphinx_watch.sh /etc/init.d/serviceBatchMgr.sh /opt/kaltura/ /usr/local/pentaho/ /usr/local/lib/codecs/;do
                                 if [ -f $i -o -h $i -o -d $i ];then
                                         rm -rf $i
                                         echo "Removed $i"
