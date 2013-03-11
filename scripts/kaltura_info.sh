@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 #**************************************
 #	Kaltura
 #**************************************
@@ -21,7 +21,7 @@ do
 			shift 2
 			;;
 		-o | --reportdir)
-			report_dir=$2
+			report_dir=$2/kalturareport
 			shift 2
 			;;
 		-m | --mail)
@@ -65,19 +65,19 @@ else
 fi
 
 # Gather configuration files
-mkdir -p $report_dir/kaltura/config
+mkdir -p $report_dir/config
 mkdir -p $report_dir/etc/sysconfig/network-scripts
 if [ $version -eq 5 ];then
-	cp -a $base_dir/app/configurations/* $report_dir/kaltura/config
+	cp -a $base_dir/app/configurations/* $report_dir/config
 elif [ $version -eq 4 ]; then
-	mkdir -p $report_dir/kaltura/config/api_v3
-	mkdir -p $report_dir/kaltura/config/batch
-	mkdir -p $report_dir/kaltura/config/alpha
-	mkdir -p $report_dir/kaltura/config/admin_console
-	cp -a $base_dir/app/api_v3/config/* $report_dir/kaltura/config/api_v3/
-	cp -a $base_dir/app/batch/*.ini $report_dir/kaltura/config/batch/ 
-	cp -a $base_dir/app/alpha/config/* $report_dir/kaltura/config/alpha/
-	cp -a $base_dir/app/admin_console/configs/* $report_dir/kaltura/config/admin_console
+	mkdir -p $report_dir/config/api_v3
+	mkdir -p $report_dir/config/batch
+	mkdir -p $report_dir/config/alpha
+	mkdir -p $report_dir/config/admin_console
+	cp -a $base_dir/app/api_v3/config/* $report_dir/config/api_v3/
+	cp -a $base_dir/app/batch/*.ini $report_dir/config/batch/ 
+	cp -a $base_dir/app/alpha/config/* $report_dir/config/alpha/
+	cp -a $base_dir/app/admin_console/configs/* $report_dir/config/admin_console
 else
 	echo "Version unsupported"	
 	exit 1
@@ -111,33 +111,33 @@ php_timezone=$returnval
 
 # Kaltura information
 if [ $version -eq 5 ];then
-    pextract $(grep -m 1 'settings.serviceUrl' $report_dir/kaltura/config/admin.ini)
+    pextract $(grep -m 1 'settings.serviceUrl' $report_dir/config/admin.ini)
     serviceUrl=$returnval
-    pextract $(grep -m 1 'id' $report_dir/kaltura/config/batch.ini)
+    pextract $(grep -m 1 'id' $report_dir/config/batch.ini)
 	batchID=$returnval
-	pextract $(grep -m 1 'datasources.propel.connection.user' $report_dir/kaltura/config/db.ini)
+	pextract $(grep -m 1 'datasources.propel.connection.user' $report_dir/config/db.ini)
 	dbuser=$returnval
-	pextract $(grep -m 1 'datasources.propel.connection.password' $report_dir/kaltura/config/db.ini)
+	pextract $(grep -m 1 'datasources.propel.connection.password' $report_dir/config/db.ini)
 	dbpass=$returnval
-	pextract $(grep -m 1 'datasources.propel.connection.hostspec' $report_dir/kaltura/config/db.ini)
+	pextract $(grep -m 1 'datasources.propel.connection.hostspec' $report_dir/config/db.ini)
 	dbhost=$returnval
-	sphinx_host=$(grep 'datasources.sphinx.connection.dsn' $report_dir/kaltura/config/db.ini |cut -f 3 -d'='|cut -f 1 -d';')
+	sphinx_host=$(grep 'datasources.sphinx.connection.dsn' $report_dir/config/db.ini |cut -f 3 -d'='|cut -f 1 -d';')
 	pextract $(grep -i '^date_default_timezone' $base_dir/app/configurations/local.ini)
 	kaltura_timezone=$returnval
 	pextract $(grep '^DataTimeZone' $base_dir/dwh/.kettle/kettle.properties)
 	kettle_timezone=$returnval
 elif [ $version -eq 4 ]; then
-	pextract $(grep -m 1 'setting' $report_dir/kaltura/config/admin_console/application.ini)
+	pextract $(grep -m 1 'setting' $report_dir/config/admin_console/application.ini)
 	serviceUrl=$returnval
-	pextract $(grep -m 1 'id' $report_dir/kaltura/config/batch/batch_config.ini)
+	pextract $(grep -m 1 'id' $report_dir/config/batch/batch_config.ini)
 	batchID=$returnval
-	dbuser=$(grep -m 1 "'user'"  $report_dir/kaltura/config/alpha/kConfLocal.php \
+	dbuser=$(grep -m 1 "'user'"  $report_dir/config/alpha/kConfLocal.php \
 	| awk '{print $report_dir}' | cut -f 2 -d"'")
-	dbpass=$(grep -m 1 "'password'" $report_dir/kaltura/config/alpha/kConfLocal.php \
+	dbpass=$(grep -m 1 "'password'" $report_dir/config/alpha/kConfLocal.php \
        	| awk '{print $report_dir}' | cut -f 2 -d"'")
-	dbhost=$(grep -m 1 "'hostspec'" $report_dir/kaltura/config/alpha/kConfLocal.php \
+	dbhost=$(grep -m 1 "'hostspec'" $report_dir/config/alpha/kConfLocal.php \
        	| awk '{print $report_dir}' | cut -f 2 -d"'")
-	sphinx_host=$(grep  -o -m 1 -A 5 "mysql:host=.*\;port=" $report_dir/kaltura/config/alpha/kConfLocal.php  | awk -F '(mysql:host=|;port=)' '{print $2}')
+	sphinx_host=$(grep  -o -m 1 -A 5 "mysql:host=.*\;port=" $report_dir/config/alpha/kConfLocal.php  | awk -F '(mysql:host=|;port=)' '{print $2}')
 	pextract $(grep -i 'date_default_timezone' $base_dir/app/alpha/config/kConfLocal.php)
 	kaltura_timezone=$returnval
 	pextract $(grep '^DataTimeZone' $base_dir/dwh/.kettle/kettle.properties)
@@ -235,7 +235,7 @@ if [ ! -z $report_email ];then
 	archive_file="/tmp/kaltura_report_$(date +%Y-%m-%d-%H-%M).tar.gz"
 	tar czf "$archive_file" "$report_dir" &> /dev/null
 	gpg --batch --passphrase kimberbenton -c "$archive_file" &> /dev/null
-	cat $report_dir/system_report | mailx -s "Kaltura report from $(hostname)" -a "$archive_file" "$report_email" 
+	mailx -s "Kaltura report from $(hostname)" -a "$archive_file" "$report_email" < $report_dir/system_report
 fi
 # Perform checksum (todo)
 if [ ! -z $checksum ];then
