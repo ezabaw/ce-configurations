@@ -237,14 +237,19 @@ if [ ! -z $report_email ];then
 	gpg --batch --passphrase kimberbenton -c "$archive_file" &> /dev/null
 	mailx -s "Kaltura report from $(hostname)" -a "$archive_file" "$report_email" < $report_dir/system_report
 fi
-# Perform checksum (todo)
+# Perform checksum
 if [ ! -z $checksum ];then
 	echo -e "Performing checksum of the kaltura directory" | tee -a $report_dir/md5sum
-	find $base_dir -type f \
-       		! -wholename '*/entry/*' \
-      		! -wholename '*/web/logs/*' \
-      	 	! -wholename '*/log/*' \
-	       -exec md5sum {} >> $report_dir/md5sum 2> /dev/null \;
+	./md5compare.sh $base_dir /tmp/md5report
+	# Run comparison check
+	if [ $version -eq 5 ];then
+		php md5compare.php falcon.md5 /tmp/md5report
+	elif [ $version -eq 4 ];then
+		php md5compare.php eagle.md5 /tmp/md5report
+	fi
+	echo "Missing count $(wc -l /tmp/md5missing)"
+	echo "Additional count $(wc -l /tmp/md5added)"
+	echo "Modified $(wc -l /tmp/md5changed)"
 	echo "Checksum complete" | tee -a $report_dir/md5sum
 fi
 
