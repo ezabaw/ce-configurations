@@ -1,4 +1,5 @@
-<?php session_start()?>
+<?php session_start();
+?>
 <link type="text/css" href="css/onprem.css" rel="Stylesheet" />
 <script type="text/javascript" src="js/jquery.min.js"></script>
 <script type="text/javascript" src="js/jquery.js"></script>
@@ -58,7 +59,7 @@
     	//document.location.reload();
     }
 </script>
-<body class=onprem>
+<body class="onprem">
 <?php
 $script_name=basename(__FILE__);
 require_once(dirname($script_name).DIRECTORY_SEPARATOR.'conn.inc');
@@ -89,9 +90,9 @@ while($res = $result->fetchArray(SQLITE3_ASSOC)){
 	<th><a href='.$script_name.'?orderby=am>AM</a></th>
 	<th><a href='.$script_name.'?orderby=ps_tech_contact>PS Engineer</a></th>
 	<th><a href='.$script_name.'?orderby=on_prem_version>Version</a></th>
-	<th><a href='.$script_name.'>SharePoint</th>
 	<th><a href='.$script_name.'>Changelog</th>
 	<th><a href='.$script_name.'>Notes</th>
+	<th><a href='.$script_name.'>SharePoint</th>
 	</tr>';
     }
     if ($index%2){
@@ -107,9 +108,9 @@ while($res = $result->fetchArray(SQLITE3_ASSOC)){
     <td>' . $res['am'].'</td>
     <td>' . $res['ps_tech_contact'].'</td>
     <td>' . $res['on_prem_version'].'</td>
-    <td align="center"><a href="' . $res['sharepoint']. '"><img src="images/sharepoint.png" /></a></td>
     <td><a href="changelog.php?id='.$res['id'].'">Changelog</a></td>
     <td>' . $res['notes'].'</td>
+    <td align="center"><a href="' . $res['sharepoint']. '"><img src="images/sharepoint.png" /></a></td>
     </tr>';
     $index++;
 }
