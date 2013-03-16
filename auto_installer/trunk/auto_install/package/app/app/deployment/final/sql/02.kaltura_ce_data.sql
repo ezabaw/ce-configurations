@@ -1320,6 +1320,7 @@ insert  into `permission_to_permission_item`(`id`,`permission_id`,`permission_it
 (1045,55,62,now(),now()),
 (1046,57,62,now(),now()),
 (1565,83,71,now(),now()),
+(NULL,87,839,now(),now()),
 (1566,83,70,now(),now()),
 (1567,83,72,now(),now()),
 (1568,83,73,now(),now()),
