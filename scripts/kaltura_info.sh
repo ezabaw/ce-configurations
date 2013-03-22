@@ -59,17 +59,17 @@ pextract () {
 
 # Determine Kaltura version
 if [ -e $base_dir/app/configurations/version.ini ];then
-        version=5
+        version=6
 else
-        version=4
+        version=5
 fi
 
 # Gather configuration files
 mkdir -p $report_dir/config
 mkdir -p $report_dir/etc/sysconfig/network-scripts
-if [ $version -eq 5 ];then
+if [ $version -eq 6 ];then
 	cp -a $base_dir/app/configurations/* $report_dir/config
-elif [ $version -eq 4 ]; then
+elif [ $version -eq 5 ]; then
 	mkdir -p $report_dir/config/api_v3
 	mkdir -p $report_dir/config/batch
 	mkdir -p $report_dir/config/alpha
@@ -110,7 +110,7 @@ pextract $(grep -i '^date.timezone' /etc/php.ini)
 php_timezone=$returnval
 
 # Kaltura information
-if [ $version -eq 5 ];then
+if [ $version -eq 6 ];then
     pextract $(grep -m 1 'settings.serviceUrl' $report_dir/config/admin.ini)
     serviceUrl=$returnval
     pextract $(grep -m 1 'id' $report_dir/config/batch.ini)
@@ -126,7 +126,7 @@ if [ $version -eq 5 ];then
 	kaltura_timezone=$returnval
 	pextract $(grep '^DataTimeZone' $base_dir/dwh/.kettle/kettle.properties)
 	kettle_timezone=$returnval
-elif [ $version -eq 4 ]; then
+elif [ $version -eq 5 ]; then
 	pextract $(grep -m 1 'setting' $report_dir/config/admin_console/application.ini)
 	serviceUrl=$returnval
 	pextract $(grep -m 1 'id' $report_dir/config/batch/batch_config.ini)
@@ -227,6 +227,13 @@ done
 # Software versions
 echo -e "\nPHP $php_version Apache $apache_version MySQL $mysql_version\n" >> $report_dir/system_report
 
+# Log status
+echo -e "\n Log status" >> $reportdir/system_report
+if [ $version -eq 5 ];then
+	grep '^[^;]*priority \?= \?[0-9]' /opt/kaltura/app/configurations/logger.ini >> $report_dir/system_report
+else 
+	grep '^[^;]*priority \?= \?[0-9]' /opt/kaltura/app/batch/logger.ini /opt/kaltura/app/api_v3/config/logger.ini >> $report_dir/system_report
+fi
 # Output report
 cat $report_dir/system_report
 
@@ -242,9 +249,9 @@ if [ ! -z $checksum ];then
 	echo -e "Performing checksum of the kaltura directory" | tee -a $report_dir/md5sum
 	./md5compare.sh $base_dir /tmp/md5report
 	# Run comparison check
-	if [ $version -eq 5 ];then
+	if [ $version -eq 6 ];then
 		php md5compare.php falcon.md5 /tmp/md5report
-	elif [ $version -eq 4 ];then
+	elif [ $version -eq 5 ];then
 		php md5compare.php eagle.md5 /tmp/md5report
 	fi
 	echo "Missing count $(wc -l /tmp/md5missing)"
