@@ -42,6 +42,6 @@ fi
 
 
 
-# Determine the md5sums from the new provided directory, directory errors are just shoved to null
+# Determine the md5sums from the new provided directory
 cd $base_dir
 find . \( -iname "*.php" -o -iname "*.phtml" -o -iname "*.swf" \) -print0 | xargs -0 md5sum > $report_file
