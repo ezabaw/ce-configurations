@@ -3,6 +3,9 @@
 #	Kaltura
 #**************************************
 # This script provides basic information about a kaltura installation
+# todo: combine version specific tasks to one section
+# general cleanup
+# convert to printf so I look cool in the bash scene
 usage () {
 	echo -e "Usage: $0 -s <kaltura_directory> -o <report_output_directory>
 			Optional: -c  performs md5 checksum as part of the report
@@ -132,11 +135,11 @@ elif [ $version -eq 5 ]; then
 	pextract $(grep -m 1 'id' $report_dir/config/batch/batch_config.ini)
 	batchID=$returnval
 	dbuser=$(grep -m 1 "'user'"  $report_dir/config/alpha/kConfLocal.php \
-	| awk '{print $report_dir}' | cut -f 2 -d"'")
+	| awk '{print $3}' | cut -f 2 -d"'")
 	dbpass=$(grep -m 1 "'password'" $report_dir/config/alpha/kConfLocal.php \
-       	| awk '{print $report_dir}' | cut -f 2 -d"'")
+       	| awk '{print $3}' | cut -f 2 -d"'")
 	dbhost=$(grep -m 1 "'hostspec'" $report_dir/config/alpha/kConfLocal.php \
-       	| awk '{print $report_dir}' | cut -f 2 -d"'")
+       	| awk '{print $3}' | cut -f 2 -d"'")
 	sphinx_host=$(grep  -o -m 1 -A 5 "mysql:host=.*\;port=" $report_dir/config/alpha/kConfLocal.php  | awk -F '(mysql:host=|;port=)' '{print $2}')
 	pextract $(grep -i 'date_default_timezone' $base_dir/app/alpha/config/kConfLocal.php)
 	kaltura_timezone=$returnval
@@ -229,7 +232,7 @@ echo -e "\nPHP $php_version Apache $apache_version MySQL $mysql_version\n" >> $r
 
 # Log status
 echo -e "\n Log status" >> $reportdir/system_report
-if [ $version -eq 5 ];then
+if [ $version -eq 6 ];then
 	grep '^[^;]*priority \?= \?[0-9]' /opt/kaltura/app/configurations/logger.ini >> $report_dir/system_report
 else 
 	grep '^[^;]*priority \?= \?[0-9]' /opt/kaltura/app/batch/logger.ini /opt/kaltura/app/api_v3/config/logger.ini >> $report_dir/system_report
