@@ -8,7 +8,6 @@
 require_once '/opt/kaltura/web/content/clientlibs/php5/KalturaClient.php';
 require_once '/opt/kaltura/web/content/clientlibs/php5/KalturaPlugins/KalturaSystemPartnerClientPlugin.php';
 
-
 echo "Username: ";
 $loginId= trim(fgets(STDIN));
 echo "\nPassword: ";
@@ -19,7 +18,6 @@ echo "\nIs this Falcon or higher? (y/n) ";
 $version = trim(fgets(STDIN));
 $serviceUrl ='http://localhost';
 $partnerID=-2;
-
 
 # Create an administrator session
 $kalturaConfig = new KalturaConfiguration($partnerID);
