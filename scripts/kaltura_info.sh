@@ -20,19 +20,19 @@ do
 			exit 0
 			;;
 		-s | --basedir)
-			base_dir=$2
+			$base_dir=$2
 			shift 2
 			;;
 		-o | --reportdir)
-			report_dir=$2/kalturareport
+			$report_dir=$2/kalturareport
 			shift 2
 			;;
 		-m | --mail)
-			report_email=$2
+			$report_email=$2
 			shift 2
 			;;
 		-c	| --checksum)
-			checksum=1
+			$checksum=1
 			shift
 			;;
         *)  
