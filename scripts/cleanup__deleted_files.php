@@ -1,7 +1,9 @@
 <?php
 // Deletes all files for assets that are marked as deleted interactively
-// this script only applies to local files
-// Usage delete_entry.php  <dbhost> <dbuser> <dbpass>
+// this script only applies to local files.
+// You must run this as a user capable of read/write access to
+// kaltura media content
+// Usage: php script.php <dbhost> <dbuser> <dbpass>
 
 if (count($argv) < 4){
 	echo "Invalid number of arguments\n";
