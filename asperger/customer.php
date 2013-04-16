@@ -1,4 +1,5 @@
 <?php session_start();?>
+
 <link type="text/css" href="css/onprem.css" rel="Stylesheet" />
 <script type="text/javascript" src="js/jquery.min.js"></script>
 <html>
@@ -42,6 +43,7 @@ function hide_passwd(obj)
 function update_host(orig_host,host_id)
 {
     //var orig_host=host_id;
+    var del_host=document.getElementById('del_host');
     var host = document.getElementById(host_id+'_hostname').value;
     var host_description = document.getElementById(host_id+'_host_description').value;
     var distro_version_arch = document.getElementById(host_id+'_distro_version_arch').value;
@@ -316,7 +318,7 @@ while($customers = $result->fetchArray(SQLITE3_ASSOC)){
 	}
 	// no point in displaying customer ID.
 	if ($key !== 'id'){
-		echo "<tr class=$color><td>$key</td><td><input type=text id='client_$key' class=k-textbox value='$val'></td></tr>";
+		echo "<div id=alt_caption alt='$val'><tr class=$color><td>$key</td><td><input type=text id='client_$key' class=k-textbox title='$val' value='$val'></td></tr></div>";
 	}
 	$index++;
     }
@@ -415,7 +417,7 @@ while($vpns = $result->fetchArray(SQLITE3_ASSOC)){
 	    echo '<li>Gateway: <input type=text class=k-textbox id="'.$vpn['id'].'_gateway" value="'.$vpn['gateway'].'"></il><br>';
 	    echo '<li>User: <input type=text class=k-textbox id="'.$vpn['id'].'_username" value="'.$vpn['username'].'"></il><br>';
 	    echo '<li>Passwd: <input type=password class=k-textbox id="'.$vpn['id'].'_passwd" value="'.$vpn['passwd'].'"  onfocus="javascript:show_passwd(this)" ></il><br>';
-	    echo '<li>Notes: <textarea class=k-textbox id="'.$vpn['id'].'_notes" rows=3>'.$vpn['notes'].'</textarea><br>
+	    echo '<div id="alt" alt="'.$vpn['notes'].'"><li>Notes: <textarea class=k-textbox id="'.$vpn['id'].'_notes" rows=3 alt="'.$vpn['notes'].'">'.$vpn['notes'].'</textarea></div><br>
 	<input type=button id="'.$vpn['id'].'_update_vpn" value="Update" onclick="javascript:update_vpn(\''.$vpn['id'].'\')"><br>
 	    </div><br>
 	<div id="vpn_message_'.$vpn['id'].'" class=hidden></div><br>';
