@@ -62,6 +62,7 @@ install_deps()
 		fi
 	fi
 	if [ "$DB1_HOST" = 'localhost' -o "$DB1_HOST" = '127.0.0.1' -o "$DB1_HOST" = `hostname` ];then
+	    if rpm -q mysql-server 2>/dev/null;then
 		MY_CNF=/etc/my.cnf
 		rm /var/lib/mysql/ib_logfile0 /var/lib/mysql/ib_logfile1 || true
 		sed -i '/^lower_case_table_names = 1$/d' $MY_CNF
@@ -71,11 +72,12 @@ install_deps()
 		sed -i 's@^\[mysqld\]$@[mysqld]\nlower_case_table_names = 1\n@' $MY_CNF
 		sed -i 's@^\[mysqld\]$@[mysqld]\ninnodb_file_per_table\n@' $MY_CNF
 		sed -i 's@^\[mysqld\]$@[mysqld]\ninnodb_log_file_size=32MB\n@' $MY_CNF
-                echo "Setting open_files_limit = 20000 in /etc/my.cnf.."
-                sed -i 's@^\[mysqld\]$@[mysqld]\nopen_files_limit = 20000\n@' $MY_CNF
-                echo "Setting max_allowed_packet = 16M in /etc/my.cnf.."
-                sed -i 's@^\[mysqld\]$@[mysqld]\nmax_allowed_packet = 16M\n@' $MY_CNF
+		echo "Setting open_files_limit = 20000 in /etc/my.cnf.."
+		sed -i 's@^\[mysqld\]$@[mysqld]\nopen_files_limit = 20000\n@' $MY_CNF
+		echo "Setting max_allowed_packet = 16M in /etc/my.cnf.."
+		sed -i 's@^\[mysqld\]$@[mysqld]\nmax_allowed_packet = 16M\n@' $MY_CNF
 		if rpm -qf /etc/init.d/mysqld;then /etc/init.d/mysqld restart;chkconfig mysqld on;fi
+	    fi
 	fi
 	for i in httpd memcached;do
 		chkconfig $i on
