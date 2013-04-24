@@ -1,0 +1,10 @@
+
+Fatal error: Uncaught exception 'QualityCenterServerException' with message 'No entity of type defect with id 0 exists.' in /home/jess/projects/php-quality-center/generator/lib/QualityCenterConnection.php:291
+Stack trace:
+#0 /home/jess/projects/php-quality-center/generator/lib/QualityCenterConnection.php(202): QualityCenterConnection->getResult()
+#1 /home/jess/projects/php-quality-center/generator/lib/services/QualityCenterEntityService.php(67): QualityCenterConnection->get('rest/domains/%s...', 'DEFAULT', 'Core', 'id=')
+#2 /home/jess/projects/php-quality-center/generator/lib/services/entities/QualityCenterDefectService.php(55): QualityCenterEntityService->getEntity('id=')
+#3 /home/jess/projects/php-quality-center/generator/lib/services/tests/QualityCenterDefectServiceTest.php(113): QualityCenterDefectService->get('id=')
+#4 /home/jess/projects/php-quality-center/view_bug.php(10): QualityCenterDefectServiceTest->testGet('id=')
+#5 {main}
+  thrown in /home/jess/projects/php-quality-center/generator/lib/QualityCenterConnection.php on line 291
