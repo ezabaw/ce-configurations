@@ -1,5 +1,0 @@
-qnd: seems CentOS 6.4 does not have the php-mcrypt RPM in its repositories and one needs to install it from EPEL.
-I'll write a simple code segment for this tomorrow.
---This line, and those below, will be ignored--
-
-M    user_input.ini
