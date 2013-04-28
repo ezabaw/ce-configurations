@@ -5,6 +5,12 @@
  */
 class kCurrentContext
 {
+	
+	/**
+	 * @var string
+	 */
+	public static $ks_kuser;
+
 	/**
 	 * @var string
 	 */
@@ -222,7 +228,7 @@ class kCurrentContext
 			kCurrentContext::$uid = $requestedPuserId;
 			kCurrentContext::$kuser_id = null;
 				
-			$ksKuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, kCurrentContext::$ks_uid, true);
+			$ksKuser = kCurrentContext::getCurrentKsKuser();
 			if($ksKuser)
 				kCurrentContext::$ks_kuser_id = $ksKuser->getId();
 		}
@@ -237,4 +243,34 @@ class kCurrentContext
 		
 		self::$ksPartnerUserInitialized = true;
 	}
+
+	public static function getCurrentKsKuser($activeOnly = true)
+	{
+		if(!kCurrentContext::$ks_kuser)
+		{			
+			kCurrentContext::$ks_kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, kCurrentContext::$ks_uid, true);
+		}
+		
+		if(kCurrentContext::$ks_kuser &&
+		   $activeOnly && 
+		   kCurrentContext::$ks_kuser->getStatus() != KuserStatus::ACTIVE)
+		   	return null;
+			
+		return kCurrentContext::$ks_kuser;
+	}
+
+	public static function getCurrentKsKuserId()
+	{
+		if (!is_null(kCurrentContext::$ks_kuser_id))
+			return kCurrentContext::$ks_kuser_id;
+			
+		$ksKuser = kCurrentContext::getCurrentKsKuser(false);
+		if($ksKuser)
+			kCurrentContext::$ks_kuser_id = $ksKuser->getId();
+		else 
+			kCurrentContext::$ks_kuser_id = 0;
+			
+		return kCurrentContext::$ks_kuser_id;
+	}
+
 }
