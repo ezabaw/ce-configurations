@@ -3,12 +3,9 @@
 #	Kaltura
 #**************************************
 # This script provides basic information about a kaltura installation
-# todo: combine version specific tasks to one section
-# general cleanup
-# convert to printf so I look cool in the bash scene
+
 usage () {
-	echo -e "Usage: $0 -b <kaltura_directory>"
-		
+	echo -e "Usage: $0 -b <kaltura_directory>" 		
 }
 
 while :
@@ -130,9 +127,9 @@ elif [ $version -eq 5 ]; then
 	pextract $(grep '^DataTimeZone' $base_dir/dwh/.kettle/kettle.properties)
 	kettle_timezone=$returnval
 	# Copy configuration files
-	cp $base_dir/app/admin_console/configs $report_dir/admin_configs
+	cp -a $base_dir/app/admin_console/configs $report_dir/admin_configs
 	cp $base_dir/app/batch/batch_config.ini $report_dir
-	cp $base_dir/app/alpha/config $report_dir/alpha_configs
+	cp -a $base_dir/app/alpha/config $report_dir/alpha_configs
 	cp $base_dir/dwh/.kettle/kettle.properties $report_dir/kettle.properties
 else
         echo "Version Unsupported"
