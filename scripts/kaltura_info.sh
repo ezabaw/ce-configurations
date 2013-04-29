@@ -33,6 +33,13 @@ if [ -z $base_dir ];then
 	echo "Base directory not specificed assuming /opt/kaltura"
 	base_dir="/opt/kaltura"
 fi
+# Required programs
+if  ! which nc &> /dev/null ;then
+	echo -e "\033[31m****************************\033[0m"
+	echo -e "\033[31mNC is required to check for connectivity, results may not be accurate\033[0m"
+	echo -e "\033[31m****************************\033[0m"
+fi
+
 
 # Utility functions, useful to extract parameters from the kaltura variables
 pextract () {
@@ -83,13 +90,13 @@ if [ $version -eq 6 ];then
 	pextract $(grep '^DataTimeZone' $base_dir/dwh/.kettle/kettle.properties)
 	kettle_timezone=$returnval
 elif [ $version -eq 5 ]; then
-	pextract $(grep -m 1 'setting' $base_dir/app/config/admin_console/application.ini)
+	pextract $(grep -m 1 'setting' $base_dir/app/admin_console/configs/application.ini)
 	serviceUrl=$returnval
 	pextract $(grep -m 1 'id' $base_dir/app/batch/batch_config.ini)
 	batchID=$returnval
-	dbuser=$(grep -m 1 "'user'"  $base_dir/app/api_v3/config/alpha/kConfLocal.php \
+	dbuser=$(grep -m 1 "'user'"  $base_dir/app/alpha/config/kConfLocal.php \
 	| awk '{print $3}' | cut -f 2 -d"'")
-	dbpass=$(grep -m 1 "'password'" /app/api_v3/app/alpha/config/kConfLocal.php \
+	dbpass=$(grep -m 1 "'password'" $base_dir/app/alpha/config/kConfLocal.php \
        	| awk '{print $3}' | cut -f 2 -d"'")
 	dbhost=$(grep -m 1 "'hostspec'" $base_dir/app/alpha/config/kConfLocal.php \
        	| awk '{print $3}' | cut -f 2 -d"'")
@@ -186,10 +193,6 @@ for x in searchd httpd mysqld memcached KGenericBatchMgr ntp;do
         fi
 done
 
-# Test NTP
-
-
-
 # Software versions
 echo -e "\n\nPHP $php_version Apache $apache_version MySQL $mysql_version" >> /tmp/ksystem_report
 
@@ -202,6 +205,4 @@ else
 fi
 # Output report
 cat /tmp/ksystem_report
-
-
 exit 0
