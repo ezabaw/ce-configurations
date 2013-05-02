@@ -32,7 +32,7 @@ if [ -z $base_dir ];then
 fi
 
 # Formatted execution date of this software
-exe_time=$(date +%d-%m-%Y-%k-%M-%S)
+exe_time=$(date +%m-%d-%Y-%H-%M-%S)
 
 # Report directory
 report_dir=/tmp/kaltura_info_$exe_time
@@ -56,7 +56,7 @@ pextract () {
 # left that out in version 6.1 : ' (
 if [ -e $base_dir/app/configurations/version.ini ];then
         version=6
-        echo "Kaltura Falcon(2) Detected"
+        echo "Kaltura Falcon Detected"
 else
         version=5
         echo "Kaltura Eagle Detected"
@@ -94,13 +94,13 @@ if [ $version -eq 6 ];then
     serviceUrl=$returnval
     pextract $(grep -m 1 'id' $base_dir/app/configurations/admin.ini)
 	batchID=$returnval
-	pextract $(grep -m 1 'datasources.propel.connection.user' $base_dir/app/configurations/db.ini)
+	pextract $(grep -m 1 'propel.connection.user' $base_dir/app/configurations/db.ini)
 	dbuser=$returnval
-	pextract $(grep -m 1 'datasources.propel.connection.password' $base_dir/app/configurations/db.ini)
+	pextract $(grep -m 1 'propel.connection.password' $base_dir/app/configurations/db.ini)
 	dbpass=$returnval
-	pextract $(grep -m 1 'datasources.propel.connection.hostspec' $base_dir/app/configurations/db.ini)
+	pextract $(grep -m 1 'propel.connection.hostspec' $base_dir/app/configurations/db.ini)
 	dbhost=$returnval
-	sphinx_host=$(grep 'datasources.sphinx.connection.dsn' $base_dir/app/configurations/db.ini |cut -f 3 -d'='|cut -f 1 -d';')
+	sphinx_host=$(grep 'sphinx..connection.dsn' $base_dir/app/configurations/db.ini |cut -f 3 -d'='|cut -f 1 -d';')
 	pextract $(grep -i '^date_default_timezone' $base_dir/app/configurations/local.ini)
 	kaltura_timezone=$returnval
 	pextract $(grep '^DataTimeZone' $base_dir/dwh/.kettle/kettle.properties)
@@ -237,16 +237,18 @@ echo -e "\nPerforming permissions check"
 apache_user=$(ps auxw | grep http | grep -m 1 -v root |awk '{print $1}')
 apache_group=$(ps augxw | grep http | grep -m 1 -v root | awk '{print $2}')
 while read -r -d ' ' user && read -r -d ' ' group && read -r -d ' ' permissions && IFS='' read -r -d '' filename; do
-if [ $apache_user == $user ];then
+if [ -z "$apache_user" ];then
+	:
+elif [ $apache_user == $user ];then
 	if [ ${permissions:0:1} -lt 6 ];then
-		echo "Bad permissions on $filename $(ls $filename -l |awk '{print $1" "$3" "$4}')"
+		echo "Bad permissions on $filename $(ls "$filename" -l |awk '{print $1" "$3" "$4}')"
 	fi
 elif [ $apache_group == $group ];then
 	if [ ${permissions:1:1} -lt 6 ];then
-		echo "Bad permissions on $filename $(ls $filename -l |awk '{print $1" "$3" "$4}')" 
+		echo "Bad permissions on $filename $(ls "$filename" -l |awk '{print $1" "$3" "$4}')" 
 	fi
 elif [ ${permissions:2:1} -lt 6 ];then
-	echo "Bad permissions on $filename $(ls $filename -l |awk '{print $1" "$3" "$4}')" 
+	echo "Bad permissions on $filename $(ls "$filename" -l |awk '{print $1" "$3" "$4}')" 
 
 else
 	:
@@ -254,8 +256,20 @@ fi
 done < <(find $base_dir -type f -printf '%u %g %m %p\0') > $report_dir/permissions
 
 # Tar up the directory and notify the user of it's location
-tar -zcf /tmp/kaltura_info_$exe_time.tar.gz $report_dir &> /dev/null
-echo "Kaltura report is located at /tmp/kaltura_info_${exe_time}.tar.gz"
-
-
+infofile="/tmp/kaltura_info_${exe_time}_$(hostname).tar.gz"
+tar -zcf $infofile $report_dir &> /dev/null
+echo "Kaltura report is located at $infofile"
+echo "Would you like the script emailed? (y/n)"
+#read answer
+#if [ $answer == 'y' ];then
+#	echo "Enter email address"
+#	read answer
+	mailx -a $infofile -s "kaltura_info_$(hostname)" christopher.deneen@kaltura.com <<< "Kaltura Information for $(hostname)" 
+	if [ $? -ne 0 ];then
+		echo "Mail was not sent"
+		tail -n 5 /var/log/maillog
+	else
+		echo "Mail sent sucessfully, check your spam box"
+	fi
+#fi
 exit 0
