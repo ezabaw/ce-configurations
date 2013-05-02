@@ -232,28 +232,7 @@ fi
 # Output report
 cat $report_file
 
-# Permissions check
-echo -e "\nPerforming permissions check"
-apache_user=$(ps auxw | grep http | grep -m 1 -v root |awk '{print $1}')
-apache_group=$(ps augxw | grep http | grep -m 1 -v root | awk '{print $2}')
-while read -r -d ' ' user && read -r -d ' ' group && read -r -d ' ' permissions && IFS='' read -r -d '' filename; do
-if [ -z "$apache_user" ];then
-	:
-elif [ $apache_user == $user ];then
-	if [ ${permissions:0:1} -lt 6 ];then
-		echo "Bad permissions on $filename $(ls "$filename" -l |awk '{print $1" "$3" "$4}')"
-	fi
-elif [ $apache_group == $group ];then
-	if [ ${permissions:1:1} -lt 6 ];then
-		echo "Bad permissions on $filename $(ls "$filename" -l |awk '{print $1" "$3" "$4}')" 
-	fi
-elif [ ${permissions:2:1} -lt 6 ];then
-	echo "Bad permissions on $filename $(ls "$filename" -l |awk '{print $1" "$3" "$4}')" 
 
-else
-	:
-fi
-done < <(find $base_dir -type f -printf '%u %g %m %p\0') > $report_dir/permissions
 
 # Tar up the directory and notify the user of it's location
 infofile="/tmp/kaltura_info_${exe_time}_$(hostname).tar.gz"
