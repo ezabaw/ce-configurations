@@ -232,23 +232,24 @@ fi
 # Output report
 cat $report_file
 
-
-
 # Tar up the directory and notify the user of it's location
 infofile="/tmp/kaltura_info_${exe_time}_$(hostname).tar.gz"
 tar -zcf $infofile $report_dir &> /dev/null
 echo "Kaltura report is located at $infofile"
 echo "Would you like the script emailed? (y/n)"
-#read answer
-#if [ $answer == 'y' ];then
-#	echo "Enter email address"
-#	read answer
-	mailx -a $infofile -s "kaltura_info_$(hostname)" christopher.deneen@kaltura.com <<< "Kaltura Information for $(hostname)" 
-	if [ $? -ne 0 ];then
-		echo "Mail was not sent"
-		tail -n 5 /var/log/maillog
+read answer
+if [ $answer == 'y' ];then
+	if ! which mailx &> /dev/null ;then
+		echo "Mailx is not installed"
 	else
-		echo "Mail sent sucessfully, check your spam box"
+		echo "Enter email address"
+		read answer
+		mailx -a $infofile -s "kaltura_info_$(hostname)" christopher.deneen@kaltura.com <<< "Kaltura Information for $(hostname)" 
+		if [ $? -ne 0 ];then
+			echo "Mail was not sent, some older versions of mailx do not support the -a attachment setting"
+		else
+			echo "Mail sent sucessfully, check your spam box"
+		fi
 	fi
-#fi
+fi
 exit 0
