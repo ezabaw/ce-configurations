@@ -1,0 +1,5 @@
+# This installs patches to the system after Kaltura is installed
+# right now there are no patches to be applied
+install_patches(){
+	printf "There are currently no patches to install\n" | tee -a $logfile
+}

@@ -1,0 +1,66 @@
+# Install the MySQL component, will eventually perform master slave installation
+# Some portions of this script were taken from the mysql_secure_installation
+
+#Query helper function
+do_query() {
+    mysql -u $mysql_user -p$mysql_password -h $mysql_host <<< $1
+    return $?
+}
+
+install_mysql(){
+	# Install MySQL
+	printf "Installing MySQL server\n" | tee -a $logfile
+	if ! yum -y install mysql-server &>> $logfile;then
+		printf "Error: unable to install MySQL server\n" | tee -a $logfile
+		return 1
+	fi
+	# Starting MySQL Server
+	printf "Starting MySQL server\n" | tee -a $logfile
+	if ! service mysqld start &>> $logfile;then
+		printf "Error: unable to start MySQL server\n" | tee -a $logfile
+	fi
+	# Set the root password
+	printf "Setting the MySQL root password\n" | tee -a $logfile
+	if ! mysqladmin -u $mysql_user -h $mysql_host password $mysql_password &>> $logfile;then
+		printf "Warning: unable to set MySQL root password\n" | tee -a $logfile
+	fi
+	printf "Checking MySQL connectivity\n" | tee -a $logfile
+	if ! do_query "quit" &>> $logfile;then
+		printf "Problem connecting with MySQL database\n" | tee -a $logfile
+		return 1
+	fi
+	# Secure the installation
+	printf "Removing anonymous users\n" | tee -a $logfile
+	if ! do_query "DELETE FROM mysql.user WHERE User='';" &>> $logfile;then
+		printf "Warning: unable to delete anonymous users\n" | tee -a $logfile
+	fi
+	printf "Removing test database\n" | tee -a $logfile
+	if ! do_query "DROP DATABASE test;" &>> $logfile;then
+		printf "Warning: unable to remove test database\n" | tee -a $logfile
+    fi
+	if ! do_query "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%'" &>> $logfile;then
+		printf "Warning: unable to remove privileges on test database\n" | tee -a $logfile
+	fi
+	printf "Removing remote root access\n"  | tee -a $logfile
+	if ! do_query "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');" &>> $logfile;then
+		printf "Warning: unable to remove root remote access\n" | tee -a $logfile
+	fi
+	
+	# Configuration modification
+	ed -s /etc/my.cnf <<<$'g/\[mysqld\]/a\\\nlower_case_table_names = 1\\\n.\nw'
+	ed -s /etc/my.cnf <<<$'g/\[mysqld\]/a\\\nthread_stack = 262144\\\n.\nw' 
+	ed -s /etc/my.cnf <<<$'g/\[mysqld\]/a\\\nopen_files_limit = 20000\\\n.\nw' 
+	ed -s /etc/my.cnf <<<$'g/\[mysqld\]/a\\\nmax_allowed_packet=16M\\\n.\nw' 
+	ed -s /etc/my.cnf <<<$'g/\[mysqld\]/a\\\ncharacter-set-server = utf8\\\n.\nw' 
+	ed -s /etc/my.cnf <<<$'g/\[mysqld\]/a\\\ninnodb_file_per_table= 1 \\\n.\nw' 
+	ed -s /etc/my.cnf <<<$'g/\[mysqld\]/a\\\ninnodb_log_file_size = 32MB\\\n.\nw' 
+
+	# Restart the server
+	if ! service mysqld restart;then
+		printf "Error: unable to restart MySQL server\n" | tee -a $logfile
+		return 1
+	fi
+	
+	# Start the server on boot
+	chkconfig mysqld on
+}

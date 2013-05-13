@@ -1,0 +1,50 @@
+# The main installation of kaltura
+install_kaltura(){
+	installer_config=installer/installer/AppConfig.class.php
+	
+	# Extract the installation file and modify the configuration file
+	# to change the base directory
+	if [[ -d $package_path/package ]];then
+		printf "Package directory already exists, utilitizing this directory\n" |  tee -a $logfile
+	else
+		mkdir -p $package_path &>> $logfile
+		printf "Extracting file\n" | tee -a $logfile
+		if ! tar -xjf $archive_file -C $package_path &>> $logfile;then
+			printf "Error: unable to extract archive\n" | tee -a $logfile
+			exit 1
+		fi
+	fi
+	
+	# Modify the values in the configuration class, this seems sloppy but the 
+	# php file contains hardcoded values for the silent mode.
+	if [[ ! -f $installer_config ]];then
+		printf "Error: the installer is missing AppConfig.class.php\n" | tee -a $logfile
+		exit 1
+	fi
+	# Bring in fresh files
+	cp templates/$installer_config $installer_config
+	cp templates/install.php installer/install.php
+	printf "Reading configuration\n" | tee -a $logfile
+	sed -i "s/%TIME_ZONE%/$time_zone/g" $installer_config &>> $logfile
+	sed -i "s/%BASE_DIR%/$base_dir/g" $installer_config &>> $logfile
+	sed -i "s/%HOSTNAME%/$hostname/g" $installer_config &>> $logfile
+	sed -i "s/%ADMIN_USER%/$admin_user/g" $installer_con &>> $logfile
+	sed -i "s/%ADMIN_PASSWORD%/$admin_password/g" $installer_config &>> $logfile
+	sed -i "s/%MYSQL_HOST%/$mysql_host/g" $installer_config &>> $logfile
+	sed -i "s/%MYSQL_PORT%/$mysql_port/g" $installer_config	 &>> $logfile
+	sed -i "s/%MYSQL_USER%/$mysql_user/g" $installer_config &>> $logfile
+	sed -i "s/%MYSQL_PASSWORD%/$mysql_password/g" $installer_config &>> $logfile
+	sed -i "s|%PACKAGE_PATH%|$package_path/package|g" installer/install.php &>> $logfile
+	
+	# Run the installer in silent mode
+	printf "Starting main installer\n"  | tee -a $logfile	
+	cd installer
+	if ! php install.php -s | tee -a $logfile;then
+		printf "Error: main installation failed, %s\n" "$(tail $logfile)" |tee -a $logfile
+	fi	
+	printf "Main installer has completed\n" | tee -a $logfile
+	
+	# Change the verbosity on log files
+	printf "Changing priority of log files to 5\n" | tee -a $logfile
+	sed -i 's/priority.priority = 7/priority.priority = 5/g' $base_dir/app/configurations/logger.ini
+}	

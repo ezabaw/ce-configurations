@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<base skipFilesMode="true" skipFilesOwner="true">
+	<installer group="${OS_ROOT_GROUP}" user="${OS_ROOT_USER}" mode="0700" filesMode="0600" scriptsMode="0700" svnPath="/usr/local/kalsource/on-premise/tags/CE-7.1.3/installer" />
+	<package group="${OS_KALTURA_GROUP}" user="${OS_ROOT_USER}" mode="0750" filesMode="0640" scriptsMode="0750" skipFilesMode="true" skipFilesOwner="true" sourcePath="directories.xml">
+		<app mode="0750" svnPath="/usr/local/kalsource/on-premise/tags/CE-7.1.3/packaging/package_root/TM/app" override="true" />
+		<web skipFilesMode="true" skipFilesOwner="true">
+			<flash skipFilesMode="true" skipFilesOwner="true">
+				<krecord skipFilesMode="true" skipFilesOwner="true">
+					<v1.5.13 svnPath="/usr/local/kalprod/flash/krecord/v1.5.13" />
+				</krecord>
+				<ksr skipFilesOwner="true" skipFilesMode="true">
+					<v1.0.32	svnPath="/usr/local/kalprod/flash/ksr/v1.0.32"	skipFilesOwner="true" skipFilesMode="true" />
+					<v1.0.33s	svnPath="/usr/local/kalprod/flash/ksr/v1.0.33s"	skipFilesOwner="true" skipFilesMode="true" />
+				</ksr>
+			</flash>
+		</web>
+	</package>
+</base>
