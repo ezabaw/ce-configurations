@@ -39,7 +39,7 @@ do
     esac
 done
 
-if [[ -z $archive_file ]];then
+if [[ -z $archive_file && kaltura ]];then
 	printf "Kaltura package file not found\n" | tee -a $logfile
 else
 	# Some details about the installation file
@@ -54,8 +54,8 @@ for var in log_file base_dir ntp_server smtp_server mysql_server mysql_user mysq
 	fi
 done
 
-# Installer requirements
-if ! yum -y install wget bzip2 &>> $logfile | tee -a $logfile;then
+# Packages required for the installer to work
+if ! yum -y install wget bzip2 ed &>> $logfile | tee -a $logfile;then
     printf "Error: unable to instal wget which is required by the installer\n" | tee -a $logfile
 fi
 

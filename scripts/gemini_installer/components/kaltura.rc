@@ -1,4 +1,4 @@
-# The main installation of kaltura
+#The main installation of kaltura
 install_kaltura(){
 	installer_config=installer/installer/AppConfig.class.php
 	

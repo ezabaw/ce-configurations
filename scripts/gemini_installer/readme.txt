@@ -1,6 +1,7 @@
 Script: Kaltura Gemini Auto Installer for On-Prem Installations
 
 todo
+selector program , sphinx, batch, trans
 fix the replacement of the package directory in config or see if you can pass a variable to the installer
 check mysql connectivity if mysql create database is set to no
 check if items exist already and offer uninstall, of course create uninstall
