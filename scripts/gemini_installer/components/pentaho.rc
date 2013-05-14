@@ -3,6 +3,7 @@ install_pentaho(){
 		printf "Error: unable to install java\n" | tee -a $logfile
 	fi
 	mkdir -p /usr/local/pentaho
+	# Look for the file locally
 	if [[ ! -f pdi-ce-4.2.1-stable.tar.gz ]]; then
 		wget http://sourceforge.net/projects/pentaho/files/Data%20Integration/4.2.1-stable/pdi-ce-4.2.1-stable.tar.gz -O /tmp/pdi-ce-4.2.1-stable.tar.gz &>> $logfile
 	fi
@@ -12,6 +13,8 @@ install_pentaho(){
 		exit 1
 	fi
 	mv /usr/local/pentaho/data-integration /usr/local/pentaho/pdi
-    chown -R kuser:kgroup /user/local/pentaho &>> $logfile
+    if ! chown -R $kuser:$kgroup /user/local/pentaho &>> $logfile;then
+		printf "Warning: unable to set permissions on pentaho, the user and group probably don't exist\n" | tee -a $logfile
+	fi
 }
 	

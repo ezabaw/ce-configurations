@@ -328,14 +328,14 @@ class AppConfig
 			self::initField(AppConfigAttribute::BASE_DIR, '%BASE_DIR%');
 			self::initField(AppConfigAttribute::KALTURA_FULL_VIRTUAL_HOST_NAME, '%HOSTNAME%');
 			self::initField(AppConfigAttribute::ADMIN_CONSOLE_ADMIN_MAIL, '%ADMIN_USER%');
-			self::initField(AppConfigAttribute::ADMIN_CONSOLE_PASSWORD, '%ADMIN_PASSWORD');
+			self::initField(AppConfigAttribute::ADMIN_CONSOLE_PASSWORD, '%ADMIN_PASSWORD%');
 			self::initField(AppConfigAttribute::DB1_HOST, '%MYSQL_HOST%');
 			self::initField(AppConfigAttribute::DB1_PORT, '%MYSQL_PORT%');
 			self::initField(AppConfigAttribute::DB_ROOT_USER, '%MYSQL_USER%');
 			self::initField(AppConfigAttribute::DB_ROOT_PASS, '%MYSQL_PASSWORD%');
 			self::initField(AppConfigAttribute::DB1_CREATE_NEW_DB, '%CREATE_NEW_DB%');
 			self::initField(AppConfigAttribute::SPHINX_SERVER1, ('%SPHINX_HOST%'));
-			self::initField(AppConfigAttribute::ENVIRONMENT_PROTOCOL, '%KENVIORNMENT');
+			self::initField(AppConfigAttribute::ENVIRONMENT_PROTOCOL, '%KENVIORNMENT%');
 		}
 		else
 		{

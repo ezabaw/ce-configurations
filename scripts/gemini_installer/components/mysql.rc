@@ -54,9 +54,11 @@ install_mysql(){
 	ed -s /etc/my.cnf <<<$'g/\[mysqld\]/a\\\ncharacter-set-server = utf8\\\n.\nw' 
 	ed -s /etc/my.cnf <<<$'g/\[mysqld\]/a\\\ninnodb_file_per_table= 1 \\\n.\nw' 
 	ed -s /etc/my.cnf <<<$'g/\[mysqld\]/a\\\ninnodb_log_file_size = 32MB\\\n.\nw' 
-
+	# Remove the log files due to change in size
+	rm -f /var/lib/mysql/ib_logfile0 &>> $logfile
+	rm -f /var/lib/mysql/ib_logfile1 &>> $logfile
 	# Restart the server
-	if ! service mysqld restart;then
+	if ! service mysqld restart &>> $logfile;then
 		printf "Error: unable to restart MySQL server\n" | tee -a $logfile
 		return 1
 	fi

@@ -5,7 +5,7 @@ install_prereq() {
 
 # Install required packages
 printf "Installing required packages\n" | tee -a $logfile
-if ! yum -y install postfix php-gd php-pdo php-mysql php-pecl-apc php-soap php-common php php-pear php-xml php-devel php-mbstring php-xmlrpc php-cli php-curl memcached zlib.i686 bzip2-libs.i686 glibc.i686 ImageMagick ncurses-libs.i686 httpd php-pecl-memcache dos2unix mysql rsync mailx cronie wget memcached git svn bind-utils gcc make telnet install man php-devel libssh2 libssh2-devel ed &>> $logfile; then
+if ! yum -y install postfix php-gd php-pdo php-mysql php-pecl-apc php-soap php-common php php-pear php-xml php-devel php-mbstring php-xmlrpc php-cli php-curl memcached zlib.i686 bzip2-libs.i686 glibc.i686 ImageMagick ncurses-libs.i686 httpd php-pecl-memcache dos2unix mysql rsync mailx cronie wget memcached git svn bind-utils gcc make telnet man php-devel libssh2 libssh2-devel nagios&>> $logfile; then
 	printf "Installationg of packages failed\n" | tee -a $logfile
 	return 1
 fi
@@ -39,11 +39,9 @@ for var in pear.php.net pear.phing.info;do
     else :
     fi
 done
-
-if ! pear install --alldeps phing/phing-2.4.13 &>> $logfile && pear install pear.php.net/VersionControl_SVN-0.5.1 &>> $logfile && pear install pear/VersionControl_Git-0.4.4 &>> $logfile;then
-	printf "Error: unable to install phing or one of it's dependancies\n" | tee -a $logfile
-	return 1
-fi
+pear install --alldeps phing/phing-2.4.13 &>> $logfile
+pear install --alldeps pear.php.net/VersionControl_SVN-0.5.1 &>> $logfile
+pear install --alldeps pear/VersionControl_Git-0.4.4 &>> $logfile
 
 # Disable SElinux
 sed -i 's/SELINUX=enforcing/SELINUX=permissive/' /etc/selinux/config
@@ -52,6 +50,6 @@ if ! setenforce 0; then
 fi
 
 # Set services status
-printf "Setting services to start on boot\n" | tee -a $logfile
+printf "Setting apache to start on boot\n" | tee -a $logfile
 chkconfig httpd on
 }

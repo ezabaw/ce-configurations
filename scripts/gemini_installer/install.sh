@@ -7,10 +7,9 @@
 # .tar.bz2
 #
 version="0.1"
-source config_file
+source config.ini
 
 for f in components/*.rc;do source $f;done
-
 
 printf "\----------------------------------------------\n" | tee -a $logfile
 printf "Gemini auto installer version %s\n" "$version" | tee -a $logfile
@@ -39,23 +38,17 @@ do
     esac
 done
 
-if [[ -z $archive_file && kaltura ]];then
-	printf "Kaltura package file not found\n" | tee -a $logfile
-else
-	# Some details about the installation file
-	printf "Installation file: %s Size:%s Date:%s\n" "${archive_file}" "$(du -bh $archive_file)" "$(stat ${archive_file} --printf %y |awk '{print $1}')"
-fi
-
 # Verify configuration file
 for var in log_file base_dir ntp_server smtp_server mysql_server mysql_user mysql_password hostname mysql ntp red5 prereq pentaho kaltura patches smtp sphinx;do
 	if [[ -z $var ]];then
-		printf "The setting %s is missing a value in %s\n" "$var" "$config_file"
+		printf "The setting %s is missing a value in %s\n" "$var" "$config_file" | tee -a $logfile
 		exit 1
 	fi
 done
 
 # Packages required for the installer to work
-if ! yum -y install wget bzip2 ed &>> $logfile | tee -a $logfile;then
+printf "Installing software required for the auto installer to function\n" | tee -a $logfile
+if ! yum -y install wget ed &>> $logfile | tee -a $logfile;then
     printf "Error: unable to instal wget which is required by the installer\n" | tee -a $logfile
 fi
 
@@ -75,17 +68,23 @@ if [[ $ntp ==  'yes' ]];then
 fi
 
 # MySQL Server
-if [[ $mysql == 'yes' && $create_new_db != 'y' ]];then
+if [[ $mysql == 'yes' && $create_new_db == 'y' ]];then
 	printf "Installing and configuring MySQL\n" | tee -a $logfile
 	if ! install_mysql;then
 		exit 1
 	fi
 elif [[ $mysql == 'no' && $create_new_db == 'y' ]];then
-	printf "You specified an existing mysql server with no database, checking connectivity\n" | tee -a $logfile
-	# check connectivity to database TODO
+	printf "You specified an existing mysql server that doesn't contain a Kaltura database, checking connectivity\n" | tee -a $logfile
+	if ! do_query "quit";then
+		echo -e  "\e[00;31mError: unable to connect to the database server $mysql_host \e[00m" | tee -a $logfile
+		exit 1
+	else echo -e "\e[00;32mSuccess!\e[00m"
+	fi
 elif [[ $mysql == 'no' && $create_new_db != 'y' ]];then
-	printf "You specified that an exsting kaltura database exists, checking connectivity and database\n" | tee -a $logfile
-	# check connectivity and database existence TODO
+	printf "Checking to see if the kaltura database exists\n" | tee -a $logfile
+	if ! do_query "use kaltura";then
+		printf "Warning: the kaltura database does not exist\n" | tee -a $logfile
+	fi
 	
 else
 	printf "Error: you can not choose to install a new mysql server but also specifiy not to create a new database\n" | tee -a $logfile
@@ -121,7 +120,7 @@ fi
 if [[ $patches == 'yes' ]];then
 	printf "Applying Patches\n" | tee -a $logfile
 	if ! install_patches;then
-		printf "Warning: unable to apply some/all patches\n" | tee -a $logfile
+		printf "Warning: unable to apply some or all patches\n" | tee -a $logfile
 	fi
 fi
 
