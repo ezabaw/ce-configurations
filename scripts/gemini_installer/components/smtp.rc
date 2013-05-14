@@ -1,9 +1,0 @@
-install_smtp(){
-	printf "Installing SMTP server\n" | tee -a $logfile
-	if ! yum -y install postfix &>> $logfile;then
-		printf "Error: unable to install postfix\n" | tee -a $logfile
-		return 1
-	else
-		printf "Configuring Postfix\n" | tee -a $logfile
-	fi
-}
