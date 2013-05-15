@@ -65,4 +65,16 @@ install_mysql(){
 	
 	# Start the server on boot
 	chkconfig mysqld on
+	printf "MySQL sucessfully installed\n" | tee -a $logfile
+}
+uninstall_mysql(){
+	printf "Note: this removes the MySQL server but not libraries and client packages\n"  | tee -a $logfile
+	if ! service mysqld stop &>> $logfile;then
+		printf "Warning: unable to stop mysql service for removal\n" | tee -a $logfile
+	fi
+	chkconfig mysqld off
+	if ! yum remove mysql-server &>> $logfile;then
+		printf "Warning: unable to remove mysql-server package\n" | tee -a $logfile
+	fi
+	printf "Mysql Sucessfully uninstalled\n"  | tee -a $logfile
 }

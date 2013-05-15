@@ -48,8 +48,5 @@ sed -i 's/SELINUX=enforcing/SELINUX=permissive/' /etc/selinux/config
 if ! setenforce 0; then
 	printf "Warning: unable to to change selinux status on the running server, a reboot might be needed\n" | tee -a $logfile
 fi
-
-# Set services status
-printf "Setting apache to start on boot\n" | tee -a $logfile
-chkconfig httpd on
+	
 }

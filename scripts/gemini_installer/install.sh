@@ -11,11 +11,19 @@ source config.ini
 
 for f in components/*.rc;do source $f;done
 
-printf "\----------------------------------------------\n" | tee -a $logfile
+
+cat << EOL
+  _  _     _    _   _____ _   _ ____      _    
+ | |/ /   / \  | | |_   _| | | |  _ \    / \   
+ | ' /   / _ \ | |   | | | | | | |_) |  / _ \  
+ | . \  / ___ \| |___| | | |_| |  _ <  / ___ \ 
+ |_|\_\/_/   \_\_____|_|  \___/|_| \_\/_/   \_\
+                                               
+EOL
 printf "Gemini auto installer version %s\n" "$version" | tee -a $logfile
 printf "Kaltura install version %s\n" "$(grep -o '[0-9].*' installer/version.ini)" | tee -a $logfile
 printf "Execution Time: %s\n" "$(date)"
-printf "\----------------------------------------------\n" | tee -a $logfile
+
 
 usage () {
 	printf "Usage: %s --archive <kaltura_archive_name>\n" "$0"
@@ -39,20 +47,39 @@ do
 done
 
 # Verify configuration file
-for var in log_file base_dir ntp_server smtp_server mysql_server mysql_user mysql_password hostname mysql ntp red5 prereq pentaho kaltura patches smtp sphinx;do
+for var in log_file base_dir ntp_server mysql_host mysql_port mysql_user mysql_password  hostname kuser kgroup admin_user admin_pass kenvironment time_zone;do
 	if [[ -z $var ]];then
-		printf "The setting %s is missing a value in %s\n" "$var" "$config_file" | tee -a $logfile
+		printf "The setting %s is missing a value in config.ini\n" "$var" | tee -a $logfile
 		exit 1
 	fi
 done
 
 # Packages required for the installer to work
-printf "Installing software required for the auto installer to function\n" | tee -a $logfile
 if ! yum -y install wget ed &>> $logfile | tee -a $logfile;then
-    printf "Error: unable to instal wget which is required by the installer\n" | tee -a $logfile
+    printf "Error: unable to install base software which is required by the auto installer\n" | tee -a $logfile
+	exit 1
 fi
 
-#Install each component, the order matter ( mysql and pentaho before kaltura)
+cat << EOL
+
+The following components will be installed
+	
+	Prerequisites: $prereq
+	MySQL: $mysql
+	NTP: $ntp
+	Pentaho: $pentaho
+	Kaltura: $kaltura
+	Patches: $patches
+	
+Proceed(y/n)?
+EOL
+read answer
+if [[ $answer != 'y' ]];then
+	printf "Quitting\n" | tee -a $logfile
+	exit 0
+fi
+
+#Install each component
 # Pre-requisites
 if [[ $prereq == 'yes' ]];then
 	printf "Installing pre-requesisites\n" | tee -a $logfile
@@ -84,8 +111,7 @@ elif [[ $mysql == 'no' && $create_new_db != 'y' ]];then
 	printf "Checking to see if the kaltura database exists\n" | tee -a $logfile
 	if ! do_query "use kaltura";then
 		printf "Warning: the kaltura database does not exist\n" | tee -a $logfile
-	fi
-	
+	fi	
 else
 	printf "Error: you can not choose to install a new mysql server but also specifiy not to create a new database\n" | tee -a $logfile
 	printf "Configuration settings as follows - mysql:%s create_new_db:%s\n" "$mysql" "$create_new_db"
@@ -104,14 +130,6 @@ fi
 if [[ $kaltura == 'yes' ]];then
 	printf  "Installing and configuring Kaltura\n" | tee -a $logfile
 	if ! install_kaltura;then
-		exit 1
-	fi
-fi
-
-# Red5
-if [[ $red5 == 'yes' ]];then
-	printf "Installing and configuring Red5\n" | tee -a $logfile
-	if ! install_red5;then
 		exit 1
 	fi
 fi

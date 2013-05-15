@@ -1,4 +1,13 @@
 install_pentaho(){
+	if [[ -d /usr/local/pentaho ]];then
+		printf "Warning: Pentaho appears to be installed already, should I remove it(y/n)?\n"
+		read answer
+		if [[ $answer == 'y' ]];then
+			rm -rf /usr/local/pentaho
+		else
+			exit 1
+		fi
+	fi
 	if ! yum -y install java-1.6.0-openjdk &>> $logfile;then
 		printf "Error: unable to install java\n" | tee -a $logfile
 	fi
@@ -16,5 +25,10 @@ install_pentaho(){
     if ! chown -R $kuser:$kgroup /user/local/pentaho &>> $logfile;then
 		printf "Warning: unable to set permissions on pentaho, the user and group probably don't exist\n" | tee -a $logfile
 	fi
+	printf "Pentaho sucessfully installed\n" | tee -a $logfile
 }
-	
+uninstall_pentaho(){
+	printf "Note: This will remove pentaho but keep java installed due to possible other dependancies\n" | tee -a $logfile
+	rm -rf /usr/local/pentaho
+	printf "Pentaho sucessfully uninstalled\n"  | tee -a $logfile
+}

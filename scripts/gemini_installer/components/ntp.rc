@@ -18,4 +18,16 @@ install_ntp(){
 		fi
 		printf "New Time %s\n" "$(date)" | tee -a $logfile
 	fi
+	printf "NTP server sucessfully installed\n" | tee -a $logfile
+}
+
+uninstall_ntp(){
+	if ! service ntpd stop &>> $logfile;then
+		printf "Warning: unable to stop ntpd for removal\n" | tee -a $logfile
+	fi
+	chkconfig ntpd off
+	if ! yum remove -y ntp ntpdate &>> $logfile;then
+		printf "Warning: unable to remove ntp packages\n" | tee -a $logfile
+	fi
+	printf "NTP server sucessfully uninstalled\n" | tee -a $logfile
 }

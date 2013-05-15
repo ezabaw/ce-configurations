@@ -2,6 +2,18 @@
 install_kaltura(){
 	installer_config=installer/installer/AppConfig.class.php
 	
+	# Check if there is an existing installation
+	if [[ -d $base_dir ]];then
+		printf "A Kaltura installation already exists in %s\nShould I remove it(y/n)?\n" "$base_dir" | tee -a $logfile
+		read answer
+		if [[ $answer == 'y' ]];then
+			uninstall_kaltura
+		else
+			printf "Since there is an existing directory and you choose not to remove it the installation can not continue\n" |tee -a $logfile
+			exit 1
+		fi
+	fi
+		
 	# Extract the installation file and modify the configuration file
 	# to change the base directory
 	if [[ -d $package_path/package ]];then
@@ -51,4 +63,17 @@ install_kaltura(){
 	# Change the verbosity on log files
 	printf "Changing priority of log files to 5\n" | tee -a $logfile
 	sed -i 's/priority.priority = 7/priority.priority = 5/g' $base_dir/app/configurations/logger.ini
+	
+	# Add red5 service link
+	ln -s $base_dir/bin/red5/red5 /etc/init.d/red5
 }	
+
+uninstall_kaltura(){
+	printf "Uninstalling Kaltura\n" | tee -a $logfile
+	for var in kaltura_batch kaltura_monit kaltura_populate kaltura_sphinx;do
+		printf "Stopping service %s\n" "$var" | tee -a $logfile
+		service $var stop %>> /dev/null
+	done
+	printf "Removing the Kaltura directory\n" | tee -a $logfile
+	rm -rf $base_dir
+}
