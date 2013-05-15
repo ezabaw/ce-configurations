@@ -1,9 +1,9 @@
 install_pentaho(){
 	if [[ -d /usr/local/pentaho ]];then
-		printf "Warning: Pentaho appears to be installed already, should I remove it(y/n)?\n"
+		printf "Warning: Pentaho appears to be installed already, should I remove it(y/n)?"
 		read answer
 		if [[ $answer == 'y' ]];then
-			rm -rf /usr/local/pentaho
+			uninstall_pentaho
 		else
 			exit 1
 		fi
@@ -14,7 +14,8 @@ install_pentaho(){
 	mkdir -p /usr/local/pentaho
 	# Look for the file locally
 	if [[ ! -f pdi-ce-4.2.1-stable.tar.gz ]]; then
-		wget http://sourceforge.net/projects/pentaho/files/Data%20Integration/4.2.1-stable/pdi-ce-4.2.1-stable.tar.gz -O /tmp/pdi-ce-4.2.1-stable.tar.gz &>> $logfile
+		printf "Downloading Pentaho\n" | tee -a $logfile
+		wget -nv http://sourceforge.net/projects/pentaho/files/Data%20Integration/4.2.1-stable/pdi-ce-4.2.1-stable.tar.gz -O /tmp/pdi-ce-4.2.1-stable.tar.gz
 	fi
 		
 	if ! tar zxf /tmp/pdi-ce-4.2.1-stable.tar.gz -C /usr/local/pentaho &>> $logfile;then
@@ -23,7 +24,7 @@ install_pentaho(){
 	fi
 	mv /usr/local/pentaho/data-integration /usr/local/pentaho/pdi
     if ! chown -R $kuser:$kgroup /user/local/pentaho &>> $logfile;then
-		printf "Warning: unable to set permissions on pentaho, the user and group probably don't exist\n" | tee -a $logfile
+		printf "Warning: unable to set permissions on pentaho, the user and group probably don't exist yet\n" | tee -a $logfile
 	fi
 	printf "Pentaho sucessfully installed\n" | tee -a $logfile
 }

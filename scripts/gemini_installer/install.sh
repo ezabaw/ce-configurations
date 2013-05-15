@@ -100,22 +100,26 @@ if [[ $mysql == 'yes' && $create_new_db == 'y' ]];then
 	if ! install_mysql;then
 		exit 1
 	fi
-elif [[ $mysql == 'no' && $create_new_db == 'y' ]];then
-	printf "You specified an existing mysql server that doesn't contain a Kaltura database, checking connectivity\n" | tee -a $logfile
-	if ! do_query "quit";then
-		echo -e  "\e[00;31mError: unable to connect to the database server $mysql_host \e[00m" | tee -a $logfile
-		exit 1
-	else echo -e "\e[00;32mSuccess!\e[00m"
+fi
+if [[ $use_existing_mysql_server == 'y' ]];then
+	if [[ $create_new_db == 'y' ]];then
+		printf "You specified an existing mysql server that doesn't contain a Kaltura database, checking connectivity\n" | tee -a $logfile
+		if ! do_query "quit" &> /dev/null;then
+			echo -e  "\e[00;31mError: unable to connect to the database server $mysql_host \e[00m" | tee -a $logfile
+			exit 1
+		else 
+			echo -e "\e[00;32mSuccess!\e[00m"
+		fi
+		if do_query "use kaltura" &> /dev/null;then
+			echo -e "\e[00;31mError: a Kaltura database already exists on $mysql_host \e[00m" | tee -a $logfile
+			exit 1
+		fi
+	else 
+		printf "You specified an existing mysql server that has a kaltura database\n" | tee -a $logfile
+		if ! do_query "use kaltura" &> /dev/null;then
+			printf "Warning: the kaltura database does not exist, ignoring\n" | tee -a $logfile
+		fi
 	fi
-elif [[ $mysql == 'no' && $create_new_db != 'y' ]];then
-	printf "Checking to see if the kaltura database exists\n" | tee -a $logfile
-	if ! do_query "use kaltura";then
-		printf "Warning: the kaltura database does not exist\n" | tee -a $logfile
-	fi	
-else
-	printf "Error: you can not choose to install a new mysql server but also specifiy not to create a new database\n" | tee -a $logfile
-	printf "Configuration settings as follows - mysql:%s create_new_db:%s\n" "$mysql" "$create_new_db"
-	exit 1
 fi
 
 # Pentaho

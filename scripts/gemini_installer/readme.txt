@@ -2,9 +2,8 @@ Script: Kaltura Gemini Auto Installer for On-Prem Installations
 
 todo
 
-installer menu
-
-add in variable checks for configuration file 
+kaltura uninstall, look for leftover in cron.d etc
+mysql: check into logic of three situations
 php main install exit error codes
 selector 
 	display and change batch id
