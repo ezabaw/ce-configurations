@@ -8,8 +8,17 @@ do_query() {
 }
 
 install_mysql(){
+	# Check to make sure mysql isn't already installed or running
+	if rpm -qa |grep 'mysql-server';then
+		printf "MySQL appears to already be installed, should I remove it? (y/n)\n" | tee -a $logfile
+		read answer
+		if [[ answer == 'y' ]]; then
+			uninstall_mysql
+		else
+			printf "Continuing the installation\n" | tee -a $logfile
+		fi
+	fi
 	# Install MySQL
-	printf "Installing MySQL server\n" | tee -a $logfile
 	if ! yum -y install mysql-server &>> $logfile;then
 		printf "Error: unable to install MySQL server\n" | tee -a $logfile
 		return 1

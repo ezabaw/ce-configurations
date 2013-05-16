@@ -19,6 +19,7 @@ cat << EOL
  | . \  / ___ \| |___| | | |_| |  _ <  / ___ \ 
  |_|\_\/_/   \_\_____|_|  \___/|_| \_\/_/   \_\
                                                
+											   
 EOL
 printf "Gemini auto installer version %s\n" "$version" | tee -a $logfile
 printf "Kaltura install version %s\n" "$(grep -o '[0-9].*' installer/version.ini)" | tee -a $logfile
