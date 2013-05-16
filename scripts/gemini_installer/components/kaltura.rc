@@ -4,6 +4,7 @@ install_kaltura(){
 	if [[ -z $archive_file ]];then
 		printf  "Warning: you didn't specify an archive files with the -a option\n" | tee -a $logfile
 	fi
+	mkdir -p $package_path
 		
 	# Check if there is an existing installation
 	if [[ -d $base_dir ]];then

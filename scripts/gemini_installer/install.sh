@@ -118,7 +118,7 @@ elif [[ $mysql -eq '2' ]];then
 		exit 1
 	fi
 	# Sets the variable for the kaltura installation
-	$create_new_db=y
+	create_new_db=y
 elif [[ $mysql -eq '3' ]];then
 	printf "You specified an existing mysql server that contains a Kaltura database, checking connectivity\n" | tee -a $logfile
 	# Test connectivity to the server
