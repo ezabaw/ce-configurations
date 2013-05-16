@@ -78,13 +78,24 @@ install_kaltura(){
 	ln -s $base_dir/bin/red5/red5 /etc/init.d/red5
 }	
 
-# TODO - left over stuff in cron.d and such
 uninstall_kaltura(){
 	printf "Uninstalling Kaltura\n" | tee -a $logfile
-	for var in kaltura_batch kaltura_monit kaltura_populate kaltura_sphinx;do
+	for var in kaltura_batch kaltura_monit kaltura_populate kaltura_sphinx red5;do
 		printf "Stopping service %s\n" "$var" | tee -a $logfile
 		service $var stop &>> /dev/null
+		chkconfig $var off
 	done
 	printf "Removing the Kaltura directory\n" | tee -a $logfile
 	rm -rf $base_dir
+	printf "Removing system files\n" | tee -a $logfile
+	rm -f /etc/cron.d/dwh
+	rm -f /etc/cron.d/api
+	rm -f /etc/dwh_crontab
+	rm -r /etc/logrotate.d/kaltura*
+	rm -rf /etc/kaltura.d
+	rm -f /php.d/zzkaltura.ini
+	rm -f /httpd/conf.d/kaltura.conf
+	rm -f /etc/init.d/kaltura*
+	rm -f /etc/init.d/red5
+	printf "Kaltura removed\n" | tee -a $logfile
 }

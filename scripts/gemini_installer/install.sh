@@ -93,33 +93,44 @@ if [[ $ntp ==  'yes' ]];then
 	printf "Installing and configuring NTP server\n" | tee -a $logfile
 	install_ntp
 fi
-
+	
 # MySQL Server
-if [[ $mysql == 'yes' && $create_new_db == 'y' ]];then
+# Option 1 install new MySQL server
+if [[ $mysql -eq '1' ]];then
 	printf "Installing and configuring MySQL\n" | tee -a $logfile
 	if ! install_mysql;then
 		exit 1
 	fi
-fi
-if [[ $use_existing_mysql_server == 'y' ]];then
-	if [[ $create_new_db == 'y' ]];then
-		printf "You specified an existing mysql server that doesn't contain a Kaltura database, checking connectivity\n" | tee -a $logfile
-		if ! do_query "quit" &> /dev/null;then
-			echo -e  "\e[00;31mError: unable to connect to the database server $mysql_host \e[00m" | tee -a $logfile
-			exit 1
-		else 
-			echo -e "\e[00;32mSuccess!\e[00m"
-		fi
-		if do_query "use kaltura" &> /dev/null;then
-			echo -e "\e[00;31mError: a Kaltura database already exists on $mysql_host \e[00m" | tee -a $logfile
-			exit 1
-		fi
+# Option 2 using existing server but install a new database
+elif [[ $mysql -eq '2' ]];then
+	printf "You specified an existing mysql server that doesn't contain a Kaltura database, checking connectivity\n" | tee -a $logfile
+	# Test connectivity to the server
+	if ! do_query "quit" &> /dev/null;then
+		echo -e  "\e[00;31mError: unable to connect to the database server $mysql_host \e[00m" | tee -a $logfile
+		exit 1
 	else 
-		printf "You specified an existing mysql server that has a kaltura database\n" | tee -a $logfile
-		if ! do_query "use kaltura" &> /dev/null;then
-			printf "Warning: the kaltura database does not exist, ignoring\n" | tee -a $logfile
-		fi
+		echo -e "\e[00;32mSuccess!\e[00m"
 	fi
+	# Check to make sure that a Kaltura database doesn't already exist
+	if do_query "use kaltura" &> /dev/null;then
+		echo -e "\e[00;31mError: a Kaltura database already exists on $mysql_host \e[00m" | tee -a $logfile
+		exit 1
+	fi
+	# Sets the variable for the kaltura installation
+	$create_new_db=y
+elif [[ $mysql -eq '3' ]];then
+	printf "You specified an existing mysql server that contains a Kaltura database, checking connectivity\n" | tee -a $logfile
+	# Test connectivity to the server
+	if ! do_query "quit" &> /dev/null;then
+		echo -e  "\e[00;31mError: unable to connect to the database server $mysql_host \e[00m" | tee -a $logfile
+		exit 1
+	else 
+		echo -e "\e[00;32mSuccess!\e[00m"
+	fi
+	# Sets the variable for the kaltura installation
+	create_new_db=n
+else
+	printf "Invalid option for MySQL settings in configuration, this variable is required\n" | tee -a $logfile
 fi
 
 # Pentaho
@@ -146,5 +157,4 @@ if [[ $patches == 'yes' ]];then
 	fi
 fi
 
-printf "Installation complete\n" | tee -a $logfile
 exit 0

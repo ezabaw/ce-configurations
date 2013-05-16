@@ -31,11 +31,11 @@ check_transcode(){
         pval=$(grep -e "KAsyncConvert[[:space:]]*=[[:space:]]*" $base_dir/app/configurations/batch/batch.ini | awk '{print $3}')
         if [[ -z $pval ]];then
                 printf "Error: unable to identify configuration variable $1\n"
-                returnval=Error
+                transcode_status=Error
         elif [[ $pval -eq 1 ]];then
-                returnval=yes
+                transcode_status=yes
         else
-                returnval=no
+                transcode_status=no
         fi
 }
 
@@ -53,9 +53,9 @@ set_transcode(){
 # Checks to see if the Sphinx service is running
 check_sphinx(){
 if pgrep -f searchd > /dev/null;then
-	returnval=yes
+	sphinx_status=yes
 else
-	returnval=no
+	sphinx_status=no
 fi
 }
 
@@ -73,10 +73,12 @@ set_sphinx(){
 # Checks to see if the Batch service is running
 check_batch(){
 	if pgrep -f KGenericBatchMgr > /dev/null;then
-		returnval=yes
+		batch_status=yes
 	else
-		returnval=no
+		batch_status=no
 	fi
+	# Obtain the batch ID
+	batch_id=$(grep -e '^id.*=.*' $base_dir/app/configurations/batch/scheduler.conf|awk '{print $3}' )
 }
 
 # Turn the batch process on or off, we perform the operation to flip the current status
@@ -89,23 +91,30 @@ set_batch(){
 		chkconfig kaltura_batch off
 	# Disable batch processing only but keep the transcoding
 	elif [[ $1 == "yes" && $transcode_status == "yes" ]];then
-	echo "temp"
-	
+		printf "This script does not yet support turning off batch but keeping transcode on\n"
 	# Re-enable batch processing that was disabled
 	elif [[ $1 == "no" && transcode_status == "yes" ]];then
-	echo "temp"
+		printf "This script does not yet support turning on batch when transcode was already on\n"
 	# Turn back on the entire server
 	else
 		service kaltura_batch start &>> $logfile
 		chkconfig kaltura_batch on
 	fi
+	# Change the batch ID
+	printf "Enter a new batch ID:"
+	read answer
+	if [[ ! -z $answer ]];then	
+		batch_id=$answer
+	fi
+	echo "answer $batch_id"
+	sed -i "s|id = .*|id = $batch_id|g" $base_dir/app/configurations/batch/scheduler.conf
 }
 # Check to see if red5 is running
 check_red5(){
 	if pgrep -f red5 > /dev/null;then
-		returnval=yes
+		red5_status=yes
 	else
-		returnval=no
+		red5_status=no
 	fi
 }
 # Change the red5 service
@@ -120,9 +129,9 @@ set_red5(){
 }
 check_httpd(){
 	if pgrep -f httpd > /dev/null;then
-		returnval=yes
+		httpd_status=yes
 	else
-		returnval=no
+		httpd_status=no
 	fi
 }
 set_httpd(){
@@ -137,9 +146,9 @@ set_httpd(){
 # Both files must be present or DWH is assumed to be off
 check_dwh(){
 	if [[ -f /etc/cron.d/dwh && -f /etc/cron.d/dwh_crontab ]];then
-		returnval=yes
+		dwh_status=yes
 	else
-		returnval=no
+		dwh_status=no
 	fi
 }
 
@@ -154,22 +163,26 @@ set_dwh(){
 }
 while :
 do
+	# Check the status of each component
+	for var in check_transcode check_batch check_sphinx check_red5 check_httpd check_dwh;do
+		eval ${var}
+	done
 	#Display current status and options to modify the installation
-	printf "\nKaltura Version: %s\n\n" "$(cat $base_dir/app/VERSION.txt)"
-	printf "Select which mode you would like to switch\n\n"
-	check_transcode;transcode_status=$returnval
-	printf "(1) Transcoder: %s\n" "$transcode_status"
-	check_batch;batch_status=$returnval
-	printf "(2) Batch: %s\n" "$batch_status"
-	check_sphinx;sphinx_status=$returnval
-	printf "(3) Sphinx: %s\n" "$sphinx_status"
-	check_red5;red5_status=$returnval
-	printf "(4) Red5: %s\n" "$red5_status"
-	check_httpd;httpd_status=$returnval
-	printf "(5) API (httpd) %s\n" "$httpd_status"
-	check_dwh;dwh_status=$returnval
-	printf "(6) DWH %s\n" "$dwh_status"
-	printf "\n(q) Quit\n"
+	printf "\nKaltura Version: %s\n" "$(cat $base_dir/app/VERSION.txt)"
+	cat << EOL
+Select which mode you would like to switch
+	
+(1) Transcoder: $transcode_status
+(2) Batch: $batch_status ID: $batch_id
+(3) Sphinx: $sphinx_status
+(4) Red5: $red5_status
+(5) API (httpd): $httpd_status
+(6) DWH: $dwh_status
+(q) Quit\
+
+EOL
+
+# I don't like switch, that's why it's this way
 	read answer
 	if [[ $answer -eq 1 ]];then
 		set_transcode

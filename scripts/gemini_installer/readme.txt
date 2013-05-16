@@ -2,20 +2,14 @@ Script: Kaltura Gemini Auto Installer for On-Prem Installations
 
 todo
 
-kaltura uninstall, look for leftover in cron.d etc
-mysql: check into logic of three situations
-php main install exit error codes
-selector 
-	display and change batch id
-	fix transcode only mode and batch only mode
+write uninstaller
 
 Known bugs:
 -Failed to create symbolic link [/etc/nagios/conf.d/kaltura.commands.cfg], target [/opt/kaltura/app/plugins/monitor/nagios/config/commands.cfg] does not exist.
-- the main thumbnail is not listed in the thumbnail page, known backend bug
-- csv bulk upload does not work
+- the main thumbnail is not listed in the thumbnail page, known backend bug 
+- csv bulk upload does not work -?
+- rewrite bug in apache - did tantan fix this?
 
 Coming soon:
 
 mysql master/slave installation
-rollback for all components
-task selection for kaltura
