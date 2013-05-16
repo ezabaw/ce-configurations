@@ -26,7 +26,7 @@ while ($count <= $limit){
 	LocalPort => $port,
 	Proto => 'tcp',
 	Listen => SOMAXCONN,
-	ReusePort => 1
+	#ReusePort => 1
      );
      
      die "Could not create socket: $!\n" unless $sock;
