@@ -59,19 +59,6 @@ if ! yum -y install nc wget ed &>> $logfile | tee -a $logfile;then
     printf "Error: unable to install base software which is required by the auto installer\n" | tee -a $logfile
 	exit 1
 fi
-# Port verification
-printf "Checking ports to determine local firewall status:"
-for var in 80 443 1935;do 
-    perl start_net_listener.pl $var &> /dev/null &
-    disown
-    sleep 1;
-    if nc localhost $var <<< "quit" &> /dev/null;then
-        printf "\e[00;32m $var \e[00m"
-    else
-        printf "\e[00;31m $var \e[00m"
-    fi
-done
-pkill -f start_net_listener.pl &> /dev/null
 
 cat << EOL
 
