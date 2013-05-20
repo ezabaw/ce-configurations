@@ -11,7 +11,7 @@ install_ntp(){
 		service ntpd stop &>> $logfile
 		printf "Adjusting time using %s\n" "$ntp_server"
 		if ! ntpdate $ntp_server &>> $logfile;then
-			printf "Warning: unable to adjust time using ntpdate\n\tThis may be a firewall issue\n" | tee -a $logfile
+			printf "Warning: unable to adjust time using ntpdate,this may be a firewall issue\n" | tee -a $logfile
 		fi
 		if ! service ntpd start &>> $logfile;then
 			printf "Warning: unable to start ntp server\n" | tee -a $logfile

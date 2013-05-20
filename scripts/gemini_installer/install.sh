@@ -6,9 +6,8 @@
 # that is obtained from the svn, stripped of all svn meta data, and is in
 # .tar.bz2
 #
-version="0.1"
-source config.ini
 
+source config.ini
 for f in components/*.rc;do source $f;done
 
 
@@ -21,7 +20,7 @@ cat << EOL
                                                
 											   
 EOL
-printf "Gemini auto installer version %s\n" "$version" | tee -a $logfile
+printf "Gemini auto installer\n"
 printf "Kaltura install version %s\n" "$(grep -o '[0-9].*' installer/version.ini)" | tee -a $logfile
 printf "Execution Time: %s\n" "$(date)"
 
@@ -56,10 +55,23 @@ for var in log_file base_dir ntp_server mysql_host mysql_port mysql_user mysql_p
 done
 
 # Packages required for the installer to work
-if ! yum -y install wget ed &>> $logfile | tee -a $logfile;then
+if ! yum -y install nc wget ed &>> $logfile | tee -a $logfile;then
     printf "Error: unable to install base software which is required by the auto installer\n" | tee -a $logfile
 	exit 1
 fi
+# Port verification
+printf "Checking ports to determine local firewall status:"
+for var in 80 443 1935;do 
+    perl start_net_listener.pl $var &> /dev/null &
+    disown
+    sleep 1;
+    if nc localhost $var <<< "quit" &> /dev/null;then
+        printf "\e[00;32m $var \e[00m"
+    else
+        printf "\e[00;31m $var \e[00m"
+    fi
+done
+pkill -f start_net_listener.pl &> /dev/null
 
 cat << EOL
 
@@ -71,7 +83,8 @@ The following components will be installed
 	Pentaho: $pentaho
 	Kaltura: $kaltura
 	Patches: $patches
-	
+
+
 Proceed(y/n)?
 EOL
 read answer
@@ -102,6 +115,7 @@ if [[ $mysql -eq '1' ]];then
 	if ! install_mysql;then
 		exit 1
 	fi
+	create_new_db=y
 # Option 2 using existing server but install a new database
 elif [[ $mysql -eq '2' ]];then
 	printf "You specified an existing mysql server that doesn't contain a Kaltura database, checking connectivity\n" | tee -a $logfile
@@ -123,8 +137,7 @@ elif [[ $mysql -eq '3' ]];then
 	printf "You specified an existing mysql server that contains a Kaltura database, checking connectivity\n" | tee -a $logfile
 	# Test connectivity to the server
 	if ! do_query "quit" &> /dev/null;then
-		echo -e  "\e[00;31mError: unable to connect to the database server $mysql_host \e[00m" | tee -a $logfile
-		exit 1
+		echo -e  "\e[00;31mWarning: unable to connect to the database server $mysql_host \e[00m" | tee -a $logfile
 	else 
 		echo -e "\e[00;32mSuccess!\e[00m"
 	fi

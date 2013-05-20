@@ -1,10 +1,6 @@
 #The main installation of kaltura
 install_kaltura(){
 	installer_config=installer/installer/AppConfig.class.php
-	if [[ -z $archive_file ]];then
-		printf  "Warning: you didn't specify an archive files with the -a option\n" | tee -a $logfile
-	fi
-	mkdir -p $package_path
 		
 	# Check if there is an existing installation
 	if [[ -d $base_dir ]];then
@@ -17,25 +13,14 @@ install_kaltura(){
 			exit 1
 		fi
 	fi
-		
-	# Package extraction, compensates for existing directory. If you want make changes
-	# you should unpack it, specifiy that path (without package). Then say no below
-	if [[ -d $package_path/package ]];then
-		printf "An existing package directory found, remove (y/n)" |  tee -a $logfile
-		read answer
-		if [[ $answer == "y" ]];then
-			rm -rf $package_path/package
-			mkdir -p $package_path
-			printf "Extracting kaltura package archive\n" | tee -a $logfile
-			if ! tar -zxf $archive_file -C $package_path &>> $logfile;then
-				printf "Error: unable to extract archive\n" | tee -a $logfile
-				exit 1
-			fi
-		else
-			printf "Using existing package directory\n" | tee -a $logfile	
-		fi
+	# No archive file and no package directory
+	if [[ ! -f $archive_file ]];then
+		printf  "Error: archive file not found\n" | tee -a $logfile
+		exit 1
 	else
 		printf "Extracting kaltura package archive\n" | tee -a $logfile
+		rm -rf $package_path
+		mkdir -p $package_path
 		if ! tar -zxf $archive_file -C $package_path &>> $logfile;then
 			printf "Error: unable to extract archive\n" | tee -a $logfile
 			exit 1
