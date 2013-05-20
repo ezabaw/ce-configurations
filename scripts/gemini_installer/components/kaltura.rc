@@ -80,8 +80,9 @@ uninstall_kaltura(){
 	rm -r /etc/logrotate.d/kaltura*
 	rm -rf /etc/kaltura.d
 	rm -f /php.d/zzkaltura.ini
-	rm -f /httpd/conf.d/kaltura.conf
+	rm -f /etc/httpd/conf.d/kaltura.conf
 	rm -f /etc/init.d/kaltura*
 	rm -f /etc/init.d/red5
+	rm 
 	printf "Kaltura removed\n" | tee -a $logfile
 }

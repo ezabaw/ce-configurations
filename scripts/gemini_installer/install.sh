@@ -102,7 +102,7 @@ if [[ $mysql -eq '1' ]];then
 	if ! install_mysql;then
 		exit 1
 	fi
-	create_new_db=y
+	create_new_db=1
 # Option 2 using existing server but install a new database
 elif [[ $mysql -eq '2' ]];then
 	printf "You specified an existing mysql server that doesn't contain a Kaltura database, checking connectivity\n" | tee -a $logfile
@@ -119,7 +119,7 @@ elif [[ $mysql -eq '2' ]];then
 		exit 1
 	fi
 	# Sets the variable for the kaltura installation
-	create_new_db=y
+	create_new_db=1
 elif [[ $mysql -eq '3' ]];then
 	printf "You specified an existing mysql server that contains a Kaltura database, checking connectivity\n" | tee -a $logfile
 	# Test connectivity to the server
@@ -129,7 +129,7 @@ elif [[ $mysql -eq '3' ]];then
 		echo -e "\e[00;32mSuccess!\e[00m"
 	fi
 	# Sets the variable for the kaltura installation
-	create_new_db=n
+	create_new_db=0
 else
 	printf "Invalid option for MySQL settings in configuration, this variable is required\n" | tee -a $logfile
 fi

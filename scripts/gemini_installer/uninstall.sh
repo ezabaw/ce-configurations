@@ -46,3 +46,5 @@ cat << EOL
 	- Removes packages, Kaltura, and drops the database if it's local
 EOL
 
+read answer
+if [[ $answer -eq 1 ]];then
