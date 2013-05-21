@@ -56,7 +56,7 @@ done
 
 # Packages required for the installer to work
 if ! yum -y install nc wget ed &>> $logfile | tee -a $logfile;then
-    printf "Error: unable to install base software which is required by the auto installer\n" | tee -a $logfile
+    printf "\e[00;31mError:\e[00mError: unable to install base software which is required by the auto installer\n" | tee -a $logfile
 	exit 1
 fi
 
@@ -131,7 +131,7 @@ elif [[ $mysql -eq '3' ]];then
 	# Sets the variable for the kaltura installation
 	create_new_db=0
 else
-	printf "Invalid option for MySQL settings in configuration, this variable is required\n" | tee -a $logfile
+	printf "\e[00;33mWarning:\e[00m invalid option for MySQL settings in configuration, this variable is required,skipping\n" | tee -a $logfile
 fi
 
 # Pentaho

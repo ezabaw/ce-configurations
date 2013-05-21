@@ -79,10 +79,10 @@ uninstall_kaltura(){
 	rm -f /etc/dwh_crontab
 	rm -r /etc/logrotate.d/kaltura*
 	rm -rf /etc/kaltura.d
-	rm -f /php.d/zzkaltura.ini
+	rm -f /etc/php.d/zzkaltura.ini
 	rm -f /etc/httpd/conf.d/kaltura.conf
 	rm -f /etc/init.d/kaltura*
 	rm -f /etc/init.d/red5
-	rm 
+	find /etc/rc.d/ -name '*kaltura*' -exec rm -f {} \;
 	printf "Kaltura removed\n" | tee -a $logfile
 }

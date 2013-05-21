@@ -62,7 +62,7 @@ echo PHP_EOL;
 Logger::logColorMessage(Logger::COLOR_LIGHT_BLUE, Logger::LEVEL_USER, "Kaltura Video Platform - Server Installation");
 
 $downloadCode = false;
-$packageDir = realpath('/opt/kaltura-nfs/package');
+$packageDir = realpath('/tmp/kpackage/package');
 if($packageDir)
 	AppConfig::init($packageDir);
 else

@@ -5,7 +5,7 @@ install_pentaho(){
 		if [[ $answer == 'y' ]];then
 			uninstall_pentaho
 		else
-			exit 1
+			exit 0
 		fi
 	fi
 	if ! yum -y install java-1.6.0-openjdk &>> $logfile;then

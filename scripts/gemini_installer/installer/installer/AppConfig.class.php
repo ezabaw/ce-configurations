@@ -333,7 +333,7 @@ class AppConfig
 			self::initField(AppConfigAttribute::DB1_PORT, '3306');
 			self::initField(AppConfigAttribute::DB_ROOT_USER, 'root');
 			self::initField(AppConfigAttribute::DB_ROOT_PASS, 'temptemp');
-			self::initField(AppConfigAttribute::DB1_CREATE_NEW_DB, 'y');
+			self::initField(AppConfigAttribute::DB1_CREATE_NEW_DB, '1');
 			self::initField(AppConfigAttribute::SPHINX_SERVER1, ('127.0.0.1'));
 			self::initField(AppConfigAttribute::ENVIRONMENT_PROTOCOL, 'http');
 		}
