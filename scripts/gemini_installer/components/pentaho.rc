@@ -9,7 +9,7 @@ install_pentaho(){
 		fi
 	fi
 	if ! yum -y install java-1.6.0-openjdk &>> $logfile;then
-		printf "Error: unable to install java\n" | tee -a $logfile
+		printf "\e[00;31mError:\e[00m unable to install java\n" | tee -a $logfile
 	fi
 	mkdir -p /usr/local/pentaho
 	# Look for the file locally
@@ -19,12 +19,12 @@ install_pentaho(){
 	fi
 		
 	if ! tar zxf /tmp/pdi-ce-4.2.1-stable.tar.gz -C /usr/local/pentaho &>> $logfile;then
-		printf "Error: unable to unpack pentaho archive\n" | tee -a $logfile
+		printf "\e[00;31mError:\e[00m unable to unpack pentaho archive\n" | tee -a $logfile
 		exit 1
 	fi
 	mv /usr/local/pentaho/data-integration /usr/local/pentaho/pdi
     if ! chown -R $kuser:$kgroup /user/local/pentaho &>> $logfile;then
-		printf "Warning: unable to set permissions on pentaho, the user and group probably don't exist yet\n" | tee -a $logfile
+		printf "\e[00;33mWarning:\e[00m unable to set permissions on pentaho, the user and group probably don't exist yet\n" | tee -a $logfile
 	fi
 	printf "Pentaho sucessfully installed\n" | tee -a $logfile
 }

@@ -108,14 +108,14 @@ elif [[ $mysql -eq '2' ]];then
 	printf "You specified an existing mysql server that doesn't contain a Kaltura database, checking connectivity\n" | tee -a $logfile
 	# Test connectivity to the server
 	if ! do_query "quit" &> /dev/null;then
-		echo -e  "\e[00;31mError: unable to connect to the database server $mysql_host \e[00m" | tee -a $logfile
+		echo -e  "\e[00;31mError:\e[00m unable to connect to the database server $mysql_host" | tee -a $logfile
 		exit 1
 	else 
 		echo -e "\e[00;32mSuccess!\e[00m"
 	fi
 	# Check to make sure that a Kaltura database doesn't already exist
 	if do_query "use kaltura" &> /dev/null;then
-		echo -e "\e[00;31mError: a Kaltura database already exists on $mysql_host \e[00m" | tee -a $logfile
+		echo -e "\e[00;31mError:\e[00m a Kaltura database already exists on $mysql_host" | tee -a $logfile
 		exit 1
 	fi
 	# Sets the variable for the kaltura installation
@@ -124,7 +124,7 @@ elif [[ $mysql -eq '3' ]];then
 	printf "You specified an existing mysql server that contains a Kaltura database, checking connectivity\n" | tee -a $logfile
 	# Test connectivity to the server
 	if ! do_query "quit" &> /dev/null;then
-		echo -e  "\e[00;31mWarning: unable to connect to the database server $mysql_host \e[00m" | tee -a $logfile
+		echo -e  "\e[00;33mWarning:\e[00m unable to connect to the database server $mysql_host" | tee -a $logfile
 	else 
 		echo -e "\e[00;32mSuccess!\e[00m"
 	fi
@@ -154,7 +154,7 @@ fi
 if [[ $patches == 'yes' ]];then
 	printf "Applying Patches\n" | tee -a $logfile
 	if ! install_patches;then
-		printf "Warning: unable to apply some or all patches\n" | tee -a $logfile
+		printf "\e[00;33mWarning:\e[00m unable to apply some or all patches\n" | tee -a $logfile
 	fi
 fi
 

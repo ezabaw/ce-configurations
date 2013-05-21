@@ -15,14 +15,14 @@ install_kaltura(){
 	fi
 	# No archive file and no package directory
 	if [[ ! -f $archive_file ]];then
-		printf  "Error: archive file not found\n" | tee -a $logfile
+		printf  "\e[00;31mError:\e[00m archive file not found\n" | tee -a $logfile
 		exit 1
 	else
 		printf "Extracting kaltura package archive\n" | tee -a $logfile
 		rm -rf $package_path
 		mkdir -p $package_path
 		if ! tar -zxf $archive_file -C $package_path &>> $logfile;then
-			printf "Error: unable to extract archive\n" | tee -a $logfile
+			printf "\e[00;31mError:\e[00m unable to extract archive\n" | tee -a $logfile
 			exit 1
 		fi
 	fi
@@ -51,7 +51,7 @@ install_kaltura(){
 	printf "Starting main installer\n"  | tee -a $logfile	
 	cd installer
 	if ! php install.php -s | tee -a $logfile;then
-		printf "Error: main installation failed, %s\n" "$(tail $logfile)" |tee -a $logfile
+		printf "\e[00;31mError:\e[00m Main installation failed, %s\n" "$(tail $logfile)" |tee -a $logfile
 		exit 1
 	fi	
 	printf "Main installer has completed\n" | tee -a $logfile
