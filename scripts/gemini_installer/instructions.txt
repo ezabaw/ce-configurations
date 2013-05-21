@@ -4,21 +4,24 @@ The auto installer consists of two parts-
 
 1. The auto installer itself.
 
-2. An archive that consists of the Kaltura Gemini packages required for installation. This will be will be provided with the auto installer.
+2. An archive that consists of the Kaltura Gemini packages required for installation. This will be provided with the auto installer.
 
-Basic overview:
+Installation Step-by-Step
 
-The auto installer wraps around the main installer for Kaltura Gemini which provided two major enhancements. The first being that the auto installer configures system components and installs pre-prerequisites and the second is the presence of the Kaltura Gemini archive. The archive is a packaged version of the files normally downloaded by the main installer. Due to the location of the SVN server this package saves a great deal of time. The downside to the package archive file is that it may become out of date.
+1. In a directory with at least 4GB of free space on the server you wish to install
+	wget http://link.com/kaltura_gemini.tar.gz
+	wget http://link.com/gemini_autoinstaller.tar.gz
+	
+	
+2. Extract the contents of the auto installer into the current directory
+	tar -xvf gemini_autoinstaller.tar.gz
 
-Configuration:
-The configuration for the auto installer is done in the config.ini file located in the root directory of the installer. Components can be installed based on yes/no selection. All other options are explained in detail in the config.ini
+3. Configure the auto installer; the config.ini explains each option in detail
+	cd auto_installer
+	nano config.ini
 
-Usage:
+4. Execute the auto installer whilst specifying the archive file to use
+	./install.sh -a <archive_file>
 
-Both the auto installer and the package archive file should be copied to the server where Kaltura is to be installed. Configuration before installation is done via the config.ini file, inside this file you'll find detailed comments that describe what each option is for. The installer is invoked by running install.sh with the -a option specifying the location of the package archive file. The archive file should be in the tar.gz format and will be provided along with the auto installer
-
-Example:
-
-install.sh /root/kaltura_gemini.tar.gz
-
-
+	
+for document translator my email is christopher.deneen@kaltura.com
