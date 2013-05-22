@@ -2,12 +2,14 @@
 # Kaltura selector script
 # This changes the configuration of the kaltura installation provided by the first parameter
 
+source functions.rc
 usage () {
         printf "Usage: %s --b <kaltura_base_directory>\n" "$0"
 }
 
 base_dir=/opt/kaltura
 logfile=/var/log/installer.log
+
 
 while :
 do
@@ -91,10 +93,18 @@ set_batch(){
 		chkconfig kaltura_batch off
 	# Disable batch processing only but keep the transcoding
 	elif [[ $1 == "yes" && $transcode_status == "yes" ]];then
-		printf "This script does not yet support turning off batch but keeping transcode on\n"
+		
+		# In this section we have to backup all variables except the main and transcode optn
+		grep 
+		# Change the values to 0
+
+
 	# Re-enable batch processing that was disabled
 	elif [[ $1 == "no" && transcode_status == "yes" ]];then
-		printf "This script does not yet support turning on batch when transcode was already on\n"
+		
+		# In this section we restore the backed up variables
+
+
 	# Turn back on the entire server
 	else
 		service kaltura_batch start &>> $logfile

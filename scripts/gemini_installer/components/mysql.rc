@@ -16,6 +16,7 @@ install_mysql(){
 			uninstall_mysql
 		else
 			printf "Continuing the installation\n" | tee -a $logfile
+			return 0
 		fi
 	fi
 	# Install MySQL
@@ -88,6 +89,6 @@ uninstall_mysql(){
 		printf "\e[00;33mWarning:\e[00m unable to remove mysql-server package\n" | tee -a $logfile
 	fi
 	rm -rf /var/lib/mysql
-	cp /etc/my.cnf /etc/my.cnf.backup
+	mv /etc/my.cnf /etc/my.cnf.backup
 	printf "MySQL Sucessfully uninstalled\n"  | tee -a $logfile
 }

@@ -4,7 +4,7 @@ install_kaltura(){
 		
 	# Check if there is an existing installation
 	if [[ -d $base_dir ]];then
-		printf "A Kaltura installation already exists in %s\nShould I remove it(y/n)?" "$base_dir" | tee -a $logfile
+		printf "A Kaltura installation was detected or there are configuration files present" | tee -a $logfile
 		read answer
 		if [[ $answer == 'y' ]];then
 			uninstall_kaltura
@@ -30,8 +30,13 @@ install_kaltura(){
 	# Bring in fresh files
 	"cp" templates/AppConfig.class.php $installer_config &>> $logfile
 	"cp" templates/install.php installer/install.php &>> $logfile
+	"cp" templates/user_input.template.ini installer/user_input.template.ini &>> logfile
 	rm -f installer/user_input.ini &>> $logfile
 	printf "Configuring kaltura installer\n" | tee -a $logfilg
+	# Set 1
+	# Huge note- the reason I'm doing this modification of a php file is because
+	# when you do silent mode on the installer some values are hard coded and not taken from 
+	# user_input_template. 
 	sed -i "s|%TIME_ZONE%|$time_zone|g" $installer_config &>> $logfile
 	sed -i "s|%BASE_DIR%|$base_dir|g" $installer_config &>> $logfile
 	sed -i "s|%HOSTNAME%|$hostname|g" $installer_config &>> $logfile
@@ -44,7 +49,12 @@ install_kaltura(){
 	sed -i "s|%CREATE_NEW_DB%|$create_new_db|g" $installer_config &>> $logfile
 	sed -i "s|%SPHINX_HOST%|$sphinx_host|g" $installer_config &>> $logfile
 	sed -i "s|%KENVIORNMENT%|$kenvironment|g" $installer_config &>> $logfile
+	# Set 2 Package path, setting this so it doesn't try to get it from SVN
 	sed -i "s|%PACKAGE_PATH%|$package_path/package|g" installer/install.php &>> $logfile
+	# Set 3 Setting the database passwords to the newly generated ones
+	sed -i "s|DB1_PASS[[:space:]]*=[[:space:]]*.*|DB1_NAME=$mysql_kaltura_password|g" installer/user_input_template.ini
+	sed -i "s|DWH_PASS[[:space:]]*=[[:space:]]*.*|DB1_NAME=$mysql_etl_password|g" installer/user_input_template.ini
+	
 	
 	
 	# Run the installer in silent mode
@@ -62,6 +72,7 @@ install_kaltura(){
 	
 	# Add red5 service link
 	ln -s $base_dir/bin/red5/red5 /etc/init.d/red5
+	chkconfig red5 on
 }	
 
 uninstall_kaltura(){

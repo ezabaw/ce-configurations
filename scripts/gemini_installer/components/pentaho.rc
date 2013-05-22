@@ -5,7 +5,7 @@ install_pentaho(){
 		if [[ $answer == 'y' ]];then
 			uninstall_pentaho
 		else
-			exit 0
+			return 0
 		fi
 	fi
 	if ! yum -y install java-1.6.0-openjdk &>> $logfile;then
@@ -13,14 +13,14 @@ install_pentaho(){
 	fi
 	mkdir -p /usr/local/pentaho
 	# Look for the file locally
-	if [[ ! -f pdi-ce-4.2.1-stable.tar.gz ]]; then
+	if [[ ! -f $pentaho_file ]]; then
 		printf "Downloading Pentaho\n" | tee -a $logfile
-		wget -nv http://sourceforge.net/projects/pentaho/files/Data%20Integration/4.2.1-stable/pdi-ce-4.2.1-stable.tar.gz -O /tmp/pdi-ce-4.2.1-stable.tar.gz
+		wget http://sourceforge.net/projects/pentaho/files/Data%20Integration/4.2.1-stable/pdi-ce-4.2.1-stable.tar.gz -O /tmp/pdi-ce-4.2.1-stable.tar.gz
 	fi
 		
 	if ! tar zxf /tmp/pdi-ce-4.2.1-stable.tar.gz -C /usr/local/pentaho &>> $logfile;then
 		printf "\e[00;31mError:\e[00m unable to unpack pentaho archive\n" | tee -a $logfile
-		exit 1
+		return 1
 	fi
 	mv /usr/local/pentaho/data-integration /usr/local/pentaho/pdi
     if ! chown -R $kuser:$kgroup /user/local/pentaho &>> $logfile;then
@@ -29,7 +29,7 @@ install_pentaho(){
 	printf "Pentaho sucessfully installed\n" | tee -a $logfile
 }
 uninstall_pentaho(){
-	printf "Note: This will remove pentaho but keep java installed due to possible other dependancies\n" | tee -a $logfile
+	printf "Note: This will remove pentaho but keep java\n" | tee -a $logfile
 	rm -rf /usr/local/pentaho
 	printf "Pentaho sucessfully uninstalled\n"  | tee -a $logfile
 }

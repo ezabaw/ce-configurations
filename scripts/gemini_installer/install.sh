@@ -6,8 +6,9 @@
 # that is obtained from the svn, stripped of all svn meta data, and is in
 # .tar.bz2
 #
-
+source functions.rc
 source config.ini
+
 for f in components/*.rc;do source $f;done
 
 
@@ -26,7 +27,7 @@ printf "Execution Time: %s\n" "$(date)"
 
 
 usage () {
-	printf "Usage: %s --archive <kaltura_archive_name>\n" "$0"
+	printf "Usage: %s --archive <kaltura_archive_name>\n\t--pentaho <pentaho file>\n" "$0"
 }
 
 while :
@@ -40,7 +41,11 @@ do
 		archive_file=$2
 		shift 2
 		;;
-        *)  
+	-p | --pentaho)
+      	pentaho_file=$2
+		shift 2
+		;;
+	*)
         	break
         	;;
     esac
@@ -54,7 +59,7 @@ for var in log_file base_dir ntp_server mysql_host mysql_port mysql_user mysql_p
 	fi
 done
 
-# Packages required for the installer to work
+# Packages required for the installer to work, might want to speed this up by performing a check
 if ! yum -y install nc wget ed &>> $logfile | tee -a $logfile;then
     printf "\e[00;31mError:\e[00mError: unable to install base software which is required by the auto installer\n" | tee -a $logfile
 	exit 1
@@ -70,7 +75,6 @@ The following components will be installed
 	Pentaho: $pentaho
 	Kaltura: $kaltura
 	Patches: $patches
-
 
 Proceed(y/n)?
 EOL
@@ -99,10 +103,19 @@ fi
 # Option 1 install new MySQL server
 if [[ $mysql -eq '1' ]];then
 	printf "Installing and configuring MySQL\n" | tee -a $logfile
+	# Generate new passwords for kaltura and etl users
+	mysql_kaltura_password=$(</dev/urandom tr -dc A-Za-z0-9 | head -c15)
+	mysql_etl_password=$(</dev/urandom tr -dc A-Za-z0-9 | head -c15)
+	# Place those values into the config.ini file
+	write_param mysql_kaltura_password $mysql_kaltura_password config.ini
+	write_param mysql_etl_password $mysql_etl_password config.ini
+	# Call the mysql installer
 	if ! install_mysql;then
 		exit 1
 	fi
+	# For the kaltura installer
 	create_new_db=1
+
 # Option 2 using existing server but install a new database
 elif [[ $mysql -eq '2' ]];then
 	printf "You specified an existing mysql server that doesn't contain a Kaltura database, checking connectivity\n" | tee -a $logfile
@@ -118,8 +131,17 @@ elif [[ $mysql -eq '2' ]];then
 		echo -e "\e[00;31mError:\e[00m a Kaltura database already exists on $mysql_host" | tee -a $logfile
 		exit 1
 	fi
-	# Sets the variable for the kaltura installation
+	
+	# Generate new passwords for kaltura and etl users
+	mysql_kaltura_password=$(</dev/urandom tr -dc A-Za-z0-9 | head -c15)
+	mysql_etl_password=$(</dev/urandom tr -dc A-Za-z0-9 | head -c15)
+	# Place those values into the config.ini file
+	write_param mysql_kaltura_password $mysql_kaltura_password config.ini
+	write_param mysql_etl_password $mysql_etl_password config.ini
+	
+	# Set the option to create a new database	
 	create_new_db=1
+
 elif [[ $mysql -eq '3' ]];then
 	printf "You specified an existing mysql server that contains a Kaltura database, checking connectivity\n" | tee -a $logfile
 	# Test connectivity to the server
@@ -128,7 +150,6 @@ elif [[ $mysql -eq '3' ]];then
 	else 
 		echo -e "\e[00;32mSuccess!\e[00m"
 	fi
-	# Sets the variable for the kaltura installation
 	create_new_db=0
 else
 	printf "\e[00;33mWarning:\e[00m invalid option for MySQL settings in configuration, this variable is required,skipping\n" | tee -a $logfile
