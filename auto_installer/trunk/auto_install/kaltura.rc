@@ -96,7 +96,7 @@ setup_pentaho()
 		    echo "Archive does not exist or is corrupted."
 		    rm $INSTALL_DIR/pdi-ce-$PENTAHO_VER-stable.tar.gz*
 		    echo "Retrieving Pentaho.."
-		    wget $PENTAHO_URL
+		    wget $PENTAHO_URL -Opdi-ce-$PENTAHO_VER-stable.tar.gz
 		fi
 		set -e
 		echo "Extracting Pentaho archive and copying to $PENTAHO_DIR/pdi.."
