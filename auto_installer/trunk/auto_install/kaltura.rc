@@ -57,7 +57,8 @@ install_deps()
 		read YESNO
 		if [ "$YESNO" = 'y' ];then
 			yum -y install mysql-server
-			/etc/init.d/mysqld restart
+			#/etc/init.d/mysqld restart
+			service mysqld start
 			mysql_secure_installation
 		fi
 	fi
@@ -76,7 +77,7 @@ install_deps()
 		sed -i 's@^\[mysqld\]$@[mysqld]\nopen_files_limit = 20000\n@' $MY_CNF
 		echo "Setting max_allowed_packet = 16M in /etc/my.cnf.."
 		sed -i 's@^\[mysqld\]$@[mysqld]\nmax_allowed_packet = 16M\n@' $MY_CNF
-		if rpm -qf /etc/init.d/mysqld;then /etc/init.d/mysqld restart;chkconfig mysqld on;fi
+		if rpm -q mysql-server;then service mysqld restart;chkconfig mysqld on;fi
 	    fi
 	fi
 	for i in httpd memcached;do
@@ -225,8 +226,8 @@ install_batch()
 		/etc/init.d/$i stop
 		chkconfig $i off
 	done 
-	if [ "$DB1_HOST" != "localhost" -a -x "/etc/init.d/mysqld" ];then
-		/etc/init.d/mysqld stop
+	if [ "$DB1_HOST" != "localhost" ];then
+		service mysqld stop || true
 		chkconfig mysqld off
 	fi
 	echo "I also need a scheduler ID?"           
@@ -256,8 +257,8 @@ install_sphinx()
 		/etc/init.d/$i stop
 		chkconfig $i off
 	done
-	if [ "$DB1_HOST" != "localhost" -a -x "/etc/init.d/mysqld" ];then
-		/etc/init.d/mysqld stop
+	if [ "$DB1_HOST" != "localhost" ];then
+		service mysqld stop || true
 		chkconfig mysqld off
 	fi
 	/etc/init.d/sphinx_watch.sh restart
@@ -282,8 +283,8 @@ install_api()
 		/etc/init.d/$i stop
 		chkconfig $i off
 	done
-	if [ "$DB1_HOST" != "localhost" -a -x "/etc/init.d/mysqld" ];then
-		/etc/init.d/mysqld stop
+	if [ "$DB1_HOST" != "localhost" ];then
+		service mysqld stop
 		chkconfig mysqld off
 	fi
 	if [ "$SPHINX_DB_HOST" != "localhost" ];then
@@ -617,8 +618,8 @@ configure_batch()
 	ln -sf $APP_CONF_DIR/apache/my_kaltura_apiv3.conf /etc/httpd/conf.d/
 	/etc/init.d/httpd restart
 	/etc/init.d/serviceBatchMgr.sh restart
-	if [ "$DB1_HOST" != "localhost" -a -x "/etc/init.d/mysqld" ];then
-		/etc/init.d/mysqld stop
+	if [ "$DB1_HOST" != "localhost" ];then
+		service mysqld stop || true
 		chkconfig mysqld off
 	fi
 	for i in httpd serviceBatchMgr.sh;do
@@ -633,8 +634,8 @@ configure_batch()
 configure_sphinx()
 {
 
-	if [ "$DB1_HOST" != "localhost" -a -x "/etc/init.d/mysqld" ];then
-		/etc/init.d/mysqld stop
+	if [ "$DB1_HOST" != "localhost" ];then
+		service mysqld stop || true
 		chkconfig mysqld off
 	fi
 	/etc/init.d/sphinx_watch.sh restart
@@ -649,8 +650,8 @@ configure_sphinx()
 
 configure_api()
 {
-	if [ "$DB1_HOST" != "localhost" -a -x "/etc/init.d/mysqld" ];then
-		/etc/init.d/mysqld stop
+	if [ "$DB1_HOST" != "localhost" ];then
+		service mysqld stop || true
 		chkconfig mysqld off
 	fi
 	clear_host_from_scheduler
