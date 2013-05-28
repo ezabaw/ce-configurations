@@ -416,8 +416,8 @@ while($vpns = $result->fetchArray(SQLITE3_ASSOC)){
 	    echo '<li>Type: <input type=text class=k-textbox id="'.$vpn['id'].'_type" value="'.$vpn['vpn_type'].'"></il><br>';
 	    echo '<li>Gateway: <input type=text class=k-textbox id="'.$vpn['id'].'_gateway" value="'.$vpn['gateway'].'"></il><br>';
 	    echo '<li>User: <input type=text class=k-textbox id="'.$vpn['id'].'_username" value="'.$vpn['username'].'"></il><br>';
-	    echo '<li>Passwd: <input type=password class=k-textbox id="'.$vpn['id'].'_passwd" value="'.$vpn['passwd'].'"  onfocus="javascript:show_passwd(this)" ></il><br>';
-	    echo '<div id="alt" alt="'.$vpn['notes'].'"><li>Notes: <textarea class=k-textbox id="'.$vpn['id'].'_notes" rows=3 alt="'.$vpn['notes'].'">'.$vpn['notes'].'</textarea></div><br>
+	    echo '<li>Passwd: <input type=password class=k-textbox id="'.$vpn['id'].'_passwd" value="'.$vpn['passwd'].'"  onfocus="javascript:show_passwd(this)" ></il><br>
+	   <div id="alt" alt="'.$vpn['notes'].'"><li>Notes: <textarea class=k-textbox id="'.$vpn['id'].'_notes" rows=3 alt="'.$vpn['notes'].'">'.$vpn['notes'].'</textarea><br>
 	<input type=button id="'.$vpn['id'].'_update_vpn" value="Update" onclick="javascript:update_vpn(\''.$vpn['id'].'\')"><br>
 	    </div><br>
 	<div id="vpn_message_'.$vpn['id'].'" class=hidden></div><br>';
