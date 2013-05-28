@@ -43,9 +43,7 @@ while true; do
 	- Remove all kaltura components
 (2) Wipe Kaltura database
 	- Drop all kaltura databse
-(3) Return system to clean state
-	- Removes packages, Kaltura, and drops the database if it's local
-(4) Quit
+(q) Quit
 EOL
 
 	read answer
@@ -79,7 +77,7 @@ EOL
 		done
 	elif [[ $answer -eq 3 ]];then
 		printf "Not done yet\n"
-	elif [[ $answer -eq 4 ]];then
+	elif [[ $answer == 'q' ]];then
 		exit 0
 	else
 		printf "Invalid selection\n\n"

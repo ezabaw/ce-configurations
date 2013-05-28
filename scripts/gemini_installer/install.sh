@@ -6,7 +6,7 @@
 # that is obtained from the svn, stripped of all svn meta data, and is in
 # .tar.bz2
 #
-source functions.rc
+source utils/functions.rc
 source config.ini
 
 for f in components/*.rc;do source $f;done
