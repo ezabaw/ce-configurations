@@ -5,7 +5,7 @@ install_prereq() {
 
 # Install required packages
 printf "Installing required packages\n" | tee -a $logfile
-if ! yum -y install postfix php-gd php-pdo php-mysql php-pecl-apc php-soap php-common php php-pear php-xml php-devel php-mbstring php-xmlrpc php-cli php-curl memcached zlib.i686 bzip2-libs.i686 glibc.i686 ImageMagick ncurses-libs.i686 httpd php-pecl-memcache dos2unix mysql rsync mailx cronie wget memcached git svn bind-utils gcc make telnet man php-devel libssh2 libssh2-devel &>> $logfile; then
+if ! yum -y install postfix php-gd php-pdo php-mysql php-pecl-apc php-soap php-common php php-pear php-xml php-devel php-mbstring php-xmlrpc php-cli php-curl memcached zlib.i686 bzip2-libs.i686 glibc.i686 ImageMagick ncurses-libs.i686 httpd php-pecl-memcache dos2unix mysql rsync mailx cronie wget memcached git svn bind-utils gcc make telnet man php-devel libssh2 libssh2-devel mod_ssl &>> $logfile; then
 	printf "Installationg of packages failed\n" | tee -a $logfile
 	return 1
 fi
