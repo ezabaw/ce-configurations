@@ -1,0 +1,14 @@
+#
+# Several useful functions to assist the main program
+# Read a parameter value from the syntax parameter=value
+# (paramter,file)
+read_param() {
+	line=$(grep -E "$1[[:space:]]*=*" $2)
+	returnval=$(echo $line  | awk 'BEGIN { FS="=|=>" } { print $2 }' | tr -d ' |" | ,')
+	}
+# Write a parameter value from the syntax parameter=value
+# (paramter,new_value,file)
+write_param() {
+	sed -i "s|$1[[:space:]]*=[[:space:]]*.*|$1=$2|g" $3
+}
+
