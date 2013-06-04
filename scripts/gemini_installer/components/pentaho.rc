@@ -16,7 +16,7 @@ install_pentaho(){
 	if [[ ! -f $pentaho_file ]]; then
 		printf "Pentaho file not specified, downloading Pentaho\n" | tee -a $logfile
 		wget http://sourceforge.net/projects/pentaho/files/Data%20Integration/4.2.1-stable/pdi-ce-4.2.1-stable.tar.gz -O /tmp/pdi-ce-4.2.1-stable.tar.gz
-        $pentaho_file = "/tmp/pdi-ce-4.2.1-stable.tar.gz"
+        pentaho_file="/tmp/pdi-ce-4.2.1-stable.tar.gz"
 	fi
 		
 	if ! tar zxf "$pentaho_file" -C /usr/local/pentaho &>> $logfile;then

@@ -4,7 +4,7 @@ install_kaltura(){
 		
 	# Check if there is an existing installation
 	if [[ -d $base_dir ]];then
-		printf "A Kaltura installation was detected or there are configuration files present" | tee -a $logfile
+		printf "A Kaltura installation was detected or there are configuration files present remove?(y/n)" | tee -a $logfile
 		read answer
 		if [[ $answer == 'y' ]];then
 			uninstall_kaltura
