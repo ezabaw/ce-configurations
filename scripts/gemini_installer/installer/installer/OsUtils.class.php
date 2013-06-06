@@ -36,11 +36,11 @@ class OsUtils {
 	{
 		if(!$path)
 			return null;
-			
+
 		$path = str_replace('/', '\\', $path);
 		if($path[0] == '\\')
 			$path = realpath('/') . ltrim($path, '\\');
-			
+
 		return $path;
 	}
 
@@ -48,7 +48,7 @@ class OsUtils {
 	public static function getComputerName() {
 		if(isset($_ENV['COMPUTERNAME'])) {
 			Logger::logMessage(Logger::LEVEL_INFO, "Host name: ".$_ENV['COMPUTERNAME']);
-	    	return $_ENV['COMPUTERNAME'];
+		return $_ENV['COMPUTERNAME'];
 		} else if (isset($_ENV['HOSTNAME'])) {
 			Logger::logMessage(Logger::LEVEL_INFO, "Host name: ".$_ENV['HOSTNAME']);
 			return $_ENV['HOSTNAME'];
@@ -89,7 +89,7 @@ class OsUtils {
 	public static function getOsLsb() {
 		if(!self::isLinux())
 			return null;
-			
+
 		$dist = OsUtils::executeWithOutput("lsb_release -d");
 		if($dist)
 		{
@@ -130,7 +130,7 @@ class OsUtils {
 			}
 			else
 			{
-				if(preg_match('/[=&;]/', $value))
+				if(preg_match('/[=&;!@#$%^*()-+{}:?]/', $value))
 					$value = '"' . trim($value, '"') . '"';
 
 				$data .= "$key=$value" . PHP_EOL;
@@ -163,10 +163,10 @@ class OsUtils {
 	{
 		$propertyFile = AppConfig::getFilePath();
 		$options = array();
-		
+
 		if(AppConfig::get(AppConfigAttribute::VERBOSE))
 			$options[] = '-verbose';
-			
+
 		foreach($attributes as $attribute => $value)
 		{
 			if(OsUtils::getOsName() == OsUtils::WINDOWS_OS)
@@ -177,7 +177,7 @@ class OsUtils {
 			$options[] = "-D{$attribute}={$value}";
 		}
 		$options = implode(' ', $options);
-		
+
 		return "phing -propertyfile $propertyFile $options $target";
 	}
 
@@ -227,7 +227,7 @@ class OsUtils {
 	{
 		if(!OsUtils::isLinux())
 			return false;
-			
+
 		if($alwaysStartAutomtically)
 			OsUtils::execute("chkconfig $service on");
 
@@ -238,7 +238,7 @@ class OsUtils {
 	{
 		if(!OsUtils::isLinux())
 			return false;
-			
+
 		if($neverStartAutomtically)
 			OsUtils::executeInBackground("chkconfig $service off");
 
@@ -371,15 +371,16 @@ class OsUtils {
 			$target = self::windowsPath($target);
 			if(is_dir($source))
 				return self::execute("xcopy /Y /S /R /Q $source $target");
-				
+
 			return self::execute("copy /Y $source $target");
 		}
-		
+
 		return self::execute("cp -r $source $target");
 	}
-	
+
 	public static function symlink($target, $link)
 	{
+		Logger::logMessage(Logger::LEVEL_INFO, "Create symbolic link target [$target], link [$link]");
 		if(strpos($link, '*') > 0)
 		{
 			list($basePath, $linkPath) = explode('*', $link, 2);
@@ -390,7 +391,7 @@ class OsUtils {
 				Logger::logMessage(Logger::LEVEL_INFO, "Failed to create symbolic link from $link to $target, path [$basePath] not found.");
 				return false;
 			}
-			
+
 			foreach($basePaths as $basePath)
 			{
 				$link = "$basePath/$linkPath";
@@ -402,23 +403,23 @@ class OsUtils {
 			}
 			return true;
 		}
-		
+
 		if(!file_exists(dirname($link)))
 			mkdir(dirname($link), 0755, true);
 
 		if(file_exists($link))
 			unlink($link);
-	
+
 		if(self::isWindows())
 		{
 			$target = self::windowsPath($target);
 			$link = self::windowsPath($link);
 			return self::execute("mklink $link $target");
 		}
-		
+
 		return symlink($target, $link);
 	}
-	
+
 	// full copy $source to $target and return true/false according to success
 	public static function rsync($source, $target, $options = "") {
 		if(self::isWindows())
@@ -427,7 +428,7 @@ class OsUtils {
 			$target = self::windowsPath($target);
 			return self::fullCopy($source, $target);
 		}
-			
+
 		return self::execute("rsync -r $options $source $target");
 	}
 
@@ -441,10 +442,10 @@ class OsUtils {
 				$path = self::windowsPath($path);
 				if(is_dir($path))
 					return self::execute("rd /F /Q $path");
-					
+
 				return self::execute("del /S /Q $path");
 			}
-				
+
 			return self::execute("rm -rf $path");
 		}
 
@@ -498,12 +499,12 @@ class OsUtils {
 		$res = array();
 		foreach($valuesArray as $key => $val)
 	    {
-	        if(is_array($val))
-	        {
-	            $res[] = "[$key]";
-	            foreach($val as $skey => $sval) $res[] = "$skey = ".(is_numeric($sval) ? $sval : '"'.$sval.'"');
-	        }
-	        else $res[] = "$key = ".(is_numeric($val) ? $val : '"'.$val.'"');
+		if(is_array($val))
+		{
+		    $res[] = "[$key]";
+		    foreach($val as $skey => $sval) $res[] = "$skey = ".(is_numeric($sval) ? $sval : '"'.$sval.'"');
+		}
+		else $res[] = "$key = ".(is_numeric($val) ? $val : '"'.$val.'"');
 	    }
 		file_put_contents($file, implode("\r\n", $res));
 	}

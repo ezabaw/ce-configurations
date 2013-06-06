@@ -63,6 +63,7 @@ class AppConfigAttribute
 	const DB3_NAME = 'DB3_NAME';
 
 	const SPHINX_SERVER = 'SPHINX_SERVER';
+	const SPHINX_SERVER_INDEX = 'SPHINX_SERVER_INDEX';
 	const SPHINX_SERVER1 = 'SPHINX_SERVER1';
 	const SPHINX_SERVER2 = 'SPHINX_SERVER2';
 	const SPHINX_DB_HOST = 'SPHINX_DB_HOST';
@@ -165,6 +166,7 @@ class AppConfigAttribute
         
 	const SSL_CERTIFICATE_FILE = 'SSL_CERTIFICATE_FILE';
 	const SSL_CERTIFICATE_KEY_FILE = 'SSL_CERTIFICATE_KEY_FILE';
+	const SSL_CERTIFICATE_CHAIN_FILE = 'SSL_CERTIFICATE_CHAIN_FILE';
 
 	const KMC_VERSION = 'KMC_VERSION';
 	const CLIPAPP_VERSION = 'CLIPAPP_VERSION';
@@ -295,16 +297,24 @@ class AppConfig
 		}
 	}
 
+	public static function getUserInputFilePath()
+	{
+		if(!self::$inputFilePath)
+			self::$inputFilePath = realpath(__DIR__ . '/../') . '/user_input.ini';
+			
+		return self::$inputFilePath;
+	}
+
 	/**
 	 * Initialize all configuration variables from ini file or from wizard
 	 */
 	public static function configure($silentRun = false, $configOnly = false)
 	{
-		self::$inputFilePath = realpath(__DIR__ . '/../') . '/user_input.ini';
+		$inputFilePath = self::getUserInputFilePath();
 
-		if(file_exists(self::$inputFilePath) && ($silentRun || self::getTrueFalse(null, "Installation configuration has been detected, do you want to use it?", 'y')))
+		if(file_exists($inputFilePath) && ($silentRun || self::getTrueFalse(null, "Installation configuration has been detected, do you want to use it?", 'y')))
 		{
-			$fileConfig = parse_ini_file(self::$inputFilePath, true);
+			$fileConfig = parse_ini_file($inputFilePath, true);
 			if(isset($fileConfig[AppConfigAttribute::VERBOSE]))
 				unset($fileConfig[AppConfigAttribute::VERBOSE]);
 			
@@ -341,8 +351,7 @@ class AppConfig
 		{
 			self::getInput(AppConfigAttribute::TIME_ZONE, "Default time zone for Kaltura application (leave empty to use system timezone: " . date_default_timezone_get() . ")", "Timezone must be a valid timezone, please enter again", InputValidator::createTimezoneValidator(), date_default_timezone_get());
 
-			self::initField(AppConfigAttribute::BASE_DIR, '/opt/kaltura');
-//			self::getInput(AppConfigAttribute::BASE_DIR, "Full target directory path for Kaltura application (leave empty for /opt/kaltura)", "Target directory must be a valid directory path, please enter again", InputValidator::createDirectoryValidator(), '/opt/kaltura');
+			self::getInput(AppConfigAttribute::BASE_DIR, "Full target directory path for Kaltura application (leave empty for /opt/kaltura)", "Target directory must be a valid directory path, please enter again", InputValidator::createDirectoryValidator(), '/opt/kaltura');
 
 			self::getInput(AppConfigAttribute::KALTURA_FULL_VIRTUAL_HOST_NAME, "Please enter the domain name that will be used for the Kaltura server (without http://, leave empty for $hostname)", 'Must be a valid hostname or ip, please enter again', InputValidator::createHostValidator(), $hostname);
 
@@ -383,6 +392,7 @@ class AppConfig
 			{
 				self::getInput(AppConfigAttribute::SSL_CERTIFICATE_FILE, "SSL certificate file path", 'File not found', InputValidator::createFileValidator());
 				self::getInput(AppConfigAttribute::SSL_CERTIFICATE_KEY_FILE, "SSL certificate key file path", 'File not found', InputValidator::createFileValidator());
+				self::getInput(AppConfigAttribute::SSL_CERTIFICATE_CHAIN_FILE, "SSL certificate chain file path", 'File not found', InputValidator::createFileValidator());
 			}
 			
 			self::initField(AppConfigAttribute::ENVIRONMENT_PROTOCOL, 'http');
@@ -398,7 +408,9 @@ class AppConfig
 		
 			if(in_array('populate', self::$components))
 			{
-				self::set(AppConfigAttribute::SPHINX_SERVER, self::getCurrentMachineConfig(AppConfigAttribute::SPHINX_SERVER));
+				$sphinxServerIndex = self::getCurrentMachineConfig(AppConfigAttribute::SPHINX_SERVER_INDEX);
+				if($sphinxServerIndex)
+					self::set(AppConfigAttribute::SPHINX_SERVER, self::get(AppConfigAttribute::SPHINX_SERVER . $sphinxServerIndex));
 			}
 		}
 		self::initField(AppConfigAttribute::SPHINX_SERVER, self::get(AppConfigAttribute::SPHINX_SERVER1));
@@ -608,7 +620,7 @@ class AppConfig
 		self::initField(AppConfigAttribute::VERIFY_INSTALLATION, true);
 		self::initField(AppConfigAttribute::DEPLOY_KMC, true);
 
-		OsUtils::writeConfigToFile(self::$config, self::$inputFilePath);
+		OsUtils::writeConfigToFile(self::$config, $inputFilePath);
 
 		$scheulderTemplate = self::getCurrentMachineConfig(AppConfigAttribute::BATCH_SCHEDULER_TEMPLATE);
 		if(!$scheulderTemplate)
@@ -701,6 +713,7 @@ class AppConfig
 			'batch' => 'Batch Server',
 			'red5' => 'Media Server (red5)',
 			'monitor' => 'Monitor (nagios)',
+			'cleanup' => 'Old content cleanup',
 		);
 
 		$sphinxPopulateAvailableServers = array(
@@ -859,12 +872,12 @@ class AppConfig
 
 						$message = "Please select the sphinx synchronizer that will be installed on $hostname sphinx synchronizer server.";
 						$sphinxPopulateAvailableServer = self::getInput(null, $message, 'Invalid sphinx synchronizer selected, please enter again', InputValidator::createEnumValidator(array_keys($sphinxPopulateAvailableServers)));
-						$hostConfig[AppConfigAttribute::SPHINX_SERVER] = $sphinxPopulateAvailableServer;
+						$hostConfig[AppConfigAttribute::SPHINX_SERVER_INDEX] = $sphinxPopulateAvailableServer;
 						unset($sphinxPopulateAvailableServers[$sphinxPopulateAvailableServer]);
 					}
 					elseif(count($sphinxPopulateAvailableServers) == 1)
 					{
-						$hostConfig[AppConfigAttribute::SPHINX_SERVER] = reset(array_keys($sphinxPopulateAvailableServers));
+						$hostConfig[AppConfigAttribute::SPHINX_SERVER_INDEX] = reset(array_keys($sphinxPopulateAvailableServers));
 					}
 					else
 					{
@@ -925,9 +938,25 @@ class AppConfig
 		return true;
 	}
 
-	public static function setCurrentMachineComponents(array $components)
+	public static function setCurrentMachineComponents(array $components = null)
 	{
+		if(!$components)
+		{
+			$components = array('*');
+			
+			$config = self::getCurrentMachineConfig();
+			if($config && isset($config['components']))
+				$components = explode(',', $config['components']);
+		}
 		self::$components = $components;
+
+		if(in_array('*', self::$components) || in_array('api', self::$components) || in_array('apps', self::$components) || in_array('var', self::$components) || in_array('admin', self::$components))
+		{
+			if(self::get(AppConfigAttribute::ENVIRONMENT_PROTOCOL) == 'https' && !in_array('ssl', self::$components))
+				self::$components[] = 'ssl';
+		}
+
+		Logger::logMessage(Logger::LEVEL_INFO, "Selected components: " . implode(', ', self::$components));
 	}
 
 	public static function componentDefined($component)
@@ -938,22 +967,9 @@ class AppConfig
 	
 	public static function getCurrentMachineComponents()
 	{
-		if(self::$components)
-			return self::$components;
-			
-		self::$components = array('*');
-
-		$config = self::getCurrentMachineConfig();
-		if($config && isset($config['components']))
-			self::$components = explode(',', $config['components']);
-
-		if(in_array('*', self::$components) || in_array('api', self::$components) || in_array('apps', self::$components) || in_array('var', self::$components) || in_array('admin', self::$components))
-		{
-			if(self::get(AppConfigAttribute::ENVIRONMENT_PROTOCOL) == 'https' && !in_array('ssl', self::$components))
-				self::$components[] = 'ssl';
-		}
-
-		Logger::logMessage(Logger::LEVEL_INFO, "Selected components: " . implode(', ', self::$components));
+		if(!self::$components)
+			self::setCurrentMachineComponents();
+		
 		return self::$components;
 	}
 

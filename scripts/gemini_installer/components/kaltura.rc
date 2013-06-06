@@ -60,7 +60,7 @@ install_kaltura(){
 	# Run the installer in silent mode
 	printf "Starting main installer\n"  | tee -a $logfile	
 	cd installer
-	if ! php install.php -s | tee -a $logfile;then
+	if ! php install.php -s -a| tee -a $logfile;then
 		printf "\e[00;31mError:\e[00m Main installation failed, %s\n" "$(tail $logfile)" |tee -a $logfile
 		exit 1
 	fi	
