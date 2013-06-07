@@ -76,7 +76,7 @@ The following components will be installed
 	Kaltura: $kaltura
 	Patches: $patches
 
-Proceed(y/n)?
+Proceed?(y/n)
 EOL
 read answer
 if [[ $answer != 'y' ]];then

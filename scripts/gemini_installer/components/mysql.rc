@@ -10,7 +10,7 @@ do_query() {
 install_mysql(){
 	# Check to make sure mysql isn't already installed or running
 	if rpm -qa |grep 'mysql-server';then
-		printf "MySQL appears to already be installed, should I remove it? (y/n)?" | tee -a $logfile
+		printf "MySQL appears to already be installed, should I remove it? (y/n)" | tee -a $logfile
 		read answer
 		if [[ $answer == 'y' ]]; then
 			uninstall_mysql

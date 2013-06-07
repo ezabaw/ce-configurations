@@ -13,11 +13,25 @@ install_kaltura(){
 			exit 1
 		fi
 	fi
-	# No archive file and no package directory
-	if [[ ! -f $archive_file ]];then
-		printf  "\e[00;31mError:\e[00m archive file not found\n" | tee -a $logfile
-		exit 1
-	else
+	# What directory to use
+	if [[ -d $package_path ]];then
+		printf "An existing package directory has been detected, use this instead of extracting the archive? (y/n)\n" | tee -a $logfile
+		read answer
+		if [[ $answer != 'y' ]];then
+			if [[ ! -f $archive_file ]];then
+				printf  "\e[00;31mError:\e[00m archive file not found\n" | tee -a $logfile
+				exit 1
+			else
+				printf "Extracting kaltura package archive\n" | tee -a $logfile
+				rm -rf $package_path
+				mkdir -p $package_path
+				if ! tar -zxf $archive_file -C $package_path &>> $logfile;then
+					printf "\e[00;31mError:\e[00m unable to extract archive\n" | tee -a $logfile
+					exit 1
+				fi
+			fi
+		fi
+	elif [[ -f $archive_file ]];then
 		printf "Extracting kaltura package archive\n" | tee -a $logfile
 		rm -rf $package_path
 		mkdir -p $package_path
@@ -25,13 +39,17 @@ install_kaltura(){
 			printf "\e[00;31mError:\e[00m unable to extract archive\n" | tee -a $logfile
 			exit 1
 		fi
+	else
+		printf "Neither a kaltura package file or package directory was found\n" | tee -a $logfile
+			exit 1
 	fi
 	
 	# Bring in fresh files
 	"cp" templates/AppConfig.class.php $installer_config &>> $logfile
 	"cp" templates/install.php installer/install.php &>> $logfile
-	"cp" templates/user_input.template.ini installer/user_input.template.ini &>> logfile
+	"cp" templates/user_input.template.ini installer/user_input.template.ini &>> $logfile
 	rm -f installer/user_input.ini &>> $logfile
+	
 	printf "Configuring kaltura installer\n" | tee -a $logfilg
 	# Set 1
 	# Huge note- the reason I'm doing this modification of a php file is because
@@ -49,15 +67,14 @@ install_kaltura(){
 	sed -i "s|%CREATE_NEW_DB%|$create_new_db|g" $installer_config &>> $logfile
 	sed -i "s|%SPHINX_HOST%|$sphinx_host|g" $installer_config &>> $logfile
 	sed -i "s|%KENVIORNMENT%|$kenvironment|g" $installer_config &>> $logfile
-	# Set 2 Package path, setting this so it doesn't try to get it from SVN
+	# Set 2 Package path, setting this so it doesn't try to checkout Kaltura from the SVN
 	sed -i "s|%PACKAGE_PATH%|$package_path/package|g" installer/install.php &>> $logfile
 	# Set 3 Setting the database passwords to the newly generated ones
 	sed -i "s|DB1_PASS[[:space:]]*=[[:space:]]*.*|DB1_NAME=$mysql_kaltura_password|g" installer/user_input.template.ini
 	sed -i "s|DWH_PASS[[:space:]]*=[[:space:]]*.*|DB1_NAME=$mysql_etl_password|g" installer/user_input.template.ini
 	
 	
-	
-	# Run the installer in silent mode
+	# Run the installer in silent mode (-s) with automatic activation key (-a)
 	printf "Starting main installer\n"  | tee -a $logfile	
 	cd installer
 	if ! php install.php -s -a| tee -a $logfile;then
@@ -69,9 +86,7 @@ install_kaltura(){
 	# Change the verbosity on log files
 	printf "Changing priority of log files to 5\n" | tee -a $logfile
 	sed -i 's/priority.priority = 7/priority.priority = 5/g' $base_dir/app/configurations/logger.ini
-	
-	# Add red5 service link
-	ln -s $base_dir/bin/red5/red5 /etc/init.d/red5
+
 	chkconfig red5 on
 }	
 

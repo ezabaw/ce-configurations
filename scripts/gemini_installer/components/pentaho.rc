@@ -1,6 +1,6 @@
 install_pentaho(){
 	if [[ -d /usr/local/pentaho ]];then
-		printf "Warning: Pentaho appears to be installed already, should I remove it(y/n)?"
+		printf "Warning: Pentaho appears to be installed already, should I remove it? (y/n)"
 		read answer
 		if [[ $answer == 'y' ]];then
 			uninstall_pentaho
