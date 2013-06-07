@@ -70,8 +70,8 @@ install_kaltura(){
 	# Set 2 Package path, setting this so it doesn't try to checkout Kaltura from the SVN
 	sed -i "s|%PACKAGE_PATH%|$package_path/package|g" installer/install.php &>> $logfile
 	# Set 3 Setting the database passwords to the newly generated ones
-	sed -i "s|DB1_PASS[[:space:]]*=[[:space:]]*.*|DB1_NAME=$mysql_kaltura_password|g" installer/user_input.template.ini
-	sed -i "s|DWH_PASS[[:space:]]*=[[:space:]]*.*|DB1_NAME=$mysql_etl_password|g" installer/user_input.template.ini
+	sed -i "s|DB1_PASS[[:space:]]*=[[:space:]]*.*|DB1_PASS=$mysql_kaltura_password|g" installer/user_input.template.ini
+	sed -i "s|DWH_PASS[[:space:]]*=[[:space:]]*.*|DWH_PASS=$mysql_etl_password|g" installer/user_input.template.ini
 	
 	
 	# Run the installer in silent mode (-s) with automatic activation key (-a)

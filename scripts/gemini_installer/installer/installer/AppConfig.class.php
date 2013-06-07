@@ -339,9 +339,9 @@ class AppConfig
 			self::initField(AppConfigAttribute::KALTURA_FULL_VIRTUAL_HOST_NAME, 'gemini.com');
 			self::initField(AppConfigAttribute::ADMIN_CONSOLE_ADMIN_MAIL, 'christopher.deneen@kaltura.com');
 			self::initField(AppConfigAttribute::ADMIN_CONSOLE_PASSWORD, 'temptemp');
-			self::initField(AppConfigAttribute::DB1_HOST, '192.168.0.37');
+			self::initField(AppConfigAttribute::DB1_HOST, 'localhost');
 			self::initField(AppConfigAttribute::DB1_PORT, '3306');
-			self::initField(AppConfigAttribute::DB_ROOT_USER, 'root2');
+			self::initField(AppConfigAttribute::DB_ROOT_USER, 'root');
 			self::initField(AppConfigAttribute::DB_ROOT_PASS, 'temptemp');
 			self::initField(AppConfigAttribute::DB1_CREATE_NEW_DB, '1');
 			self::initField(AppConfigAttribute::SPHINX_SERVER1, ('127.0.0.1'));
