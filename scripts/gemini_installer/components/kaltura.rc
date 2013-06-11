@@ -87,7 +87,7 @@ install_kaltura(){
 	printf "Changing priority of log files to 5\n" | tee -a $logfile
 	sed -i 's/priority.priority = 7/priority.priority = 5/g' $base_dir/app/configurations/logger.ini
 	# Red5 configuration
-	ln -s /opt/kaltura/bin/red5/red /etc/init.d/red5
+	ln -s /opt/kaltura/bin/red5/red5 /etc/init.d/red5
 	chkconfig red5 on
 	service red5 start
 }	
