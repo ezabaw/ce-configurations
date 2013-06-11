@@ -45,39 +45,38 @@ install_kaltura(){
 	fi
 	
 	# Bring in fresh files
-	"cp" templates/AppConfig.class.php $installer_config &>> $logfile
 	"cp" templates/install.php installer/install.php &>> $logfile
-	"cp" templates/user_input.template.ini installer/user_input.template.ini &>> $logfile
-	rm -f installer/user_input.ini &>> $logfile
+	"cp" templates/user_input.template.ini installer/user_input.ini &>> $logfile
 	
 	printf "Configuring kaltura installer\n" | tee -a $logfilg
-	# Set 1
-	# Huge note- the reason I'm doing this modification of a php file is because
-	# when you do silent mode on the installer some values are hard coded and not taken from 
-	# user_input_template. 
-	sed -i "s|%TIME_ZONE%|$time_zone|g" $installer_config &>> $logfile
-	sed -i "s|%BASE_DIR%|$base_dir|g" $installer_config &>> $logfile
-	sed -i "s|%HOSTNAME%|$hostname|g" $installer_config &>> $logfile
-	sed -i "s|%ADMIN_USER%|$admin_user|g" $installer_config &>> $logfile
-	sed -i "s|%ADMIN_PASSWORD%|$admin_pass|g" $installer_config &>> $logfile
-	sed -i "s|%MYSQL_HOST%|$mysql_host|g" $installer_config &>> $logfile
-	sed -i "s|%MYSQL_PORT%|$mysql_port|g" $installer_config	 &>> $logfile
-	sed -i "s|%MYSQL_USER%|$mysql_user|g" $installer_config &>> $logfile
-	sed -i "s|%MYSQL_PASSWORD%|$mysql_password|g" $installer_config &>> $logfile
-	sed -i "s|%CREATE_NEW_DB%|$create_new_db|g" $installer_config &>> $logfile
-	sed -i "s|%SPHINX_HOST%|$sphinx_host|g" $installer_config &>> $logfile
-	sed -i "s|%KENVIORNMENT%|$kenvironment|g" $installer_config &>> $logfile
-	# Set 2 Package path, setting this so it doesn't try to checkout Kaltura from the SVN
+	
+	# Package path, setting this so it doesn't try to checkout Kaltura from the SVN
 	sed -i "s|%PACKAGE_PATH%|$package_path/package|g" installer/install.php &>> $logfile
-	# Set 3 Setting the database passwords to the newly generated ones
-	sed -i "s|DB1_PASS[[:space:]]*=[[:space:]]*.*|DB1_PASS=$mysql_kaltura_password|g" installer/user_input.template.ini
-	sed -i "s|DWH_PASS[[:space:]]*=[[:space:]]*.*|DWH_PASS=$mysql_etl_password|g" installer/user_input.template.ini
 	
+	# Set values in the user_input
+	write_param BASE_DIR $base_dir installer/user_input.ini
+	write_param TIME_ZONE $time_zone installer/user_input.ini
+	write_param ENVIRONMENT_PROTOCOL $kenvironment installer/user_input.ini
+	write_param DB1_CREATE_NEW_DB $create_new_db installer/user_input.ini
+	write_param DB_ROOT_USER $mysql_user installer/user_input.ini
+	write_param DB_ROOT_PASS $mysql_password installer/user_input.ini
+	write_param DB1_HOST $mysql_host installer/user_input.ini
+	write_param DB1_PORT $mysql_port installer/user_input.ini
+	write_param DB1_USER kaltura installer/user_input.ini 
+	write_param DB1_PASS $mysql_kaltura_password installer/user_input.ini
+	write_param DWH_HOST $mysql_host installer/user_input.ini
+	write_param DWH_PORT $mysql_port installer/user_input.ini
+	write_param DWH_USER kaltura_etl installer/user_input.ini
+	write_param DWH_PASS $mysql_etl_password installer/user_input.ini
+	write_param SPHINX_DB_HOST $mysql_host installer/user_input.ini
+	write_param SPHINX_DB_PORT $mysql_port installer/user_input.ini
+	write_param SPHINX_SERVER1 $sphinx_host installer/user_input.ini
+	write_param GOOGLE_ANALYTICS_ACCOUNT UA-7714780-1 installer/user_input.ini
 	
-	# Run the installer in silent mode (-s) with automatic activation key (-a)
+	# Run the installer with automatic activation key (-a)
 	printf "Starting main installer\n"  | tee -a $logfile	
 	cd installer
-	if ! php install.php -s -a| tee -a $logfile;then
+	if ! php install.php -a| tee -a $logfile;then
 		printf "\e[00;31mError:\e[00m Main installation failed, %s\n" "$(tail $logfile)" |tee -a $logfile
 		exit 1
 	fi	
