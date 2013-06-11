@@ -2,7 +2,7 @@
 # Kaltura selector script
 # This changes the configuration of the kaltura installation provided by the first parameter
 
-source functions.rc
+source utils/functions.rc
 usage () {
         printf "Usage: %s --b <kaltura_base_directory>\n" "$0"
 }
