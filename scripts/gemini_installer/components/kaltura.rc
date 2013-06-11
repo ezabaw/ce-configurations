@@ -62,11 +62,11 @@ install_kaltura(){
 	write_param DB_ROOT_PASS $mysql_password installer/user_input.ini
 	write_param DB1_HOST $mysql_host installer/user_input.ini
 	write_param DB1_PORT $mysql_port installer/user_input.ini
-	write_param DB1_USER kaltura installer/user_input.ini 
+	write_param DB1_USER $mysql_kaltura_user installer/user_input.ini 
 	write_param DB1_PASS $mysql_kaltura_password installer/user_input.ini
 	write_param DWH_HOST $mysql_host installer/user_input.ini
 	write_param DWH_PORT $mysql_port installer/user_input.ini
-	write_param DWH_USER kaltura_etl installer/user_input.ini
+	write_param DWH_USER $mysql_etl_user installer/user_input.ini
 	write_param DWH_PASS $mysql_etl_password installer/user_input.ini
 	write_param SPHINX_DB_HOST $mysql_host installer/user_input.ini
 	write_param SPHINX_DB_PORT $mysql_port installer/user_input.ini

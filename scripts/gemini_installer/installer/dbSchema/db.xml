@@ -27,7 +27,7 @@
 		</host>
 	</databases>
 	<users>
-		<user id="kaltura" password="n5RVIlv0wEwP4Ue" fromHost="%">
+		<user id="kaltura" password="AUP6WJIAk16tzGF" fromHost="%">
 			<databases>
 				<database dbname="kaltura" privileges="INSERT,UPDATE,DELETE,SELECT" host="mysql1" id="propel" />
 				<database dbname="kaltura" privileges="SELECT" host="mysql2" id="propel2" />
@@ -36,7 +36,7 @@
 				<database dbname="kaltura_sphinx_log" privileges="SELECT,INSERT,UPDATE" host="mysql1" id="sphinx_log" />
 			</databases>
 		</user>
-		<user id="kaltura_etl" password="pcDVZvCXWauSzRw" fromHost="%">
+		<user id="etl" password="HiTWytwZpx6D4UU" fromHost="%">
 			<databases>
 				<database dbname="kaltura" privileges="SELECT,EXECUTE" host="mysql2" />
 				<database dbname="kalturadw" privileges="INSERT,UPDATE,DELETE,SELECT,EXECUTE" host="mysql1" />
