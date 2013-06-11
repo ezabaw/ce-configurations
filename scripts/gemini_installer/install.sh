@@ -151,6 +151,8 @@ elif [[ $mysql -eq '3' ]];then
 		echo -e "\e[00;32mSuccess!\e[00m"
 	fi
 	create_new_db=0
+elif [[ $mysql -eq '0' ]];then
+	printf "Mysql will not be installed\n"
 else
 	printf "\e[00;33mWarning:\e[00m invalid option for MySQL settings in configuration, this variable is required,skipping\n" | tee -a $logfile
 fi
