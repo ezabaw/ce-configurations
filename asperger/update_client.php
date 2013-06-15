@@ -17,9 +17,10 @@ $engineer=SQLite3::escapeString($_POST['engineer']);
 $version=SQLite3::escapeString($_POST['version']);
 $sharepoint=SQLite3::escapeString($_POST['sharepoint']);
 $notes=SQLite3::escapeString($_POST['notes']);
+$status=SQLite3::escapeString($_POST['status']);
 
 $db=new SQLite3($dbfile) or die("Unable to connect to database $dbfile");
-$query="update customers set name='$name',customer_tech_contact='$tech_contact',pm='$client_pm',am='$client_am',ps_tech_contact='$engineer',on_prem_version='$version',sharepoint='$sharepoint',notes='$notes' where id=$client_id";
+$query="update customers set name='$name',customer_tech_contact='$tech_contact',pm='$client_pm',am='$client_am',ps_tech_contact='$engineer',on_prem_version='$version',sharepoint='$sharepoint',notes='$notes',status='$status' where id=$client_id";
 $db->exec($query);
 if ($db->lastErrorCode()){
     $msg=json_encode("ERROR: on client update: " . $db->lastErrorCode() . ' '.$db->lastErrorMsg().' :(');

@@ -241,10 +241,11 @@ function update_client()
 	var version = document.getElementById('client_on_prem_version').value;
 	var sharepoint = document.getElementById('client_sharepoint').value;
 	var notes = document.getElementById('client_notes').value;
+	var cust_status = document.getElementById('client_status').value;
 	$.ajax({
 			type: 'POST',
 			url: 'update_client.php',
-			data: {'client_id':client_id, 'name':name,'tech_contact':tech_contact,'client_pm':pm,'client_am':am,'engineer':engineer,'version':version,'sharepoint':sharepoint,'notes':notes},
+			data: {'client_id':client_id, 'name':name,'tech_contact':tech_contact,'client_pm':pm,'client_am':am,'engineer':engineer,'version':version,'sharepoint':sharepoint,'notes':notes,'status':cust_status},
 	success:function(data){
 		if (data!==null){
 			message=document.getElementById("client_message");
