@@ -7,7 +7,9 @@ CREATE TABLE customers
     am VARCHAR(128),
     ps_tech_contact VARCHAR(128),
     on_prem_version VARCHAR(128),
-    notes VARCHAR(1024)
+    sharepoint VARCHAR(256),
+    notes VARCHAR(1024),
+    status varchar(25)
 );
 
 CREATE TABLE hosts
