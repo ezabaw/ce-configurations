@@ -46,10 +46,11 @@
 	var ps_tech_contact = document.getElementById('ps_tech_contact').value;
 	var on_prem_version = document.getElementById('on_prem_version').value;
 	var notes = document.getElementById('notes').value;
+	var cust_status = document.getElementById('status').value;
 	$.ajax({
 		  type: 'POST',
 		  url: 'add_customer.php',
-		  data: {'name': name,'customer_tech_contact': customer_tech_contact,'pm': pm, 'am': am, 'ps_tech_contact': ps_tech_contact, 'on_prem_version': on_prem_version, 'notes': notes},
+		  data: {'name': name,'customer_tech_contact': customer_tech_contact,'pm': pm, 'am': am, 'ps_tech_contact': ps_tech_contact, 'on_prem_version': on_prem_version, 'notes': notes,'status':cust_status},
 		  success: function(data){
 		      if (data!==null){
 			  alert(data);
@@ -150,11 +151,15 @@ echo '</table><br>
 	    </li>
 	    <li class="fl">
 		<label for="on_prem_version">OnPrem version:</label>
-		<input type="text" id="on_prem_version" name="on_prem_version" tabindex="40" autocomplete="on">
+		<input type="text" id="on_prem_version" name="on_prem_version" tabindex="40" autocomplete="on" value="Falcon2">
 	    </li>
 	    <li class="fl">
 		<label for="notes">Notes:</label>
 		<input type="text" id="notes" name="notes" tabindex="40" autocomplete="on">
+	    </li>
+	    <li class="fl">
+		<label for="notes">Status:</label>
+		<input type="text" id="status" name="status" tabindex="40" autocomplete="on" value="ACTIVE">
 	    </li>
 	    <li class="fl">
 		<label for="update"></label>

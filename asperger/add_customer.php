@@ -15,8 +15,9 @@ $am=SQLite3::escapeString($_POST['am']);
 $ps_tech_contact=SQLite3::escapeString($_POST['ps_tech_contact']);
 $on_prem_version=SQLite3::escapeString($_POST['on_prem_version']);
 $notes=SQLite3::escapeString($_POST['notes']);
+$status=SQLite3::escapeString($_POST['status']);
 $db=new SQLite3($dbfile) or die("Unable to connect to database $dbfile");
-$query="insert into customers values(NULL,'$name','$customer_tech_contact','$pm','$am','$ps_tech_contact','$on_prem_version',NULL,'$notes',DATE())";
+$query="insert into customers values(NULL,'$name','$customer_tech_contact','$pm','$am','$ps_tech_contact','$on_prem_version',NULL,'$notes',DATE(),'$status')";
 $db->exec($query);
 if ($db->lastErrorCode()){
     $msg=json_encode('ERROR: #' . $db->lastErrorCode() . ' '.$db->lastErrorMsg().' :(');
