@@ -60,7 +60,7 @@ for var in log_file base_dir ntp_server mysql_host mysql_port mysql_user mysql_p
 done
 
 # Packages required for the installer to work, might want to speed this up by performing a check
-if ! yum -y install nc wget ed &>> $logfile | tee -a $logfile;then
+if ! yum -y install wget ed bzip2 &>> $logfile | tee -a $logfile;then
     printf "\e[00;31mError:\e[00mError: unable to install base software which is required by the auto installer\n" | tee -a $logfile
 	exit 1
 fi

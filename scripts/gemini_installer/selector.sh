@@ -39,12 +39,20 @@ fi
 
 # Turn the sphinx service on or off
 set_sphinx(){
-	if [[ $sphinx_status == "yes" ]];then
+	if [ $sphinx_status == "yes" ];then
 		service kaltura_sphinx stop &>> $logfile
+		service kaltura_populate stop &>> $logfile
 		chkconfig kaltura_sphinx off
+		chkconfig kaltura_populate off
+		rm -f /etc/init.d/kaltura_sphinx
+		rm -f /etc/init.d/kaltura_populate
 	else 
+		ln -s $base_dir/app/scripts/kaltura_sphinx.sh /etc/init.d/kaltura_sphinx
+		ln -s $base_dir/app/scripts/kaltura_populate.sh /etc/init.d/kaltura_populate
 		service kaltura_sphinx start &>> $logfile
+		service kaltura_populate start &>> $logfile
 		chkconfig kaltura_sphinx on
+		chkconfig kaltura_populate on
 	fi
 }
 
@@ -64,17 +72,19 @@ check_batch(){
 
 set_batch(){
 	# Turn off all batch processing
-	if [[ $batch_status == "yes" && $transcode_status == "no" ]];then
+	if [ $batch_status == "yes" ]; then
 		service kaltura_batch stop &>> $logfile
 		chkconfig kaltura_batch off
+		rm -f /etc/init.d/kaltura_batch
 	# Turn back on the entire server
 	else
+		ln -s $base_dir/app/scripts/kaltura_batch.sh /etc/init.d/kaltura_batch
 		service kaltura_batch start &>> $logfile
 		chkconfig kaltura_batch on
 		# Change the batch ID
 		printf "Enter a new batch ID ($batch_id)"
 		read answer
-		if [[ ! -z $answer ]];then	
+		if [ ! -z $answer ];then	
 			batch_id=$answer
 		fi
 		write_param id $batch_id $base_dir/app/configurations/batch/scheduler.conf
@@ -93,10 +103,12 @@ check_red5(){
 
 # Change the red5 service
 set_red5(){
-	if [[ $red5_status == "yes" ]];then
+	if [ $red5_status == "yes" ];then
 		service red5 stop &>> $logfile
 		chkconfig red5 off
+		rm -f /etc/init.d/red5
 	else
+		ln -s $base_dir/bin/red5/red5 /etc/init.d/red5
 		service red5 start &>> $logfile
 		chkconfig red5 on
 	fi
@@ -111,10 +123,16 @@ check_httpd(){
 }
 
 set_httpd(){
-	if [[ $httpd_status == "yes" ]];then
+	if [ $httpd_status == "yes" ];then
 		service httpd stop &>> $logfile
 		chkconfig httpd off
+		rm -f /etc/httpd/conf.d/kaltura.conf
+		rm -f /etc/cron.d/cleanup
+		rm -f /etc/cron.d/api
 	else
+		ln -s $base_dir/app/configurations/apache/kaltura.conf /etc/httpd/conf.d/kaltura.conf
+		ln -s $base_dir/app/configurations/cron/api /etc/cron.d/api
+		ln -s $base_dir/app/configurations/cron/cleanup /etc/cron.d/cleanup	
 		service httpd start &>> $logfile
 		chkconfig httpd on
 	fi
@@ -122,7 +140,7 @@ set_httpd(){
 
 # Both files must be present or DWH is assumed to be off
 check_dwh(){
-	if [[ -f /etc/cron.d/dwh && -f /etc/cron.d/dwh_crontab ]];then
+	if [ -f /etc/cron.d/dwh ] ;then
 		dwh_status=yes
 	else
 		dwh_status=no
@@ -130,19 +148,17 @@ check_dwh(){
 }
 
 set_dwh(){
-	if [[ $dwh_status == "yes" ]];then
+	if [ $dwh_status == "no" ];then
 		ln -s $base_dir/app/configurations/cron/dwh /etc/cron.d/dwh
-		ln -s $base_dir/app/configurations/cron/dwh_crontab
 	else 
 		rm -r /etc/cron.d/dwh
-		rm -r /etc/cron.d/dwh_crontab
 	fi
 }
 
 while :
 do
 	# Check the status of each component
-	for var in check_transcode check_batch check_sphinx check_red5 check_httpd check_dwh;do
+	for var in  check_batch check_sphinx check_red5 check_httpd check_dwh;do
 		eval ${var}
 	done
 	#Display current status and options to modify the installation
@@ -155,25 +171,27 @@ Select which mode you would like to switch
 (3) Red5: $red5_status
 (4) API (httpd): $httpd_status
 (5) DWH: $dwh_status
-(q) Quit\
+(0) Quit\
 
 EOL
 
 # I don't like switch, that's why it's this way
 	read answer
-	if [[ $answer -eq 1 ]];then
-		set_batch
-	elif [[ $answer -eq 2 ]];then 
-		set_sphinx
-	elif [[ $answer -eq 3 ]];then
-		set_red5
-	elif [[ $answer -eq 4 ]];then
-		set_httpd
-	elif [[ $answer -eq 5 ]];then
-		set_dwh
-	elif [[ $answer == "q" ]];then
-		exit 0
-	else 
-		printf "Invalid option\n"
+	if [ ! -z $answer ];then
+		if [ $answer -eq 1 ];then
+				set_batch
+		elif [ $answer -eq 2 ];then 
+			set_sphinx
+		elif [ $answer -eq 3 ];then
+			set_red5
+		elif [ $answer -eq 4 ];then
+			set_httpd
+		elif [ $answer -eq 5 ];then
+			set_dwh
+		elif [ $answer -eq 0 ];then
+			exit 0
+		else 
+			printf "Invalid option\n"
+		fi
 	fi
 done

@@ -61,18 +61,18 @@ EOL
 		# Remove all the databases
 		for v in kaltura kaltura_sphinx_log kalturadw kalturadw_bisources kalturadw_ds kalturalog;do
 			if ! do_query "use $v";then
-				printf "%s does not exist\n" "$v"
+				printf "$v does not exist\n" "$v"
 			elif ! do_query "drop database $v";then
-				printf "Unable to drop %s\n" "$v"
+				printf "Unable to drop $v\n" "$v"
 			else	
-				printf "%s dropped\n" "$s"
+				printf "$v dropped\n" "$s"
 			fi
 		done
 		# Remove the kaltura users, since there is no wildcard support this assumes the
 		# installer always creates the same two users
 		for v in kaltura_etl kaltura;do
 			if ! do_query "drop user '$v'@'%'";then
-				printf "Unable to drop user %s\n" "$v"
+				printf "Unable to drop user $v\n" "$v"
 			fi
 		done
 	elif [[ $answer -eq 3 ]];then

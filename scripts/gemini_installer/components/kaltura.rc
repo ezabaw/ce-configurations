@@ -25,7 +25,7 @@ install_kaltura(){
 				printf "Extracting kaltura package archive\n" | tee -a $logfile
 				rm -rf $package_path
 				mkdir -p $package_path
-				if ! tar -zxf $archive_file -C $package_path &>> $logfile;then
+				if ! tar -xjf $archive_file -C $package_path &>> $logfile;then
 					printf "\e[00;31mError:\e[00m unable to extract archive\n" | tee -a $logfile
 					exit 1
 				fi
@@ -47,7 +47,7 @@ install_kaltura(){
 	# Bring in fresh files
 	"cp" templates/install.php installer/install.php &>> $logfile
 	"cp" templates/user_input.template.ini installer/user_input.ini &>> $logfile
-	
+	rm installer/user_input.template.ini	
 	printf "Configuring kaltura installer\n" | tee -a $logfilg
 	
 	# Package path, setting this so it doesn't try to checkout Kaltura from the SVN
@@ -110,6 +110,7 @@ uninstall_kaltura(){
 	rm -f /etc/httpd/conf.d/kaltura.conf
 	rm -f /etc/init.d/kaltura*
 	rm -f /etc/init.d/red5
+	rm -f /etc/nagios/conf.d/kaltura*
 	find /etc/rc.d/ -name '*kaltura*' -exec rm -f {} \;
 	printf "Kaltura removed\n" | tee -a $logfile
 }
