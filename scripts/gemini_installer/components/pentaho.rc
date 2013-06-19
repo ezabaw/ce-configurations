@@ -1,30 +1,30 @@
 install_pentaho(){
-	if [[ -d /usr/local/pentaho ]];then
+	if [ -d /usr/local/pentaho ];then
 		printf "Warning: Pentaho appears to be installed already, should I remove it? (y/n)"
 		read answer
-		if [[ $answer == 'y' ]];then
+		if [ $answer == 'y' ];then
 			uninstall_pentaho
 		else
 			return 0
 		fi
 	fi
-	if ! yum -y install java-1.6.0-openjdk &>> $logfile;then
+	if ! yum -y install java-1.6.0-openjdk >> $logfile 2>&1;then
 		printf "\e[00;31mError:\e[00m unable to install java\n" | tee -a $logfile
 	fi
 	mkdir -p /usr/local/pentaho
 	# Look for the file locally
-	if [[ ! -f $pentaho_file ]]; then
+	if [ ! -f $pentaho_file ]; then
 		printf "Pentaho file not specified, downloading Pentaho\n" | tee -a $logfile
 		wget http://sourceforge.net/projects/pentaho/files/Data%20Integration/4.2.1-stable/pdi-ce-4.2.1-stable.tar.gz -O /tmp/pdi-ce-4.2.1-stable.tar.gz
         pentaho_file="/tmp/pdi-ce-4.2.1-stable.tar.gz"
 	fi
 		
-	if ! tar zxf "$pentaho_file" -C /usr/local/pentaho &>> $logfile;then
+	if ! tar zxf "$pentaho_file" -C /usr/local/pentaho >> $logfile 2>&1;then
 		printf "\e[00;31mError:\e[00m unable to unpack pentaho archive\n" | tee -a $logfile
 		return 1
 	fi
 	mv /usr/local/pentaho/data-integration /usr/local/pentaho/pdi
-    if ! chown -R $kuser:$kgroup /user/local/pentaho &>> $logfile;then
+    if ! chown -R $kuser:$kgroup /user/local/pentaho >> $logfile 2>&1;then
 		printf "\e[00;33mWarning:\e[00m unable to set permissions on pentaho, the user and group probably don't exist yet\n" | tee -a $logfile
 	fi
 	printf "Pentaho sucessfully installed\n" | tee -a $logfile

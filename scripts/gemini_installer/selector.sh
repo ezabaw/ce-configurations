@@ -40,8 +40,8 @@ fi
 # Turn the sphinx service on or off
 set_sphinx(){
 	if [ $sphinx_status == "yes" ];then
-		service kaltura_sphinx stop &>> $logfile
-		service kaltura_populate stop &>> $logfile
+		service kaltura_sphinx stop >> $logfile 2>&1
+		service kaltura_populate stop >> $logfile 2>&1
 		chkconfig kaltura_sphinx off
 		chkconfig kaltura_populate off
 		rm -f /etc/init.d/kaltura_sphinx
@@ -49,8 +49,8 @@ set_sphinx(){
 	else 
 		ln -s $base_dir/app/scripts/kaltura_sphinx.sh /etc/init.d/kaltura_sphinx
 		ln -s $base_dir/app/scripts/kaltura_populate.sh /etc/init.d/kaltura_populate
-		service kaltura_sphinx start &>> $logfile
-		service kaltura_populate start &>> $logfile
+		service kaltura_sphinx start >> $logfile 2>&1
+		service kaltura_populate start >> $logfile 2>&1
 		chkconfig kaltura_sphinx on
 		chkconfig kaltura_populate on
 	fi
@@ -73,13 +73,13 @@ check_batch(){
 set_batch(){
 	# Turn off all batch processing
 	if [ $batch_status == "yes" ]; then
-		service kaltura_batch stop &>> $logfile
+		service kaltura_batch stop >> $logfile 2>&1
 		chkconfig kaltura_batch off
 		rm -f /etc/init.d/kaltura_batch
 	# Turn back on the entire server
 	else
 		ln -s $base_dir/app/scripts/kaltura_batch.sh /etc/init.d/kaltura_batch
-		service kaltura_batch start &>> $logfile
+		service kaltura_batch start >> $logfile 2>&1
 		chkconfig kaltura_batch on
 		# Change the batch ID
 		printf "Enter a new batch ID ($batch_id)"
@@ -104,12 +104,12 @@ check_red5(){
 # Change the red5 service
 set_red5(){
 	if [ $red5_status == "yes" ];then
-		service red5 stop &>> $logfile
+		service red5 stop >> $logfile 2>&1
 		chkconfig red5 off
 		rm -f /etc/init.d/red5
 	else
 		ln -s $base_dir/bin/red5/red5 /etc/init.d/red5
-		service red5 start &>> $logfile
+		service red5 start >> $logfile 2>&1
 		chkconfig red5 on
 	fi
 }
@@ -124,7 +124,7 @@ check_httpd(){
 
 set_httpd(){
 	if [ $httpd_status == "yes" ];then
-		service httpd stop &>> $logfile
+		service httpd stop >> $logfile 2>&1
 		chkconfig httpd off
 		rm -f /etc/httpd/conf.d/kaltura.conf
 		rm -f /etc/cron.d/cleanup
@@ -133,7 +133,7 @@ set_httpd(){
 		ln -s $base_dir/app/configurations/apache/kaltura.conf /etc/httpd/conf.d/kaltura.conf
 		ln -s $base_dir/app/configurations/cron/api /etc/cron.d/api
 		ln -s $base_dir/app/configurations/cron/cleanup /etc/cron.d/cleanup	
-		service httpd start &>> $logfile
+		service httpd start >> $logfile 2>&1
 		chkconfig httpd on
 	fi
 }
@@ -151,14 +151,30 @@ set_dwh(){
 	if [ $dwh_status == "no" ];then
 		ln -s $base_dir/app/configurations/cron/dwh /etc/cron.d/dwh
 	else 
-		rm -r /etc/cron.d/dwh
+		rm -f /etc/cron.d/dwh
+	fi
+}
+check_admin(){
+	if [ -f $base_dir/app/configurations/apache/conf.d/enabled.admin.conf ];then
+		admin_status=yes
+	else
+		admin_status=no
+	fi
+}
+set_admin(){
+	if [ $admin_status == "no" ];then
+		ln -s $base_dir/app/configurations/apache/conf.d/admin.conf $base_dir/app/configurations/apache/conf.d/enabled.admin.conf
+		service httpd reload
+	else
+		rm  -r $base_dir/app/configurations/apache/conf.d/enabled.admin.conf
+		service httpd reload
 	fi
 }
 
 while :
 do
 	# Check the status of each component
-	for var in  check_batch check_sphinx check_red5 check_httpd check_dwh;do
+	for var in  check_batch check_sphinx check_red5 check_httpd check_dwh check_admin;do
 		eval ${var}
 	done
 	#Display current status and options to modify the installation
@@ -171,6 +187,7 @@ Select which mode you would like to switch
 (3) Red5: $red5_status
 (4) API (httpd): $httpd_status
 (5) DWH: $dwh_status
+(6) Admin Console: $admin_status
 (0) Quit\
 
 EOL
@@ -188,6 +205,8 @@ EOL
 			set_httpd
 		elif [ $answer -eq 5 ];then
 			set_dwh
+		elif [ $answer -eq 6 ];then
+			echo "this is not functional at the moment"
 		elif [ $answer -eq 0 ];then
 			exit 0
 		else 

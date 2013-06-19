@@ -3,10 +3,10 @@ install_kaltura(){
 	installer_config=installer/installer/AppConfig.class.php
 		
 	# Check if there is an existing installation
-	if [[ -d $base_dir ]];then
+	if [ -d $base_dir ];then
 		printf "A Kaltura installation was detected or there are configuration files present remove?(y/n)" | tee -a $logfile
 		read answer
-		if [[ $answer == 'y' ]];then
+		if [ $answer == 'y' ];then
 			uninstall_kaltura
 		else
 			printf "Since there is an existing directory and you choose not to remove it the installation can not continue\n" |tee -a $logfile
@@ -14,28 +14,28 @@ install_kaltura(){
 		fi
 	fi
 	# What directory to use
-	if [[ -d $package_path ]];then
+	if [ -d $package_path ];then
 		printf "An existing package directory has been detected, use this instead of extracting the archive? (y/n)\n" | tee -a $logfile
 		read answer
-		if [[ $answer != 'y' ]];then
-			if [[ ! -f $archive_file ]];then
+		if [ $answer != 'y' ];then
+			if [ ! -f $archive_file ];then
 				printf  "\e[00;31mError:\e[00m archive file not found\n" | tee -a $logfile
 				exit 1
 			else
 				printf "Extracting kaltura package archive\n" | tee -a $logfile
 				rm -rf $package_path
 				mkdir -p $package_path
-				if ! tar -xjf $archive_file -C $package_path &>> $logfile;then
+				if ! tar -xjf $archive_file -C $package_path >> $logfile 2>&1;then
 					printf "\e[00;31mError:\e[00m unable to extract archive\n" | tee -a $logfile
 					exit 1
 				fi
 			fi
 		fi
-	elif [[ -f $archive_file ]];then
+	elif [ -f $archive_file ];then
 		printf "Extracting kaltura package archive\n" | tee -a $logfile
 		rm -rf $package_path
 		mkdir -p $package_path
-		if ! tar -zxf $archive_file -C $package_path &>> $logfile;then
+		if ! tar -zxf $archive_file -C $package_path >> $logfile 2>&1;then
 			printf "\e[00;31mError:\e[00m unable to extract archive\n" | tee -a $logfile
 			exit 1
 		fi
@@ -45,13 +45,13 @@ install_kaltura(){
 	fi
 	
 	# Bring in fresh files
-	"cp" templates/install.php installer/install.php &>> $logfile
-	"cp" templates/user_input.template.ini installer/user_input.ini &>> $logfile
-	rm installer/user_input.template.ini	
+	"cp" templates/install.php installer/install.php >> $logfile 2>&1
+	"cp" templates/user_input.template.ini installer/user_input.ini >> $logfile 2>&1
+	rm -f installer/user_input.template.ini	>> $logfile 2>&1
 	printf "Configuring kaltura installer\n" | tee -a $logfilg
 	
 	# Package path, setting this so it doesn't try to checkout Kaltura from the SVN
-	sed -i "s|%PACKAGE_PATH%|$package_path/package|g" installer/install.php &>> $logfile
+	sed -i "s|%PACKAGE_PATH%|$package_path/package|g" installer/install.php >> $logfile 2>&1
 	
 	# Set values in the user_input
 	write_param BASE_DIR $base_dir installer/user_input.ini
@@ -85,17 +85,14 @@ install_kaltura(){
 	# Change the verbosity on log files
 	printf "Changing priority of log files to 5\n" | tee -a $logfile
 	sed -i 's/priority.priority = 7/priority.priority = 5/g' $base_dir/app/configurations/logger.ini
-	# Red5 configuration
-	ln -s /opt/kaltura/bin/red5/red5 /etc/init.d/red5
-	chkconfig red5 on
-	service red5 start
+	
 }	
 
 uninstall_kaltura(){
 	printf "Uninstalling Kaltura\n" | tee -a $logfile
 	for var in kaltura_batch kaltura_monit kaltura_populate kaltura_sphinx red5;do
 		printf "Stopping service %s\n" "$var" | tee -a $logfile
-		service $var stop &>> /dev/null
+		service $var stop &> /dev/null
 		chkconfig $var off
 	done
 	printf "Removing the Kaltura directory\n" | tee -a $logfile
@@ -103,6 +100,7 @@ uninstall_kaltura(){
 	printf "Removing system files\n" | tee -a $logfile
 	rm -f /etc/cron.d/dwh
 	rm -f /etc/cron.d/api
+	rm -f /etc/cron.d/cleanup
 	rm -f /etc/dwh_crontab
 	rm -r /etc/logrotate.d/kaltura*
 	rm -rf /etc/kaltura.d

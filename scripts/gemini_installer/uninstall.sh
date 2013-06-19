@@ -48,7 +48,7 @@ EOL
 
 	read answer
 	# Remove Kaltura
-	if [[ $answer -eq 1 ]];then
+	if [ $answer -eq 1 ];then
 		printf "Removing Kaltura\n"
 		if uninstall_kaltura;then
 			printf "Kaltura successfully removed\n"
@@ -56,7 +56,7 @@ EOL
 			printf "Warning: unable to remove Kaltura\n"
 		fi
 	# Remove the kaltura database
-	elif [[ $answer -eq 2 ]];then
+	elif [ $answer -eq 2 ];then
 		printf "Dropping kaltura MySQL databases\n\n"
 		# Remove all the databases
 		for v in kaltura kaltura_sphinx_log kalturadw kalturadw_bisources kalturadw_ds kalturalog;do
@@ -70,14 +70,14 @@ EOL
 		done
 		# Remove the kaltura users, since there is no wildcard support this assumes the
 		# installer always creates the same two users
-		for v in kaltura_etl kaltura;do
+		for v in $mysql_kaltura_user $mysql_etl_user;do
 			if ! do_query "drop user '$v'@'%'";then
 				printf "Unable to drop user $v\n" "$v"
 			fi
 		done
-	elif [[ $answer -eq 3 ]];then
+	elif [ $answer -eq 3 ];then
 		printf "Not done yet\n"
-	elif [[ $answer == 'q' ]];then
+	elif [ $answer == 'q' ];then
 		exit 0
 	else
 		printf "Invalid selection\n\n"

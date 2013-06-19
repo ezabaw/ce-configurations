@@ -1,6 +1,6 @@
 # Installs and configures the NTP server
 install_ntp(){
-	if ! yum -y install ntp ntpdate &>> $logfile;then
+	if ! yum -y install ntp ntpdate >> $logfile 2>&1;then
 		printf "\e[00;31mWarning:\e[00m unable to install ntp server\n" | tee -a $logfile
 	else
 		printf "Configuring ntp server with the following host: %s\n" "$ntpserver" | tee -a $logfile
@@ -8,12 +8,12 @@ install_ntp(){
 		sed -i '/^server/d' /etc/ntp.conf
 		echo "Server %s" "$ntp_server" >> /etc/ntp.conf
 		printf "Current time %s\n" "$(date)" | tee -a $logfile
-		service ntpd stop &>> $logfile
+		service ntpd stop >> $logfile 2>&1
 		printf "Adjusting time using %s\n" "$ntp_server"
-		if ! ntpdate $ntp_server &>> $logfile;then
+		if ! ntpdate $ntp_server >> $logfile 2>&1;then
 			printf "\e[00;33mWarning:\e[00m unable to adjust time using ntpdate,this may be a firewall issue\n" | tee -a $logfile
 		fi
-		if ! service ntpd start &>> $logfile;then
+		if ! service ntpd start >> $logfile 2>&1;then
 			printf "\e[00;33mWarning:\e[00m unable to start ntp server\n" | tee -a $logfile
 		fi
 		printf "New Time %s\n" "$(date)" | tee -a $logfile
@@ -22,11 +22,11 @@ install_ntp(){
 }
 
 uninstall_ntp(){
-	if ! service ntpd stop &>> $logfile;then
+	if ! service ntpd stop >> $logfile 2>&1;then
 		printf "\e[00;33mWarning:\e[00m unable to stop ntpd for removal\n" | tee -a $logfile
 	fi
 	chkconfig ntpd off
-	if ! yum remove -y ntp ntpdate &>> $logfile;then
+	if ! yum remove -y ntp ntpdate >> $logfile 2>&1;then
 		printf "\e[00;33mWarning:\e[00m unable to remove ntp packages\n" | tee -a $logfile
 	fi
 	printf "NTP server sucessfully uninstalled\n" | tee -a $logfile

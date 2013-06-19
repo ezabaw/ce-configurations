@@ -2,10 +2,7 @@
 #
 # Gemini auto installer
 #
-# The archive file provided in the command line is the kaltura package
-# that is obtained from the svn, stripped of all svn meta data, and is in
-# .tar.bz2
-#
+
 source utils/functions.rc
 source config.ini
 
@@ -52,15 +49,16 @@ do
 done
 
 # Verify configuration file
-for var in log_file base_dir ntp_server mysql_host mysql_port mysql_user mysql_password  hostname kuser kgroup admin_user admin_pass kenvironment time_zone;do
-	if [[ -z $var ]];then
+for var in log_file ;do
+	if [ -z $var ];then
 		printf "The setting %s is missing a value in config.ini\n" "$var" | tee -a $logfile
 		exit 1
 	fi
 done
 
 # Packages required for the installer to work, might want to speed this up by performing a check
-if ! yum -y install wget ed bzip2 &>> $logfile | tee -a $logfile;then
+printf "Installing base packages for the installer...\n" | tee -a $logfile
+if ! yum -y install wget ed >> $logfile 2>&1;then
     printf "\e[00;31mError:\e[00mError: unable to install base software which is required by the auto installer\n" | tee -a $logfile
 	exit 1
 fi
@@ -79,14 +77,14 @@ The following components will be installed
 Proceed?(y/n)
 EOL
 read answer
-if [[ $answer != 'y' ]];then
+if [ $answer != 'y' ];then
 	printf "Quitting\n" | tee -a $logfile
 	exit 0
 fi
 
 #Install each component
 # Pre-requisites
-if [[ $prereq == 'yes' ]];then
+if [ $prereq == 'yes' ];then
 	printf "Installing pre-requesisites\n" | tee -a $logfile
 	if ! install_prereq; then
 		exit 1
@@ -94,14 +92,14 @@ if [[ $prereq == 'yes' ]];then
 fi
 
 # NTP server
-if [[ $ntp ==  'yes' ]];then
+if [ $ntp ==  'yes' ];then
 	printf "Installing and configuring NTP server\n" | tee -a $logfile
 	install_ntp
 fi
 	
 # MySQL Server
 # Option 1 install new MySQL server
-if [[ $mysql -eq '1' ]];then
+if [ $mysql -eq '1' ];then
 	printf "Installing and configuring MySQL\n" | tee -a $logfile
 	# Generate new passwords for kaltura and etl users
 	mysql_kaltura_password=$(</dev/urandom tr -dc A-Za-z0-9 | head -c15)
@@ -117,7 +115,7 @@ if [[ $mysql -eq '1' ]];then
 	create_new_db=1
 
 # Option 2 using existing server but install a new database
-elif [[ $mysql -eq '2' ]];then
+elif [ $mysql -eq '2' ];then
 	printf "You specified an existing mysql server that doesn't contain a Kaltura database, checking connectivity\n" | tee -a $logfile
 	# Test connectivity to the server
 	if ! do_query "quit" &> /dev/null;then
@@ -142,7 +140,7 @@ elif [[ $mysql -eq '2' ]];then
 	# Set the option to create a new database	
 	create_new_db=1
 
-elif [[ $mysql -eq '3' ]];then
+elif [ $mysql -eq '3' ];then
 	printf "You specified an existing mysql server that contains a Kaltura database, checking connectivity\n" | tee -a $logfile
 	# Test connectivity to the server
 	if ! do_query "quit" &> /dev/null;then
@@ -151,14 +149,14 @@ elif [[ $mysql -eq '3' ]];then
 		echo -e "\e[00;32mSuccess!\e[00m"
 	fi
 	create_new_db=0
-elif [[ $mysql -eq '0' ]];then
+elif [ $mysql -eq '0' ];then
 	printf "Mysql will not be installed\n"
 else
 	printf "\e[00;33mWarning:\e[00m invalid option for MySQL settings in configuration, this variable is required,skipping\n" | tee -a $logfile
 fi
 
 # Pentaho
-if [[ $pentaho == 'yes' ]];then
+if [ $pentaho == 'yes' ];then
     printf "Installing and configuring Pentaho\n" | tee -a $logfile
     if ! install_pentaho;then
         exit 1
@@ -166,7 +164,7 @@ if [[ $pentaho == 'yes' ]];then
 fi
 
 # Kaltura
-if [[ $kaltura == 'yes' ]];then
+if [ $kaltura == 'yes' ];then
 	printf  "Installing and configuring Kaltura\n" | tee -a $logfile
 	if ! install_kaltura;then
 		exit 1
@@ -174,7 +172,7 @@ if [[ $kaltura == 'yes' ]];then
 fi
 
 # Patches
-if [[ $patches == 'yes' ]];then
+if [ $patches == 'yes' ];then
 	printf "Applying Patches\n" | tee -a $logfile
 	if ! install_patches;then
 		printf "\e[00;33mWarning:\e[00m unable to apply some or all patches\n" | tee -a $logfile
