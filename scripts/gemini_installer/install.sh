@@ -14,13 +14,12 @@ cat << EOL
  | |/ /   / \  | | |_   _| | | |  _ \    / \   
  | ' /   / _ \ | |   | | | | | | |_) |  / _ \  
  | . \  / ___ \| |___| | | |_| |  _ <  / ___ \ 
- |_|\_\/_/   \_\_____|_|  \___/|_| \_\/_/   \_\
+ |_|\_\/_/   \_\_____|_|  \___/|_| \_\/_/   \_\_
                                                
 											   
 EOL
 printf "Gemini auto installer\n"
 printf "Kaltura install version %s\n" "$(grep -o '[0-9].*' installer/version.ini)" | tee -a $logfile
-printf "Execution Time: %s\n" "$(date)"
 
 
 usage () {
@@ -39,7 +38,7 @@ do
 		shift 2
 		;;
 	-p | --pentaho)
-      	pentaho_file=$2
+      		pentaho_file=$2
 		shift 2
 		;;
 	*)
@@ -48,7 +47,7 @@ do
     esac
 done
 
-# Verify configuration file
+# Verify configuration file, currently not checking anything due to constant changes
 for var in log_file ;do
 	if [ -z $var ];then
 		printf "The setting %s is missing a value in config.ini\n" "$var" | tee -a $logfile
