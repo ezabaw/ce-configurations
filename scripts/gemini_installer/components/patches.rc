@@ -12,5 +12,19 @@ install_patches(){
 	find $base_dir -group apache -exec chgrp kaltura {} \;
 	find $base_dir -user apache -exec chown kaltura {} \;
 
+	printf "Installing patch #3 - Inserting the proper RTMP URL into configuration files" | tee -a $logfile
+	find /opt/kaltura/web/content/uiconf -type f -exec sed -i 's|rtmp://{HOST_NAME}|rtmp://$rtmp_url|g' {} \;
+	find /opt/kaltura/web/content/uiconf -type f -exec sed -i 's|rtmp://kaltura.com|rtmp://$rtmp_url|g' {} \;
+	find /opt/kaltura/web/content/uiconf -type f -exec sed -i 's|rtmp://{DOMAIN_NAME}|rtmp://$rtmp_url|g' {} \;
+	find /opt/kaltura/web/flash -type f -exec sed -i 's|rtmp://{HOST_NAME}|rtmp://$rtmp_url|g' {} \;
+	find /opt/kaltura/web/flash -type f -exec sed -i 's|rtmp://kaltura.com|rtmp://$rtmp_url|g' {} \;
+	find /opt/kaltura/web/flash -type f -exec sed -i 's|rtmp://{DOMAIN_NAME}|rtmp://$rtmp_url|g' {} \;
+	
+	printf "Flushing the cache after all patch" | tee -a $logfile
+	rm -rf /opt/kaltura/app/alpha/cache/*
+	rm -rf /opt/kaltura/app/cache/*
+	rm -rf /opt/kaltura/web/content/cacheswf/*
+	
+	
 	printf "Patching complete" | tee -a $logfile
 }
